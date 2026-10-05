@@ -2,7 +2,7 @@ import { Menu } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Avatar } from '../components/ui/Avatar'
-import { USE_MOCKS } from '../config/env'
+import { MODO_DEMO, USE_MOCKS } from '../config/env'
 import { useSession } from '../hooks/useSession'
 import { PAPEIS } from '../utils/permissions'
 import { Sidebar } from './Sidebar'
@@ -31,8 +31,11 @@ export function AdminLayout() {
             <Menu size={20} />
           </button>
           <span className="topbar__date">{hoje}</span>
-          {USE_MOCKS && (
-            <span className="topbar__env" title="Defina VITE_USE_MOCKS=false para usar a API real">
+          {MODO_DEMO && (
+            <span
+              className="topbar__env"
+              title={USE_MOCKS ? 'Dados de demonstração no navegador (VITE_USE_MOCKS=true)' : 'API conectada, com dados de demonstração carregados pelo seed'}
+            >
               Dados de demonstração
             </span>
           )}
