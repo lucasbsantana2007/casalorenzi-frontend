@@ -18,7 +18,7 @@ export function AdminLayout() {
   const redirectState = useMemo(() => ({ from }), [from])
 
   // Sem sessão da equipe: vai para o login e volta para a página pedida depois de entrar
-  if (!isEquipe) return <Navigate to="/login" replace state={redirectState} />
+  if (!isEquipe) return <Navigate to="/login/equipe" replace state={redirectState} />
 
   return (
     <div className="admin-shell">
