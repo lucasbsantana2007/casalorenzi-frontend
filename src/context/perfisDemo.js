@@ -1,7 +1,7 @@
 import { CLIENTES, USUARIOS } from '../data/seed/pessoas'
 
 // Contas de demonstração exibidas no acesso rápido da tela de login.
-// Válidas apenas com VITE_USE_MOCKS=true.
+// Exibidas com VITE_MODO_DEMO=true (as mesmas contas existem no seed do backend).
 export const PERFIS_DEMO = [1, 2, 6].map((id) => USUARIOS.find((u) => u.id === id))
 
 export const CLIENTE_DEMO = CLIENTES.find((c) => c.id === 101)

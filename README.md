@@ -20,6 +20,7 @@ npm run build
 | ---------------- | ----------------------- | ------------------------------------------------------------------ |
 | `VITE_API_URL`   | `http://127.0.0.1:8000/api` | Endereço da API FastAPI, já com o prefixo `/api`                |
 | `VITE_USE_MOCKS` | `true`                  | `true` usa dados de demonstração em memória; `false` usa a API real |
+| `VITE_MODO_DEMO` | `true`                  | Selo "Dados de demonstração" no painel e acesso rápido no login (funciona também com a API, que usa as mesmas contas do seed); `false` quando houver dados reais |
 
 As variáveis são lidas somente em `src/config/env.js`.
 

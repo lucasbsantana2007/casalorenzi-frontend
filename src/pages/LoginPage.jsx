@@ -7,7 +7,7 @@ import { CheckboxLine } from '../components/auth/CheckboxLine'
 import { LoginShowcase } from '../components/auth/LoginShowcase'
 import { BrandMark } from '../components/BrandMark'
 import { FormError } from '../components/ui/FormError'
-import { USE_MOCKS } from '../config/env'
+import { MODO_DEMO } from '../config/env'
 import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
 import { useSession } from '../hooks/useSession'
 import { PAPEIS } from '../utils/permissions'
@@ -104,7 +104,7 @@ function LoginPage({ area }) {
               </div>
             ) : (
               <>
-              {USE_MOCKS && (
+              {MODO_DEMO && (
                 <>
                   <div className="login__quick">
                     <span className="login__quick-label">Acesso rápido de demonstração</span>
@@ -146,7 +146,7 @@ function LoginPage({ area }) {
 
             <div className="login__footer">
               <p>{config.esqueceu}</p>
-              {USE_MOCKS && (
+              {MODO_DEMO && (
                 <p>
                   Demonstração: use o acesso rápido ou a senha <code>{SENHA_DEMO}</code>.
                 </p>
