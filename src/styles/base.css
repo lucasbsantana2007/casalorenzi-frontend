@@ -28,8 +28,8 @@
   --info-bg: #e7edf6;
 
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /* Títulos em todo o site: condensada em caixa alta */
-  --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  /* Títulos, menus e rótulos em todo o site (fonte de peso único) */
+  --font-display: 'Marcellus', Georgia, 'Times New Roman', serif;
 
   /* Cantos retos, no estilo editorial da loja */
   --radius-sm: 2px;
@@ -61,6 +61,8 @@ body {
   color: var(--text);
   background: var(--bg);
   -webkit-font-smoothing: antialiased;
+  /* A Marcellus só tem peso regular: não deixar o navegador criar um negrito artificial */
+  font-synthesis-weight: none;
   -moz-osx-font-smoothing: grayscale;
 }
 
