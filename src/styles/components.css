@@ -96,7 +96,6 @@
   font-size: 19px;
   font-weight: 400;
   letter-spacing: 0.01em;
-  text-transform: uppercase;
   color: var(--navy-950);
 }
 
@@ -710,7 +709,6 @@
 .page-title {
   font-family: var(--font-display);
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: 40px;
   line-height: 1;

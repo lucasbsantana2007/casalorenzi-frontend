@@ -351,7 +351,6 @@ a.ticket-list__item:hover {
   gap: 12px;
   font-family: var(--font-display);
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: 22px;
   color: var(--navy-950);
@@ -1118,7 +1117,6 @@ a.ticket-list__item:hover {
 .client-hero__title {
   font-family: var(--font-display);
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: 56px;
   line-height: 1;
@@ -1134,7 +1132,6 @@ a.ticket-list__item:hover {
 .client-title {
   font-family: var(--font-display);
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: 42px;
   line-height: 1;
@@ -1161,7 +1158,6 @@ a.ticket-list__item:hover {
   font-size: 20px;
   font-weight: 400;
   letter-spacing: 0.01em;
-  text-transform: uppercase;
   color: var(--navy-950);
 }
 

@@ -44,7 +44,6 @@
 .login__title {
   font-family: var(--font-display);
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: 46px;
   line-height: 1;
@@ -314,7 +313,6 @@
 .login-showcase__title {
   font-family: var(--font-display);
   font-weight: 400;
-  text-transform: uppercase;
   letter-spacing: 0.03em;
   font-size: 30px;
   line-height: 1.15;
