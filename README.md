@@ -18,7 +18,7 @@ npm run build
 
 | Variável         | Padrão                  | Descrição                                                          |
 | ---------------- | ----------------------- | ------------------------------------------------------------------ |
-| `VITE_API_URL`   | `http://127.0.0.1:8000` | Endereço da API FastAPI                                             |
+| `VITE_API_URL`   | `http://127.0.0.1:8000/api` | Endereço da API FastAPI, já com o prefixo `/api`                |
 | `VITE_USE_MOCKS` | `true`                  | `true` usa dados de demonstração em memória; `false` usa a API real |
 
 As variáveis são lidas somente em `src/config/env.js`.
@@ -87,6 +87,8 @@ Para conectar o backend, defina `VITE_USE_MOCKS=false`. As páginas não mudam. 
 Os mocks mantêm alterações (movimentações, transferências, mensagens, produtos) até a página ser recarregada.
 
 ## Contrato esperado da API
+
+Todas as rotas ficam sob o prefixo **`/api`** (ex.: `GET /api/produtos`), pensando no deploy unificado de frontend e backend. O prefixo já faz parte de `VITE_API_URL`; por isso, os caminhos abaixo e os serviços em `src/services` aparecem sem ele.
 
 Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `yyyy-mm-dd`. Erros seguem o padrão do FastAPI, `{ "detail": "mensagem" }`, que é exibido ao usuário. As respostas de listagem devem trazer os relacionamentos já expandidos (`produto`, `variacao`, `loja`, `usuario`...), no formato produzido por `src/services/mock/db.js`.
 
