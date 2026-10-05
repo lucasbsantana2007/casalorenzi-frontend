@@ -42,7 +42,7 @@ function destinoPara(usuario, from) {
 
 function LoginPage({ area }) {
   const config = AREAS[area]
-  const { usuario, login } = useSession()
+  const { usuario, login, logout } = useSession()
   const location = useLocation()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
@@ -50,7 +50,10 @@ function LoginPage({ area }) {
   const [entrando, setEntrando] = useState(false)
   const [error, setError] = useState(null)
 
-  if (usuario) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
+  // Sessão ativa da mesma área: vai direto para ela. Da outra área (ex.: cliente logado
+  // abrindo o login da equipe): mostra a tela com um aviso, em vez de redirecionar em silêncio.
+  const sessaoDeOutraArea = usuario && (usuario.papel === 'CLIENTE') !== (area === 'cliente')
+  if (usuario && !sessaoDeOutraArea) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
 
   async function entrar(credenciais) {
     setError(null)
@@ -84,20 +87,37 @@ function LoginPage({ area }) {
               <p className="muted">{config.descricao}</p>
             </div>
 
-            {USE_MOCKS && (
-              <>
-                <div className="login__quick">
-                  <span className="login__quick-label">Acesso rápido de demonstração</span>
-                  <div className={`login__quick-grid login__quick-grid--${config.contas.length}`}>
-                    {config.contas.map((conta) => (
-                      <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
-                        <strong>{conta.rotulo}</strong>
-                        <span>{conta.nome}</span>
-                      </button>
-                    ))}
-                  </div>
+            {sessaoDeOutraArea ? (
+              <div className="login__session" role="status">
+                <p>
+                  Você está conectado como <strong>{usuario.nome}</strong> ({usuario.papel === 'CLIENTE' ? 'cliente' : PAPEIS[usuario.papel]}). Para entrar com
+                  outra conta, saia primeiro.
+                </p>
+                <div className="login__session-actions">
+                  <Link to={usuario.papel === 'CLIENTE' ? '/cliente' : '/dashboard'} className="btn btn-secondary">
+                    Ir para minha área
+                  </Link>
+                  <button type="button" className="btn btn-primary" onClick={logout}>
+                    Sair e trocar de conta
+                  </button>
                 </div>
-                <div className="login__divider">ou entre com seu e-mail</div>
+              </div>
+            ) : (
+              <>
+              {USE_MOCKS && (
+                <>
+                  <div className="login__quick">
+                    <span className="login__quick-label">Acesso rápido de demonstração</span>
+                    <div className={`login__quick-grid login__quick-grid--${config.contas.length}`}>
+                      {config.contas.map((conta) => (
+                        <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
+                          <strong>{conta.rotulo}</strong>
+                          <span>{conta.nome}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="login__divider">ou entre com seu e-mail</div>
               </>
             )}
 
@@ -121,6 +141,8 @@ function LoginPage({ area }) {
                 {entrando ? 'Entrando…' : 'Entrar'}
               </button>
             </form>
+              </>
+            )}
 
             <div className="login__footer">
               <p>{config.esqueceu}</p>

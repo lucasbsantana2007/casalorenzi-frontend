@@ -418,3 +418,26 @@
     font-size: 28px;
   }
 }
+
+/* Aviso de sessão ativa de outra área */
+.login__session {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--navy-50);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.login__session-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.login__session-actions .btn {
+  height: 40px;
+}
