@@ -1,4 +1,5 @@
 import { LogOut } from 'lucide-react'
+import { useMemo } from 'react'
 import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { BrandMark } from '../components/BrandMark'
 import { useSession } from '../hooks/useSession'
@@ -14,8 +15,11 @@ export function ClientLayout() {
   const { usuario, isCliente } = useSession()
   const location = useLocation()
   const navigate = useNavigate()
+  // Objeto estável: <Navigate> redireciona de novo sempre que o state muda de identidade
+  const from = `${location.pathname}${location.search}`
+  const redirectState = useMemo(() => ({ from }), [from])
 
-  if (!isCliente) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />
+  if (!isCliente) return <Navigate to="/login" replace state={redirectState} />
 
   return (
     <div className="client-shell">
