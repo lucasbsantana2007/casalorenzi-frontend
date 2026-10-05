@@ -1,5 +1,5 @@
 import { Menu } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Avatar } from '../components/ui/Avatar'
 import { USE_MOCKS } from '../config/env'
@@ -13,9 +13,12 @@ export function AdminLayout() {
   const { usuario, isEquipe } = useSession()
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
+  // Objeto estável: <Navigate> redireciona de novo sempre que o state muda de identidade
+  const from = `${location.pathname}${location.search}`
+  const redirectState = useMemo(() => ({ from }), [from])
 
   // Sem sessão da equipe: vai para o login e volta para a página pedida depois de entrar
-  if (!isEquipe) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />
+  if (!isEquipe) return <Navigate to="/login" replace state={redirectState} />
 
   return (
     <div className="admin-shell">

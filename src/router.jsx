@@ -29,7 +29,15 @@ const publica = (carregar, nome) => ({
 })
 
 export const router = createBrowserRouter([
-  { path: '/', ...publica(() => import('./pages/HomePage'), 'HomePage') },
+  {
+    // Loja pública: início, coleções e lojas
+    ...publica(() => import('./layouts/StoreLayout'), 'StoreLayout'),
+    children: [
+      { index: true, ...publica(() => import('./pages/HomePage'), 'HomePage') },
+      { path: 'colecao/:genero', ...publica(() => import('./pages/ColecaoPage'), 'ColecaoPage') },
+      { path: 'lojas', ...publica(() => import('./pages/LojasPage'), 'LojasPage') },
+    ],
+  },
   { path: '/login', ...publica(() => import('./pages/LoginPage'), 'LoginPage') },
   {
     // Painel interno (exige login da equipe)
