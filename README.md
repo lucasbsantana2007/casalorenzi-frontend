@@ -30,11 +30,15 @@ As variáveis são lidas somente em `src/config/env.js`.
    - **`/colecao/masculino` e `/colecao/feminino`:** coleção com filtro por estação.
    - **`/lojas`:** lista das lojas.
    - **Menu:** Masculino, Feminino, Lojas e Atendimento, com Pedidos e Conta à direita. O acesso da equipe é um link discreto no rodapé.
-2. **`/login`: login único para todos.** Não há escolha de tipo de acesso: o papel da conta (`CLIENTE`, `ADMINISTRADOR`, `LOJISTA` ou `OPERADOR`) define a área e as permissões.
+2. **Dois logins:**
+   - **`/login`:** clientes, acessado por "Conta" no topo do site.
+   - **`/login/equipe`:** Administrador, Lojista e Operador, acessado por "Acesso da equipe" no rodapé.
+
+   O papel da conta precisa corresponder ao login usado; caso contrário, a tela indica o login certo e não cria a sessão.
 3. **Depois do login**, o cliente vai para `/cliente` e a equipe para `/dashboard`. Quem tentou abrir uma página protegida volta para ela depois de entrar.
 4. **"Sair"**, nas duas áreas, encerra a sessão e volta para a página inicial.
 
-Com `VITE_USE_MOCKS=true`, o login oferece acesso rápido a um usuário de cada tipo: Cliente (Mariana Costa), Administrador, Lojista e Operador. Qualquer e-mail cadastrado entra com a senha `lorenzi2026`.
+Com `VITE_USE_MOCKS=true`, cada login oferece acesso rápido de demonstração: a cliente Mariana Costa em `/login`, e Administrador, Lojista e Operador em `/login/equipe`. Qualquer e-mail cadastrado entra com a senha `lorenzi2026`.
 
 | Perfil        | Módulos                                                               |
 | ------------- | --------------------------------------------------------------------- |
@@ -45,7 +49,7 @@ Com `VITE_USE_MOCKS=true`, o login oferece acesso rápido a um usuário de cada 
 
 As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-**Público:** `/`, `/colecao/:genero`, `/lojas` e `/login`.
+**Público:** `/`, `/colecao/:genero`, `/lojas`, `/login` e `/login/equipe`.
 
 **Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`.
 

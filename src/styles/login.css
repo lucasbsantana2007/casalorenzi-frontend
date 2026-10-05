@@ -63,8 +63,12 @@
 
 .login__quick-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
+}
+
+.login__quick-grid--1 {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .login__form-wrap > .back-link {
@@ -388,36 +392,22 @@
   .login-showcase__title {
     font-size: 42px;
   }
-  /* Prévias inclinadas saindo pela borda inferior, como no componente original:
-     painel da equipe ao fundo e área do cliente à frente */
+  /* Prévia inclinada saindo pela borda inferior, como no componente original */
   .login-showcase__mockup {
     position: absolute;
+    left: 12%;
+    bottom: -120px;
+    width: 108%;
     margin: 0;
     transform: rotate(-3deg);
     transform-origin: bottom left;
   }
-  .login-showcase__mockup--equipe {
-    left: 34%;
-    bottom: 70px;
-    width: 92%;
-  }
-  .login-showcase__mockup--cliente {
-    z-index: 2;
-    left: 7%;
-    bottom: -50px;
-    width: 64%;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
-  }
-}
-
-/* No celular, uma prévia só */
-@media (max-width: 1023px) {
-  .login-showcase__mockup--equipe {
-    display: none;
-  }
 }
 
 @media (max-width: 480px) {
+  .login__quick-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .login__title {
     font-size: 34px;
   }

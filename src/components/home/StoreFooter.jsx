@@ -14,7 +14,7 @@ export function StoreFooter() {
       </nav>
       <div className="store-footer__bottom">
         <span>© {ANO} Casa Lorenzi</span>
-        <Link to="/login" className="store-footer__staff">
+        <Link to="/login/equipe" className="store-footer__staff">
           Acesso da equipe
         </Link>
       </div>
