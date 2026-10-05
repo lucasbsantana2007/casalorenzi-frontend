@@ -1,0 +1,162 @@
+:root {
+  /* Marca */
+  --navy-950: #0c1628;
+  --navy-900: #14233d;
+  --navy-800: #1d3152;
+  --navy-700: #2a4269;
+  --navy-100: #e6eaf1;
+  --navy-50: #f1f3f7;
+
+  /* Neutros quentes */
+  --bg: #f6f5f2;
+  --surface: #ffffff;
+  --surface-muted: #faf9f7;
+  --border: #e6e2db;
+  --border-strong: #d6d0c6;
+  --text: #1c2230;
+  --text-muted: #6b6a66;
+  --text-subtle: #97938b;
+
+  /* Semânticas (sóbrias) */
+  --success: #2e7255;
+  --success-bg: #e8f2ec;
+  --warning: #9a6513;
+  --warning-bg: #f7efe0;
+  --danger: #a63d35;
+  --danger-bg: #f7e7e5;
+  --info: #2a4b7c;
+  --info-bg: #e7edf6;
+
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px rgba(20, 35, 61, 0.05);
+  --shadow-md: 0 12px 32px -12px rgba(20, 35, 61, 0.22);
+  --focus: 0 0 0 3px rgba(42, 66, 105, 0.22);
+
+  --sidebar-width: 248px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-subtle);
+}
+
+.muted {
+  color: var(--text-muted);
+}
+
+.subtle {
+  color: var(--text-subtle);
+  font-size: 12px;
+}
+
+.mono {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+  letter-spacing: 0.01em;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.text-success {
+  color: var(--success);
+}
+.text-warning {
+  color: var(--warning);
+}
+.text-danger {
+  color: var(--danger);
+}
+.text-info {
+  color: var(--info);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
