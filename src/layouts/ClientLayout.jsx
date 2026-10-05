@@ -20,7 +20,7 @@ export function ClientLayout() {
       <header className="client-header">
         <div className="client-container client-header__inner">
           <Link to="/cliente" className="client-header__brand">
-            <BrandMark subtitle="Atendimento ao cliente" />
+            <BrandMark size="sm" />
           </Link>
           <nav className="client-nav" aria-label="Portal do cliente">
             {LINKS.map((link) => (
