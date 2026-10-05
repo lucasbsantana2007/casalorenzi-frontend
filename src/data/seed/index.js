@@ -3,8 +3,6 @@ import { CATEGORIAS, LOJAS, PRODUTOS } from './catalogo'
 import { buildEstoque, buildVariacoes } from './estoque'
 import { CLIENTES, USUARIOS } from './pessoas'
 
-export { CLIENTE_DEMO_ID } from './pessoas'
-
 // Monta o estado inicial completo dos dados de demonstração.
 export function createSeed() {
   const variacoes = buildVariacoes()
@@ -15,7 +13,7 @@ export function createSeed() {
   return {
     lojas: LOJAS.map((loja) => ({ ...loja })),
     categorias: [...CATEGORIAS],
-    produtos: PRODUTOS.map(({ id, nome, categoria, precoBase, ativo = true }) => ({ id, nome, categoria, precoBase, ativo })),
+    produtos: PRODUTOS.map(({ id, nome, categoria, precoBase, genero, estacao, ativo = true }) => ({ id, nome, categoria, precoBase, genero, estacao, ativo })),
     variacoes,
     usuarios: [...USUARIOS, ...CLIENTES],
     estoques,

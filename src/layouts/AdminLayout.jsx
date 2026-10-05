@@ -1,6 +1,6 @@
 import { Menu } from 'lucide-react'
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { Avatar } from '../components/ui/Avatar'
 import { USE_MOCKS } from '../config/env'
 import { useSession } from '../hooks/useSession'
@@ -10,8 +10,12 @@ import { Sidebar } from './Sidebar'
 const hoje = new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date())
 
 export function AdminLayout() {
-  const { usuario } = useSession()
+  const { usuario, isEquipe } = useSession()
+  const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
+
+  // Sem sessão da equipe: vai para o login e volta para a página pedida depois de entrar
+  if (!isEquipe) return <Navigate to="/login" replace state={{ from: `${location.pathname}${location.search}` }} />
 
   return (
     <div className="admin-shell">
@@ -38,7 +42,7 @@ export function AdminLayout() {
           </div>
         </header>
 
-        {/* key: ao trocar de perfil, a página é remontada com os padrões do novo usuário */}
+        {/* key: ao trocar de usuário, a página é remontada com os padrões do novo perfil */}
         <main className="admin-content" id="conteudo" key={usuario.id}>
           <Outlet />
         </main>

@@ -19,6 +19,3 @@ export const CLIENTES = [
   { id: 107, nome: 'Patrícia Moreira', email: 'patricia.moreira@uol.com.br', telefone: '(11) 98820-5573', clienteDesde: '2018-05-05', lojaPreferidaId: 2 },
   { id: 108, nome: 'Thiago Ribeiro', email: 'thiago.ribeiro@gmail.com', telefone: '(41) 99107-8834', clienteDesde: '2023-09-12', lojaPreferidaId: 4 },
 ].map((cliente) => ({ ...cliente, papel: 'CLIENTE' }))
-
-// Cliente "logado" no portal durante a demonstração
-export const CLIENTE_DEMO_ID = 101

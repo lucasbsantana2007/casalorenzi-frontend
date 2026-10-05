@@ -1,5 +1,6 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter } from 'react-router-dom'
 import { RequireAccess } from './components/RequireAccess'
+import { LoadingState } from './components/ui/LoadingState'
 import { AdminLayout } from './layouts/AdminLayout'
 import { ClientLayout } from './layouts/ClientLayout'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -21,12 +22,19 @@ import { SolicitacaoDetalhePage } from './pages/cliente/SolicitacaoDetalhePage'
 
 const protegida = (modulo, element) => <RequireAccess modulo={modulo}>{element}</RequireAccess>
 
+// Páginas públicas carregadas sob demanda: o shader e as animações ficam fora do pacote principal
+const publica = (carregar, nome) => ({
+  hydrateFallbackElement: <LoadingState />,
+  lazy: async () => ({ Component: (await carregar())[nome] }),
+})
+
 export const router = createBrowserRouter([
+  { path: '/', ...publica(() => import('./pages/HomePage'), 'HomePage') },
+  { path: '/login', ...publica(() => import('./pages/LoginPage'), 'LoginPage') },
   {
-    path: '/',
+    // Painel interno (exige login da equipe)
     element: <AdminLayout />,
     children: [
-      { index: true, element: <Navigate to="/dashboard" replace /> },
       { path: 'dashboard', element: protegida('dashboard', <DashboardPage />) },
       { path: 'estoque', element: protegida('estoque', <EstoquePage />) },
       { path: 'estoque/historico', element: protegida('estoque', <PosicaoEmDataPage />) },
@@ -37,10 +45,10 @@ export const router = createBrowserRouter([
       { path: 'atendimento', element: protegida('atendimento', <AtendimentosPage />) },
       { path: 'atendimento/:id', element: protegida('atendimento', <AtendimentoDetalhePage />) },
       { path: 'financeiro', element: protegida('financeiro', <FinanceiroPage />) },
-      { path: '*', element: <NotFoundPage /> },
     ],
   },
   {
+    // Área do cliente (exige login de cliente)
     path: '/cliente',
     element: <ClientLayout />,
     children: [
@@ -51,5 +59,13 @@ export const router = createBrowserRouter([
       { path: 'solicitacoes/:id', element: <SolicitacaoDetalhePage /> },
       { path: '*', element: <NotFoundPage homePath="/cliente" /> },
     ],
+  },
+  {
+    path: '*',
+    element: (
+      <main className="standalone-page">
+        <NotFoundPage homePath="/" />
+      </main>
+    ),
   },
 ])

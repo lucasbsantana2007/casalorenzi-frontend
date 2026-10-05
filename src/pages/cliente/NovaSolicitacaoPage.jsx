@@ -32,7 +32,8 @@ function Formulario({ tipos }) {
   const { clienteId } = useSession()
   const [params] = useSearchParams()
   const pedidos = useAsync(() => clienteService.listarPedidos(clienteId), [clienteId]).data ?? []
-  const [tipoId, setTipoId] = useState(null)
+  // ?tipo=<id> pré-seleciona o assunto (links de atendimento da página inicial)
+  const [tipoId, setTipoId] = useState(() => tipos.find((t) => t.id === Number(params.get('tipo')))?.id ?? null)
   const [pedidoId, setPedidoId] = useState(params.get('pedido') ?? '')
   const [descricao, setDescricao] = useState('')
   const [saving, setSaving] = useState(false)
