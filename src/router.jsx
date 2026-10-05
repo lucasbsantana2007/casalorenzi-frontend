@@ -11,7 +11,6 @@ import { EstoqueDetalhePage } from './pages/admin/estoque/EstoqueDetalhePage'
 import { EstoquePage } from './pages/admin/estoque/EstoquePage'
 import { MovimentacoesPage } from './pages/admin/estoque/MovimentacoesPage'
 import { PosicaoEmDataPage } from './pages/admin/estoque/PosicaoEmDataPage'
-import { FinanceiroPage } from './pages/admin/FinanceiroPage'
 import { ProdutosPage } from './pages/admin/ProdutosPage'
 import { TransferenciasPage } from './pages/admin/TransferenciasPage'
 import { ClienteHomePage } from './pages/cliente/ClienteHomePage'
@@ -53,7 +52,15 @@ export const router = createBrowserRouter([
       { path: 'transferencias', element: protegida('transferencias', <TransferenciasPage />) },
       { path: 'atendimento', element: protegida('atendimento', <AtendimentosPage />) },
       { path: 'atendimento/:id', element: protegida('atendimento', <AtendimentoDetalhePage />) },
-      { path: 'financeiro', element: protegida('financeiro', <FinanceiroPage />) },
+      {
+        // Carregada sob demanda: os gráficos (recharts) ficam fora do pacote principal
+        path: 'financeiro',
+        hydrateFallbackElement: <LoadingState />,
+        lazy: async () => {
+          const { FinanceiroPage } = await import('./pages/admin/FinanceiroPage')
+          return { element: protegida('financeiro', <FinanceiroPage />) }
+        },
+      },
     ],
   },
   {

@@ -5,5 +5,6 @@ import * as mock from './mock/financeiro'
 export const financeiroService = USE_MOCKS
   ? mock
   : {
-      obterResumo: () => api.get('/financeiro/resumo'),
+      // { de, ate, comparar, agrupar, lojas, canais, categorias, generos } (listas separadas por vírgula)
+      obterResumo: (filtros) => api.get('/financeiro/resumo', filtros),
     }
