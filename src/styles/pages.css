@@ -349,8 +349,11 @@ a.ticket-list__item:hover {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-family: var(--font-serif);
-  font-size: 21px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 22px;
   color: var(--navy-950);
 }
 
@@ -604,10 +607,12 @@ a.ticket-list__item:hover {
 }
 
 .client-hero__title {
-  font-family: var(--font-serif);
-  font-size: 48px;
-  font-weight: 500;
-  line-height: 1.05;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 56px;
+  line-height: 1;
   color: var(--navy-950);
 }
 
@@ -618,12 +623,14 @@ a.ticket-list__item:hover {
 }
 
 .client-title {
-  font-family: var(--font-serif);
-  font-size: 36px;
-  font-weight: 500;
-  line-height: 1.1;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 42px;
+  line-height: 1;
   color: var(--navy-950);
-  margin: 4px 0;
+  margin: 6px 0;
 }
 
 .client-page-header {
@@ -641,8 +648,12 @@ a.ticket-list__item:hover {
 }
 
 .section-heading h2 {
-  font-size: 15px;
+  font-family: var(--font-display);
+  font-size: 20px;
   font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--navy-950);
 }
 
 .shortcut-grid {

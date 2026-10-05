@@ -42,10 +42,12 @@
 }
 
 .login__title {
-  font-family: var(--font-serif);
-  font-size: 40px;
+  font-family: var(--font-display);
   font-weight: 600;
-  line-height: 1.05;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 46px;
+  line-height: 1;
   color: var(--navy-950);
 }
 
@@ -310,11 +312,12 @@
 }
 
 .login-showcase__title {
-  font-family: var(--font-serif);
-  font-size: 34px;
-  font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  font-size: 36px;
+  line-height: 1.02;
   color: rgba(255, 255, 255, 0.94);
 }
 

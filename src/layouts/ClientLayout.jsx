@@ -1,16 +1,17 @@
 import { LogOut } from 'lucide-react'
 import { useMemo } from 'react'
-import { Link, Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { BrandMark } from '../components/BrandMark'
+import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { StoreFooter } from '../components/home/StoreFooter'
+import { StoreHeader } from '../components/home/StoreHeader'
 import { useSession } from '../hooks/useSession'
 
 const LINKS = [
-  { to: '/cliente', label: 'Início', end: true },
-  { to: '/cliente/solicitacoes', label: 'Minhas solicitações' },
-  { to: '/cliente/pedidos', label: 'Meus pedidos' },
+  { to: '/cliente', label: 'Minha conta', end: true },
+  { to: '/cliente/solicitacoes', label: 'Solicitações' },
+  { to: '/cliente/pedidos', label: 'Pedidos' },
 ]
 
-// Área do cliente: experiência separada do painel interno, com a mesma identidade.
+// Área do cliente: mesmo cabeçalho e rodapé da loja, com navegação própria abaixo.
 export function ClientLayout() {
   const { usuario, isCliente } = useSession()
   const location = useLocation()
@@ -22,42 +23,30 @@ export function ClientLayout() {
   if (!isCliente) return <Navigate to="/login" replace state={redirectState} />
 
   return (
-    <div className="client-shell">
-      <header className="client-header">
-        <div className="client-container client-header__inner">
-          <Link to="/cliente" className="client-header__brand">
-            <BrandMark size="sm" />
-          </Link>
-          <nav className="client-nav" aria-label="Área do cliente">
-            {LINKS.map((link) => (
-              <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => `client-nav__link ${isActive ? 'is-active' : ''}`}>
-                {link.label}
-              </NavLink>
-            ))}
-          </nav>
-          <div className="client-header__user">
-            <span>{usuario.nome}</span>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => navigate('/', { state: { sair: true } })}
-            >
-              <LogOut size={14} /> Sair
-            </button>
-          </div>
-        </div>
-      </header>
+    <div className="store">
+      <StoreHeader />
 
-      <main className="client-container client-content">
+      <div className="client-bar">
+        <nav className="client-bar__nav" aria-label="Área do cliente">
+          {LINKS.map((link) => (
+            <NavLink key={link.to} to={link.to} end={link.end} className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
+              {link.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className="client-bar__user">
+          <span>{usuario.nome}</span>
+          <button type="button" onClick={() => navigate('/', { state: { sair: true } })}>
+            <LogOut size={14} aria-hidden="true" /> Sair
+          </button>
+        </div>
+      </div>
+
+      <main className="client-content">
         <Outlet />
       </main>
 
-      <footer className="client-footer">
-        <div className="client-container client-footer__inner">
-          <span>Casa Lorenzi · Oscar Freire · Iguatemi · Leblon · Pátio Batel</span>
-          <Link to="/">Página inicial</Link>
-        </div>
-      </footer>
+      <StoreFooter />
     </div>
   )
 }

@@ -1,13 +1,13 @@
 /* ---------- Loja pública (início, coleções, lojas) ----------
    Estilo editorial: fotos grandes, caixa alta condensada e muito espaço. */
 .store {
-  --store-font: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  --store-font: var(--font-display);
   --store-gutter: 40px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: #fff;
-  color: #111;
+  color: var(--navy-950);
 }
 
 .store main {
@@ -191,7 +191,7 @@
   height: 46px;
   padding: 0 18px;
   border: 0;
-  background: #111;
+  background: var(--navy-900);
   color: #fff;
   font-family: var(--store-font);
   font-size: 18px;
@@ -214,12 +214,12 @@
   font-size: 17px;
   font-weight: 500;
   text-transform: uppercase;
-  color: #888;
+  color: var(--text-subtle);
 }
 
 .store-filters button:hover,
 .store-filters button.is-active {
-  color: #111;
+  color: var(--navy-950);
   text-decoration: underline;
   text-underline-offset: 5px;
 }
@@ -253,7 +253,7 @@
   aspect-ratio: 4 / 5;
   margin-bottom: 20px;
   overflow: hidden;
-  background: #f4f3f1;
+  background: #f1eee8;
 }
 
 .product-card__image img {
@@ -273,7 +273,7 @@
 .product-card p {
   margin-top: 4px;
   font-size: 13px;
-  color: #444;
+  color: var(--navy-700);
 }
 
 /* Lojas */
@@ -283,7 +283,7 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid var(--border);
 }
 
 .store-list li {
@@ -291,7 +291,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 24px 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--border);
   font-family: var(--store-font);
   text-transform: uppercase;
 }
@@ -303,24 +303,34 @@
 
 .store-list span {
   font-size: 18px;
-  color: #666;
+  color: var(--text-muted);
 }
 
-/* Rodapé */
+/* Rodapé: faixa azul-marinho */
 .store-footer {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  margin-top: 96px;
-  padding: 40px var(--store-gutter) 28px;
-  border-top: 1px solid #e5e5e5;
+  gap: 48px;
+  margin-top: 112px;
+  padding: 56px var(--store-gutter) 28px;
+  background: var(--navy-950);
+  color: #f4f1ea;
   font-family: var(--store-font);
   text-transform: uppercase;
+}
+
+.store-footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 32px;
 }
 
 .store-footer__links {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 12px 32px;
   font-size: 17px;
   font-weight: 600;
@@ -328,14 +338,17 @@
 
 .store-footer__bottom {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(244, 241, 234, 0.14);
   font-size: 14px;
-  color: #888;
+  color: #8d98ad;
 }
 
 .store-footer a:hover {
-  color: #111;
+  color: #fff;
   text-decoration: underline;
   text-underline-offset: 5px;
 }
@@ -374,7 +387,7 @@
     flex-wrap: wrap;
     align-content: flex-start;
     background: #fff;
-    color: #111;
+    color: var(--navy-950);
   }
   .store-header.is-open .store-header__secondary {
     display: inline;
