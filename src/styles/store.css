@@ -24,9 +24,9 @@
   gap: 24px;
   padding: 28px var(--store-gutter);
   font-family: var(--store-font);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -122,9 +122,9 @@
   bottom: 40px;
   z-index: 1;
   font-family: var(--store-font);
-  font-size: 20px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
@@ -161,8 +161,8 @@
 .store-heading {
   font-family: var(--store-font);
   font-size: 28px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 400;
+  letter-spacing: 0.04em;
   line-height: 1;
   text-transform: uppercase;
 }
@@ -177,9 +177,10 @@
 
 .store-heading-link {
   font-family: var(--store-font);
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 400;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .store-heading-link:hover {
@@ -194,9 +195,10 @@
   background: var(--navy-900);
   color: #fff;
   font-family: var(--store-font);
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 400;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .store-filters {
@@ -211,10 +213,11 @@
   border: 0;
   background: none;
   font-family: var(--store-font);
-  font-size: 17px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 400;
   text-transform: uppercase;
   color: var(--text-subtle);
+  letter-spacing: 0.08em;
 }
 
 .store-filters button:hover,
@@ -264,9 +267,9 @@
 
 .product-card h3 {
   font-family: var(--store-font);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -297,13 +300,15 @@
 }
 
 .store-list strong {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 600;
+  letter-spacing: 0.04em;
 }
 
 .store-list span {
-  font-size: 18px;
+  font-size: 15px;
   color: var(--text-muted);
+  letter-spacing: 0.06em;
 }
 
 /* Rodapé: faixa azul-marinho */
@@ -332,8 +337,9 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 12px 32px;
-  font-size: 17px;
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: 0.1em;
 }
 
 .store-footer__bottom {
@@ -343,8 +349,9 @@
   gap: 16px;
   padding-top: 20px;
   border-top: 1px solid rgba(244, 241, 234, 0.14);
-  font-size: 14px;
+  font-size: 12px;
   color: #8d98ad;
+  letter-spacing: 0.08em;
 }
 
 .store-footer a:hover {
@@ -422,7 +429,11 @@
     padding-top: 40px;
   }
   .store-heading--lg {
-    font-size: 34px;
+    font-size: 24px;
+  }
+  .store-section__head {
+    flex-wrap: wrap;
+    margin-bottom: 32px;
   }
   .store-list li {
     flex-direction: column;

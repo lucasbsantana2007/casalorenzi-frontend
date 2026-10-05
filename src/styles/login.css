@@ -43,7 +43,7 @@
 
 .login__title {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.01em;
   font-size: 46px;
@@ -313,11 +313,11 @@
 
 .login-showcase__title {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
-  letter-spacing: 0.01em;
-  font-size: 36px;
-  line-height: 1.02;
+  letter-spacing: 0.03em;
+  font-size: 30px;
+  line-height: 1.15;
   color: rgba(255, 255, 255, 0.94);
 }
 
@@ -393,7 +393,7 @@
     padding: 72px 64px 0;
   }
   .login-showcase__title {
-    font-size: 42px;
+    font-size: 34px;
   }
   /* Prévia inclinada saindo pela borda inferior, como no componente original */
   .login-showcase__mockup {
