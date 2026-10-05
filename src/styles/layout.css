@@ -100,32 +100,11 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.sidebar__profile {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 0 4px;
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: #7d8aa1;
-}
-
-.sidebar__profile select {
-  height: 34px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.04);
-  font-size: 12.5px;
-  letter-spacing: 0;
-  text-transform: none;
-  color: #e6eaf1;
-}
-
-.sidebar__profile option {
-  color: var(--text);
+button.sidebar__link {
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
 }
 
 .sidebar-backdrop {
@@ -294,6 +273,9 @@
 }
 
 .client-header__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding-left: 20px;
   border-left: 1px solid var(--border);
   font-size: 13px;
@@ -352,4 +334,12 @@
   .client-content {
     padding-top: 28px;
   }
+}
+
+/* Página avulsa (ex.: 404 fora das áreas logadas) */
+.standalone-page {
+  display: grid;
+  place-items: center;
+  min-height: 100vh;
+  padding: 24px;
 }

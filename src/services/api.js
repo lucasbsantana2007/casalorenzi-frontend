@@ -1,9 +1,8 @@
 import { API_URL } from '../config/env'
+import { getToken } from './authStorage'
 
 // Cliente HTTP central. Nenhum componente deve chamar fetch diretamente:
 // os serviços de domínio (src/services/*Service.js) usam este módulo.
-
-const TOKEN_KEY = 'casalorenzi.token'
 
 export class ApiError extends Error {
   constructor(message, { status = 0, details = null } = {}) {
@@ -11,14 +10,6 @@ export class ApiError extends Error {
     this.name = 'ApiError'
     this.status = status
     this.details = details
-  }
-}
-
-function getToken() {
-  try {
-    return localStorage.getItem(TOKEN_KEY)
-  } catch {
-    return null
   }
 }
 

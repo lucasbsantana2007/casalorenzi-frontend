@@ -2,7 +2,7 @@
 
 Plataforma integrada de gestão das lojas Casa Lorenzi: dashboard consolidado, estoque por loja e SKU com histórico, produtos, transferências entre lojas, atendimento e portal do cliente.
 
-React 19 · Vite · JavaScript · React Router · lucide-react. O backend (FastAPI + PostgreSQL) fica em um repositório separado.
+React 19 · Vite · JavaScript · React Router · lucide-react · motion e @paper-design/shaders-react (página inicial e login). O backend (FastAPI + PostgreSQL) fica em um repositório separado.
 
 ## Como rodar
 
@@ -23,19 +23,29 @@ npm run build
 
 As variáveis são lidas somente em `src/config/env.js`.
 
-## Perfis e rotas
+## Fluxo de acesso e rotas
 
-O seletor **Perfil de acesso (demo)**, no rodapé do menu, alterna entre Administrador, Lojista e Operador. As regras de acesso ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
+1. **`/`: vitrine pública, voltada ao cliente.** Tem a coleção com filtros (Masculino, Feminino, Inverno, Verão), a seção de **Atendimento** (abrir solicitação e, para clientes logados, os próprios atendimentos) e as lojas. No topo ficam "Consultar pedido" e "Minha conta" (login do cliente). O acesso da equipe é um link discreto no rodapé.
+2. **`/login`: login único para todos.** Não há escolha de tipo de acesso: o papel da conta (`CLIENTE`, `ADMINISTRADOR`, `LOJISTA` ou `OPERADOR`) define a área e as permissões.
+3. **Depois do login**, o cliente vai para `/cliente` e a equipe para `/dashboard`. Quem tentou abrir uma página protegida volta para ela depois de entrar.
+4. **"Sair"**, nas duas áreas, encerra a sessão e volta para a página inicial.
 
-| Perfil        | Módulos                                                           |
-| ------------- | ----------------------------------------------------------------- |
+Com `VITE_USE_MOCKS=true`, o login oferece acesso rápido a um usuário de cada tipo: Cliente (Mariana Costa), Administrador, Lojista e Operador. Qualquer e-mail cadastrado entra com a senha `lorenzi2026`.
+
+| Perfil        | Módulos                                                               |
+| ------------- | --------------------------------------------------------------------- |
 | Administrador | Dashboard, Estoque, Produtos, Transferências, Atendimento, Financeiro |
-| Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Atendimento    |
-| Operador      | Dashboard, Estoque, Transferências                                 |
+| Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Atendimento       |
+| Operador      | Dashboard, Estoque, Transferências                                    |
+| Cliente       | Área do cliente                                                       |
+
+As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
+
+**Público:** `/` (vitrine) e `/login`.
 
 **Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`.
 
-**Portal do cliente:** `/cliente`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`, `/cliente/pedidos`.
+**Área do cliente:** `/cliente`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`, `/cliente/pedidos`.
 
 ## Estrutura
 
@@ -47,7 +57,7 @@ src/
     *Service.js          um serviço por domínio: endpoints reais OU mock (mesma interface)
     mock/                implementação em memória dos mesmos serviços
   data/seed/             dados de demonstração determinísticos (catálogo, pessoas, histórico)
-  context/               sessão simulada (usuário e perfil)
+  context/               sessão (login/logout, usuário e permissões)
   hooks/                 useAsync, useDebouncedValue, useSession, useCadastros
   layouts/               AdminLayout (sidebar) e ClientLayout (portal)
   components/ui/         PageHeader, StatCard, StatusBadge, DataTable, Modal, Tabs, estados...
@@ -76,6 +86,9 @@ Os mocks mantêm alterações (movimentações, transferências, mensagens, prod
 
 Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `yyyy-mm-dd`. Erros seguem o padrão do FastAPI, `{ "detail": "mensagem" }`, que é exibido ao usuário. As respostas de listagem devem trazer os relacionamentos já expandidos (`produto`, `variacao`, `loja`, `usuario`...), no formato produzido por `src/services/mock/db.js`.
 
+**Autenticação**
+- `POST /auth/login` com `{ email, senha }` retorna `{ token, usuario: { id, nome, email, papel, lojaId } }`. Serve para equipe e clientes (`papel: 'CLIENTE'`). Em erro, use HTTP 401 com `detail`.
+
 **Cadastros**
 - `GET /lojas`
 - `GET /categorias`
@@ -95,7 +108,7 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - Tipos: `ENTRADA`, `VENDA`, `DEVOLUCAO`, `AJUSTE`, `TRANSFERENCIA_SAIDA`, `TRANSFERENCIA_ENTRADA`
 
 **Produtos**
-- `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`)
+- `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
 - `GET /produtos/{id}`
 - `POST /produtos` e `PUT /produtos/{id}` com `{ nome, categoria, precoBase, ativo, variacoes: [{ id?, sku, tamanho, cor }] }`
 
@@ -114,7 +127,7 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `POST /atendimentos/{id}/mensagens` com `{ conteudo, autorId, autorTipo }`
 - Status: `ABERTO`, `EM_ANDAMENTO`, `AGUARDANDO_CLIENTE`, `CONCLUIDO`
 
-**Portal do cliente** (quando houver autenticação, os endpoints podem virar `/clientes/me/...`)
+**Área do cliente** (com o token, os endpoints podem virar `/clientes/me/...`)
 - `GET /clientes/{id}`
 - `GET /clientes/{id}/atendimentos`
 - `GET /clientes/{id}/atendimentos/{atendimentoId}`
@@ -122,4 +135,8 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `GET /clientes/{id}/pedidos`
 - `GET /clientes/{id}/pedidos/{numero}`
 
-**Autenticação (próximo passo):** `api.js` já envia `Authorization: Bearer <token>` se houver um token salvo em `localStorage` (`casalorenzi.token`). O `SessionProvider` deve passar a obter o usuário por algo como `GET /auth/me`.
+O token recebido no login é enviado em todas as requisições como `Authorization: Bearer <token>`. "Manter conectado" guarda a sessão no `localStorage`; sem essa opção, ela fica no `sessionStorage` e termina ao fechar o navegador.
+
+## Imagens
+
+As fotos da vitrine (`src/assets/colecao/`) são do [Unsplash](https://unsplash.com/license), de uso livre, e servem só para ilustrar. Quando a API devolver `imagemUrl` nos produtos, ela substitui automaticamente a foto ilustrativa (`src/data/imagensProdutos.js`).

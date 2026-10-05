@@ -1,43 +1,34 @@
 import { useMemo, useState } from 'react'
-import { CLIENTE_DEMO_ID } from '../data/seed'
+import { authService } from '../services/authService'
+import { getUsuarioSalvo, limparSessao, salvarSessao } from '../services/authStorage'
 import { podeAcessar } from '../utils/permissions'
-import { PERFIS_DEMO } from './perfisDemo'
 import { SessionContext } from './sessionContext'
 
-const STORAGE_KEY = 'casalorenzi.usuarioId'
-
-function usuarioInicial() {
-  try {
-    const salvo = Number(localStorage.getItem(STORAGE_KEY))
-    return PERFIS_DEMO.find((u) => u.id === salvo) ?? PERFIS_DEMO[0]
-  } catch {
-    return PERFIS_DEMO[0]
-  }
-}
-
-// Sessão simulada. Quando houver login real, este provider passa a obter o usuário
-// a partir do token (ex.: GET /auth/me) e o restante da aplicação não muda.
+// Login único para clientes e equipe: o papel da conta (CLIENTE, ADMINISTRADOR,
+// LOJISTA, OPERADOR) define a área e as permissões. O token é enviado pela camada
+// de API em todas as requisições (Authorization: Bearer).
 export function SessionProvider({ children }) {
-  const [usuario, setUsuario] = useState(usuarioInicial)
+  const [usuario, setUsuario] = useState(getUsuarioSalvo)
 
-  const value = useMemo(
-    () => ({
+  const value = useMemo(() => {
+    const isCliente = usuario?.papel === 'CLIENTE'
+    return {
       usuario,
-      clienteId: CLIENTE_DEMO_ID,
-      pode: (modulo) => podeAcessar(usuario.papel, modulo),
-      trocarPerfil: (id) => {
-        const proximo = PERFIS_DEMO.find((u) => u.id === Number(id))
-        if (!proximo) return
-        setUsuario(proximo)
-        try {
-          localStorage.setItem(STORAGE_KEY, String(proximo.id))
-        } catch {
-          // armazenamento indisponível: o perfil vale só para esta sessão
-        }
+      isCliente,
+      isEquipe: Boolean(usuario) && !isCliente,
+      clienteId: isCliente ? usuario.id : null,
+      pode: (modulo) => Boolean(usuario) && podeAcessar(usuario.papel, modulo),
+      login: async ({ email, senha, manterConectado }) => {
+        const sessao = await authService.login({ email, senha })
+        salvarSessao(sessao, manterConectado)
+        setUsuario(sessao.usuario)
       },
-    }),
-    [usuario],
-  )
+      logout: () => {
+        limparSessao()
+        setUsuario(null)
+      },
+    }
+  }, [usuario])
 
   return <SessionContext.Provider value={value}>{children}</SessionContext.Provider>
 }
