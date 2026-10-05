@@ -4,9 +4,14 @@ import { getUsuarioSalvo, limparSessao, salvarSessao } from '../services/authSto
 import { podeAcessar } from '../utils/permissions'
 import { SessionContext } from './sessionContext'
 
-// Login único para clientes e equipe: o papel da conta (CLIENTE, ADMINISTRADOR,
-// LOJISTA, OPERADOR) define a área e as permissões. O token é enviado pela camada
-// de API em todas as requisições (Authorization: Bearer).
+const LOGIN_CERTO = {
+  cliente: 'Esta é uma conta da equipe. Entre pelo "Acesso da equipe", no rodapé do site.',
+  equipe: 'Esta é uma conta de cliente. Entre por "Conta", no topo do site.',
+}
+
+// Há dois logins: clientes (/login) e equipe (/login/equipe). O papel da conta
+// (CLIENTE, ADMINISTRADOR, LOJISTA, OPERADOR) precisa corresponder ao login usado
+// e define as permissões. O token é enviado pela camada de API (Authorization: Bearer).
 export function SessionProvider({ children }) {
   const [usuario, setUsuario] = useState(getUsuarioSalvo)
 
@@ -18,8 +23,10 @@ export function SessionProvider({ children }) {
       isEquipe: Boolean(usuario) && !isCliente,
       clienteId: isCliente ? usuario.id : null,
       pode: (modulo) => Boolean(usuario) && podeAcessar(usuario.papel, modulo),
-      login: async ({ email, senha, manterConectado }) => {
+      // area: 'cliente' | 'equipe'
+      login: async ({ email, senha, manterConectado, area }) => {
         const sessao = await authService.login({ email, senha })
+        if ((sessao.usuario.papel === 'CLIENTE') !== (area === 'cliente')) throw new Error(LOGIN_CERTO[area])
         salvarSessao(sessao, manterConectado)
         setUsuario(sessao.usuario)
       },

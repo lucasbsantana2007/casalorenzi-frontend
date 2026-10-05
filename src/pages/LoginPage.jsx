@@ -12,8 +12,26 @@ import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
 import { useSession } from '../hooks/useSession'
 import { PAPEIS } from '../utils/permissions'
 
-// Contas do acesso rápido: uma por tipo de usuário
-const CONTAS_DEMO = [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }, ...PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] }))]
+// Dois logins com a mesma tela: clientes (/login) e equipe (/login/equipe)
+const AREAS = {
+  cliente: {
+    titulo: 'Entrar',
+    descricao: 'Acesse sua conta para acompanhar pedidos e atendimentos.',
+    placeholder: 'seu@email.com',
+    contas: [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }],
+    esqueceu: 'Esqueceu a senha? Fale com a sua loja Casa Lorenzi.',
+  },
+  equipe: {
+    titulo: 'Acesso da equipe',
+    descricao: 'Painel de gestão para administradores, lojistas e operadores.',
+    placeholder: 'nome@casalorenzi.com.br',
+    contas: PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] })),
+    esqueceu: 'Esqueceu a senha? Fale com o administrador da sua loja.',
+  },
+}
+
+export const LoginClientePage = () => <LoginPage area="cliente" />
+export const LoginEquipePage = () => <LoginPage area="equipe" />
 
 // Destino após o login: a página que levou até aqui (se for da área do usuário) ou a área padrão
 function destinoPara(usuario, from) {
@@ -22,8 +40,8 @@ function destinoPara(usuario, from) {
   return cliente ? '/cliente' : '/dashboard'
 }
 
-// Login único: o tipo da conta (cliente, administrador, lojista, operador) define a área.
-export function LoginPage() {
+function LoginPage({ area }) {
+  const config = AREAS[area]
   const { usuario, login } = useSession()
   const location = useLocation()
   const [email, setEmail] = useState('')
@@ -38,7 +56,7 @@ export function LoginPage() {
     setError(null)
     setEntrando(true)
     try {
-      await login({ ...credenciais, manterConectado })
+      await login({ ...credenciais, manterConectado, area })
     } catch (err) {
       setError(err)
       setEntrando(false)
@@ -62,16 +80,16 @@ export function LoginPage() {
             <BrandMark />
 
             <div className="login__heading">
-              <h1 className="login__title">Entrar</h1>
-              <p className="muted">Use seu e-mail e senha. Você será levado direto para a sua área.</p>
+              <h1 className="login__title">{config.titulo}</h1>
+              <p className="muted">{config.descricao}</p>
             </div>
 
             {USE_MOCKS && (
               <>
                 <div className="login__quick">
                   <span className="login__quick-label">Acesso rápido de demonstração</span>
-                  <div className="login__quick-grid">
-                    {CONTAS_DEMO.map((conta) => (
+                  <div className={`login__quick-grid login__quick-grid--${config.contas.length}`}>
+                    {config.contas.map((conta) => (
                       <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
                         <strong>{conta.rotulo}</strong>
                         <span>{conta.nome}</span>
@@ -90,7 +108,7 @@ export function LoginPage() {
                 entrar({ email, senha })
               }}
             >
-              <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="username" required />
+              <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder={config.placeholder} autoComplete="username" required />
               <AuthField label="Senha" type="password" value={senha} onChange={setSenha} placeholder="Digite sua senha" autoComplete="current-password" required />
 
               <CheckboxLine checked={manterConectado} onChange={setManterConectado}>
@@ -105,17 +123,17 @@ export function LoginPage() {
             </form>
 
             <div className="login__footer">
-              <p>Esqueceu a senha? Fale com a sua loja Casa Lorenzi.</p>
+              <p>{config.esqueceu}</p>
               {USE_MOCKS && (
                 <p>
-                  Demonstração: use o acesso rápido ou qualquer e-mail cadastrado com a senha <code>{SENHA_DEMO}</code>.
+                  Demonstração: use o acesso rápido ou a senha <code>{SENHA_DEMO}</code>.
                 </p>
               )}
             </div>
           </div>
         </section>
 
-        <LoginShowcase />
+        <LoginShowcase area={area} />
       </main>
     </MotionConfig>
   )

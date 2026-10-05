@@ -38,7 +38,8 @@ export const router = createBrowserRouter([
       { path: 'lojas', ...publica(() => import('./pages/LojasPage'), 'LojasPage') },
     ],
   },
-  { path: '/login', ...publica(() => import('./pages/LoginPage'), 'LoginPage') },
+  { path: '/login', ...publica(() => import('./pages/LoginPage'), 'LoginClientePage') },
+  { path: '/login/equipe', ...publica(() => import('./pages/LoginPage'), 'LoginEquipePage') },
   {
     // Painel interno (exige login da equipe)
     element: <AdminLayout />,

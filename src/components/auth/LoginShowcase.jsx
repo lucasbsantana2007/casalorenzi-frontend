@@ -11,42 +11,55 @@ const reveal = (delay = 0, y = 16, blur = 6) => ({
   transition: { duration: 0.8, delay, ease: EASE },
 })
 
-function Janela({ url, imagem, alt, className, delay }) {
-  return (
-    <div className={`login-showcase__mockup ${className}`}>
-      <motion.div className="login-showcase__window" {...reveal(delay, 72, 10)} transition={{ duration: 1, delay, ease: [0.16, 1, 0.3, 1] }}>
-        <div className="login-showcase__bar" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-          <small>{url}</small>
-        </div>
-        <img src={imagem} alt={alt} />
-      </motion.div>
-    </div>
-  )
+const CONTEUDO = {
+  cliente: {
+    eyebrow: 'Casa Lorenzi · Sua conta',
+    titulo: 'Seus pedidos e atendimentos, acompanhados de perto.',
+    texto: 'Trocas, devoluções, ajustes de costura e rastreio de entregas.',
+    url: 'casalorenzi.com.br/cliente',
+    imagem: previewCliente,
+    alt: 'Prévia da área do cliente',
+  },
+  equipe: {
+    eyebrow: 'Casa Lorenzi · Acesso da equipe',
+    titulo: 'Estoque, transferências e atendimento das quatro lojas, em um só lugar.',
+    texto: 'Oscar Freire · Iguatemi São Paulo · Leblon · Pátio Batel',
+    url: 'casalorenzi.com.br/dashboard',
+    imagem: previewEquipe,
+    alt: 'Prévia do painel da equipe',
+  },
 }
 
-// Painel de apresentação do login: um só acesso leva cada conta à sua área.
-export function LoginShowcase() {
+// Painel de apresentação do login, com conteúdo da área (cliente ou equipe).
+export function LoginShowcase({ area }) {
+  const c = CONTEUDO[area]
   return (
     <div className="login-showcase">
       <FlutedBackdrop />
 
       <div className="login-showcase__content">
         <motion.p className="login-showcase__eyebrow" {...reveal(0, 12)}>
-          Casa Lorenzi · Acesso único
+          {c.eyebrow}
         </motion.p>
         <motion.h2 className="login-showcase__title" {...reveal(0.12, 18, 8)}>
-          Uma conta, e cada um no seu lugar.
+          {c.titulo}
         </motion.h2>
         <motion.p className="login-showcase__text" {...reveal(0.2, 18, 8)}>
-          Clientes acompanham pedidos e atendimentos. A equipe gerencia estoque, transferências e o atendimento das quatro lojas.
+          {c.texto}
         </motion.p>
       </div>
 
-      <Janela url="casalorenzi.com.br/dashboard" imagem={previewEquipe} alt="Prévia do painel da equipe" className="login-showcase__mockup--equipe" delay={0.3} />
-      <Janela url="casalorenzi.com.br/cliente" imagem={previewCliente} alt="Prévia da área do cliente" className="login-showcase__mockup--cliente" delay={0.45} />
+      <div className="login-showcase__mockup">
+        <motion.div className="login-showcase__window" {...reveal(0.3, 72, 10)} transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
+          <div className="login-showcase__bar" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <small>{c.url}</small>
+          </div>
+          <img src={c.imagem} alt={c.alt} />
+        </motion.div>
+      </div>
     </div>
   )
 }
