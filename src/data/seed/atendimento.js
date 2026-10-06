@@ -10,6 +10,7 @@ export const TIPOS_SOLICITACAO = [
   { id: 5, titulo: 'Reserva em outra loja', categoria: 'Disponibilidade', exigeVenda: false, ordemExibicao: 5, ativo: true, descricao: 'Reservar uma peça disponível em outra unidade.' },
   { id: 6, titulo: 'Dúvida sobre produto', categoria: 'Informações', exigeVenda: false, ordemExibicao: 6, ativo: true, descricao: 'Medidas, composição e cuidados com a peça.' },
   { id: 7, titulo: 'Reclamação', categoria: 'Qualidade', exigeVenda: false, ordemExibicao: 7, ativo: true, descricao: 'Relate um problema com produto ou atendimento.' },
+  { id: 8, titulo: 'Outro assunto', categoria: 'Outros', exigeVenda: false, ordemExibicao: 8, ativo: true, descricao: 'Qualquer outra dúvida ou pedido.' },
 ]
 
 // Pedidos de venda (consultados pelo portal do cliente e vinculados a atendimentos)

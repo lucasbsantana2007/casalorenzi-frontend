@@ -15,9 +15,7 @@ export function StoreFooter() {
           <Link to="/colecao/masculino">Masculino</Link>
           <Link to="/colecao/feminino">Feminino</Link>
           <Link to="/lojas">Lojas</Link>
-          <Link to="/cliente/solicitacoes">Atendimento</Link>
-          <Link to="/cliente/pedidos">Consultar pedido</Link>
-          <Link to="/login">Conta</Link>
+          <Link to="/meus-pedidos">Meus pedidos</Link>
         </nav>
       </div>
       <div className="store-footer__bottom">

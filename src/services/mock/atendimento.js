@@ -10,9 +10,22 @@ function pedidoView(pedido) {
   }
 }
 
-function clienteView(id) {
+// Compras sem conta: o atendimento guarda o contato informado no pedido
+function contatoView(contato) {
+  return {
+    id: null,
+    nome: contato.nome,
+    email: contato.email,
+    telefone: contato.telefone || '—',
+    clienteDesde: null,
+    totalPedidos: db.pedidos.filter((p) => p.contato?.email === contato.email).length,
+    totalAtendimentos: db.atendimentos.filter((a) => a.contato?.email === contato.email).length,
+  }
+}
+
+function clienteView(id, contato) {
   const cliente = byId(db.usuarios, id)
-  if (!cliente) return null
+  if (!cliente) return contato ? contatoView(contato) : null
   const { id: clienteId, nome, email, telefone, clienteDesde } = cliente
   return {
     id: clienteId,
@@ -30,7 +43,7 @@ export function atendimentoView(atendimento, { detalhado = false } = {}) {
   const view = {
     ...atendimento,
     tipoSolicitacao: byId(db.tiposSolicitacao, atendimento.tipoSolicitacaoId),
-    cliente: { id: atendimento.solicitanteId, nome: byId(db.usuarios, atendimento.solicitanteId)?.nome },
+    cliente: { id: atendimento.solicitanteId, nome: byId(db.usuarios, atendimento.solicitanteId)?.nome ?? atendimento.contato?.nome },
     responsavel: usuarioResumo(atendimento.responsavelId),
     loja: byId(db.lojas, atendimento.lojaId),
     ultimaMensagem: ultima ? { autorTipo: ultima.autorTipo, conteudo: ultima.conteudo, enviadoEm: ultima.enviadoEm } : null,
@@ -38,7 +51,7 @@ export function atendimentoView(atendimento, { detalhado = false } = {}) {
   if (!detalhado) return view
   return {
     ...view,
-    cliente: clienteView(atendimento.solicitanteId),
+    cliente: clienteView(atendimento.solicitanteId, atendimento.contato),
     pedido: pedidoView(byId(db.pedidos, atendimento.pedidoId)),
     mensagens: db.mensagens
       .filter((m) => m.atendimentoId === atendimento.id)

@@ -153,7 +153,7 @@ function Detalhe({ atendimento, onUpdate }) {
                 </div>
                 <div>
                   <dt>Cliente desde</dt>
-                  <dd>{formatDate(`${atendimento.cliente.clienteDesde}T12:00:00`)}</dd>
+                  <dd>{atendimento.cliente.clienteDesde ? formatDate(`${atendimento.cliente.clienteDesde}T12:00:00`) : 'Compra sem conta'}</dd>
                 </div>
                 <div>
                   <dt>Histórico</dt>
