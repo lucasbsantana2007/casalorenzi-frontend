@@ -6,12 +6,11 @@ import { ProductGrid } from '../components/home/ProductGrid'
 import { useAsync } from '../hooks/useAsync'
 import { produtosService } from '../services/produtosService'
 
-// Intercala masculino e feminino para a seleção da estação
+// Peças em destaque no início, na ordem em que aparecem (ids dos produtos)
+const DESTAQUES = [11, 7, 6]
+
 function selecaoDaEstacao(produtos) {
-  const inverno = produtos.filter((p) => p.estacao === 'Inverno')
-  const masc = inverno.filter((p) => p.genero === 'Masculino')
-  const fem = inverno.filter((p) => p.genero === 'Feminino')
-  return [masc[0], fem[0], masc[1], fem[1]].filter(Boolean)
+  return DESTAQUES.map((id) => produtos.find((p) => p.id === id)).filter(Boolean)
 }
 
 // Início: duas fotos grandes e uma seleção curta de peças. Nada além disso.

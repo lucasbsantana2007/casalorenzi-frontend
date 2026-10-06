@@ -14,7 +14,7 @@ export const PRODUTOS = [
   { id: 1, genero: 'Masculino', estacao: 'Verão', nome: 'Camisa de Linho Toscana', categoria: 'Camisaria', precoBase: 489, codigo: 'CML', tamanhos: ['P', 'M', 'G'], cores: ['Branco', 'Azul Céu'] },
   { id: 2, genero: 'Masculino', estacao: 'Atemporal', nome: 'Camisa de Linho Positano', categoria: 'Camisaria', precoBase: 369, codigo: 'COX', tamanhos: ['P', 'M', 'G'], cores: ['Marinho'] },
   { id: 3, genero: 'Masculino', estacao: 'Verão', nome: 'Calça de Linho Amalfi', categoria: 'Alfaiataria', precoBase: 649, codigo: 'CAL', tamanhos: ['40', '42', '44'], cores: ['Grafite', 'Marinho'] },
-  { id: 4, genero: 'Masculino', estacao: 'Inverno', nome: 'Blazer Milano', categoria: 'Alfaiataria', precoBase: 1490, codigo: 'BLZ', tamanhos: ['48', '50', '52'], cores: ['Marinho'] },
+  { id: 4, genero: 'Masculino', estacao: 'Inverno', nome: 'Jaqueta de Camurça Capri', categoria: 'Outerwear', precoBase: 1490, codigo: 'JCC', tamanhos: ['48', '50', '52'], cores: ['Caramelo'] },
   { id: 5, genero: 'Feminino', estacao: 'Verão', nome: 'Vestido Midi de Seda', categoria: 'Vestidos', precoBase: 1190, codigo: 'VMS', tamanhos: ['P', 'M', 'G'], cores: ['Off-white', 'Verde Oliva'] },
   { id: 6, genero: 'Feminino', estacao: 'Inverno', nome: 'Suéter de Cashmere Gola Careca', categoria: 'Tricô', precoBase: 1290, codigo: 'SCC', tamanhos: ['P', 'M', 'G'], cores: ['Camel'] },
   { id: 7, genero: 'Feminino', estacao: 'Inverno', nome: 'Cardigã de Lã Merino', categoria: 'Tricô', precoBase: 789, codigo: 'CLM', tamanhos: ['P', 'M', 'G'], cores: ['Cinza Mescla'] },

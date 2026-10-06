@@ -4,6 +4,7 @@ import { ProductGrid } from '../components/home/ProductGrid'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { EmptyState } from '../components/ui/EmptyState'
 import { useAsync } from '../hooks/useAsync'
+import { ordenarVitrine } from '../data/imagensProdutos'
 import { produtosService } from '../services/produtosService'
 import { NotFoundPage } from './NotFoundPage'
 
@@ -22,7 +23,7 @@ export function ColecaoPage() {
 
   if (!nome) return <NotFoundPage homePath="/" />
 
-  const produtos = (state.data ?? []).filter((p) => p.genero === nome && daEstacao(p, estacao))
+  const produtos = ordenarVitrine((state.data ?? []).filter((p) => p.genero === nome && daEstacao(p, estacao)))
 
   return (
     <main className="store-section store-section--page">

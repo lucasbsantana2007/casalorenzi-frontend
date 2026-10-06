@@ -45,6 +45,16 @@
   color: #fff;
 }
 
+/* Sobre a foto: sombra discreta para o logo e o menu continuarem legíveis em céus claros */
+.store-header.is-transparent .brand__logo {
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45));
+}
+
+.store-header.is-transparent a,
+.store-header.is-transparent button {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
 .store-header__actions,
 .store-header__nav {
   white-space: nowrap;
@@ -119,6 +129,8 @@
 .split-hero__half::after {
   content: '';
   position: absolute;
+  /* Acima da foto mesmo durante o zoom do hover (o transform da imagem a traria para a frente) */
+  z-index: 1;
   left: 0;
   right: 0;
   pointer-events: none;
@@ -126,8 +138,8 @@
 
 .split-hero__half::before {
   top: 0;
-  height: 160px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent);
+  height: 280px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3) 45%, transparent);
 }
 
 .split-hero__half::after {
@@ -140,7 +152,7 @@
   position: absolute;
   left: var(--store-gutter);
   bottom: 40px;
-  z-index: 1;
+  z-index: 2;
   font-family: var(--store-font);
   font-size: 16px;
   font-weight: 400;
@@ -158,7 +170,7 @@
   position: absolute;
   right: var(--store-gutter);
   bottom: 42px;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Seções */
