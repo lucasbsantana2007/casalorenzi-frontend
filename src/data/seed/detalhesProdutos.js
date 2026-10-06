@@ -7,14 +7,14 @@ export const DETALHES_PRODUTOS = {
     cuidados: 'Lavar à mão em água fria. Secar à sombra. Passar a ferro morno com o tecido ainda úmido.',
   },
   2: {
-    descricao: 'A camisa de todo dia, em algodão Oxford de trama encorpada e modelagem slim. Colarinho com botões e pala nas costas para mais conforto ao longo do dia.',
-    composicao: '100% algodão',
-    cuidados: 'Lavar na máquina a 30 °C. Não usar secadora. Passar a ferro médio.',
+    descricao: 'Camisa de manga longa em linho lavado, de toque macio e caimento solto. Colarinho clássico e punhos que ficam bem dobrados, para os dias de sol na costa.',
+    composicao: '100% linho',
+    cuidados: 'Lavar à mão em água fria. Secar à sombra. Passar a ferro morno com o tecido ainda úmido.',
   },
   3: {
-    descricao: 'Calça de alfaiataria em lã fria com pregas frontais e vinco marcado. O tecido respira e quase não amassa, acompanhando do escritório ao jantar.',
-    composicao: '98% lã, 2% elastano',
-    cuidados: 'Somente lavagem a seco. Pendurar pelo cós após o uso.',
+    descricao: 'Calça em linho com cós de elástico e cordão, bolsos laterais e barra reta. Leve e fresca, vai da praia ao jantar à beira-mar.',
+    composicao: '100% linho',
+    cuidados: 'Lavar à mão ou na máquina em ciclo delicado, em água fria. Secar à sombra.',
   },
   4: {
     descricao: 'Blazer de dois botões com construção meio-forrada e ombros naturais, inspirado na alfaiataria de Milão. Lapela entalhada e bolsos com lapela.',
