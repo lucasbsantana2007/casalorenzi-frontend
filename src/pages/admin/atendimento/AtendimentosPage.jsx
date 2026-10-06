@@ -15,7 +15,7 @@ import { useSession } from '../../../hooks/useSession'
 import { atendimentoService } from '../../../services/atendimentoService'
 import { cadastrosService } from '../../../services/cadastrosService'
 import { formatDate, formatRelative } from '../../../utils/format'
-import { statusOptions } from '../../../utils/status'
+import { etapaDoAtendimento, ETAPAS_ATENDIMENTO } from '../../../utils/status'
 
 const PREFIXO_AUTOR = { CLIENTE: '', ATENDENTE: 'Equipe: ', SISTEMA: 'Sistema: ' }
 
@@ -55,7 +55,7 @@ const columns = [
       </>
     ),
   },
-  { key: 'status', header: 'Status', render: (a) => <StatusBadge type="atendimento" value={a.status} /> },
+  { key: 'status', header: 'Status', render: (a) => <StatusBadge type="atendimentoPainel" value={a.status} /> },
   {
     key: 'responsavel',
     header: 'Responsável',
@@ -89,8 +89,12 @@ export function AtendimentosPage() {
   )
 
   const todos = state.data ?? []
-  const pertence = (a, valor) => valor === 'TODOS' || a.status === valor
-  const tabs = [{ value: 'TODOS', label: 'Todos' }, ...statusOptions('atendimento')].map((tab) => ({ ...tab, count: todos.filter((a) => pertence(a, tab.value)).length }))
+  const pertence = (a, aba) => aba === 'TODOS' || etapaDoAtendimento(a.status) === aba
+  const tabs = [{ value: 'TODOS', label: 'Todos' }, ...ETAPAS_ATENDIMENTO].map(({ value, label }) => ({
+    value,
+    label,
+    count: todos.filter((a) => pertence(a, value)).length,
+  }))
 
   return (
     <>

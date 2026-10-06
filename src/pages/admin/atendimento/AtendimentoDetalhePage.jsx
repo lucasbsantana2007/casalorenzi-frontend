@@ -14,7 +14,7 @@ import { useEquipe } from '../../../hooks/useCadastros'
 import { useSession } from '../../../hooks/useSession'
 import { atendimentoService } from '../../../services/atendimentoService'
 import { formatDate, formatDateTime } from '../../../utils/format'
-import { statusOptions } from '../../../utils/status'
+import { etapaDoAtendimento, ETAPAS_ATENDIMENTO } from '../../../utils/status'
 
 export function AtendimentoDetalhePage() {
   const { id } = useParams()
@@ -65,7 +65,7 @@ function Detalhe({ atendimento, onUpdate }) {
         description={`Aberto em ${formatDateTime(atendimento.criadoEm)} · ${atendimento.loja?.nome ?? 'Sem loja'}`}
         actions={
           <>
-            <StatusBadge type="atendimento" value={atendimento.status} />
+            <StatusBadge type="atendimentoPainel" value={atendimento.status} />
             {atendimento.responsavelId !== usuario.id && (
               <button type="button" className="btn btn-secondary" disabled={saving} onClick={() => atualizar({ responsavelId: usuario.id, status: atendimento.status === 'ABERTO' ? 'EM_ANDAMENTO' : undefined })}>
                 <UserCheck size={16} /> Assumir atendimento
@@ -106,8 +106,13 @@ function Detalhe({ atendimento, onUpdate }) {
             </div>
             <div className="card__body stack-sm">
               <Field label="Status">
-                <select className="select" value={atendimento.status} disabled={saving} onChange={(e) => atualizar({ status: e.target.value })}>
-                  {statusOptions('atendimento').map((o) => (
+                <select
+                  className="select"
+                  value={etapaDoAtendimento(atendimento.status)}
+                  disabled={saving}
+                  onChange={(e) => atualizar({ status: e.target.value })}
+                >
+                  {ETAPAS_ATENDIMENTO.map((o) => (
                     <option key={o.value} value={o.value}>
                       {o.label}
                     </option>

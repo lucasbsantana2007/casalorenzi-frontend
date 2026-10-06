@@ -201,7 +201,7 @@ function DashboardContent({ resumo, pode }) {
                   <>
                     <div className="ticket-list__top">
                       <span className="mono">{a.protocolo}</span>
-                      <StatusBadge type="atendimento" value={a.status} />
+                      <StatusBadge type="atendimentoPainel" value={a.status} />
                     </div>
                     <strong>{a.cliente.nome}</strong>
                     <span className="subtle">
