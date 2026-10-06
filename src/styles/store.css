@@ -572,38 +572,140 @@ button.pdp__cta:hover:not(:disabled) {
 }
 
 .store-list li {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 24px 0;
   border-bottom: 1px solid var(--border);
   font-family: var(--store-font);
-  text-transform: uppercase;
 }
 
-.store-list strong {
+.store-list__toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  width: 100%;
+  padding: 24px 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.store-list__toggle:disabled {
+  cursor: default;
+}
+
+.store-list__toggle:focus-visible {
+  outline: 2px solid var(--navy-700);
+  outline-offset: 4px;
+}
+
+.store-list__toggle strong {
   font-size: 22px;
   font-weight: 600;
   letter-spacing: 0.04em;
 }
 
-.store-list span {
+.store-list__toggle span {
   font-size: 15px;
   color: var(--text-muted);
   letter-spacing: 0.06em;
 }
 
-.store-list li strong,
-.store-list li span {
+.store-list__toggle strong,
+.store-list__toggle span {
   transition: color 0.2s ease;
 }
 
-.store-list li.is-ativa strong {
+.store-list__seta {
+  margin-left: 10px;
+  vertical-align: 0.1em;
+  color: var(--text-muted);
+  transition: transform 0.25s ease, color 0.2s ease;
+}
+
+.store-list__toggle[aria-expanded='true'] .store-list__seta {
+  transform: rotate(180deg);
+}
+
+.store-list li.is-ativa .store-list__seta {
   color: var(--navy-700);
 }
 
-.store-list li.is-ativa span {
+.store-list li.is-ativa .store-list__toggle strong {
+  color: var(--navy-700);
+}
+
+.store-list li.is-ativa .store-list__toggle span {
   color: var(--navy-950);
+}
+
+/* Foto e informações da loja aberta, embaixo do nome */
+.store-list__detalhes {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 28px;
+  animation: store-list-abrir 0.25s ease-out;
+}
+
+.store-list__detalhes img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--border);
+}
+
+.store-list__detalhes dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 24px;
+  margin: 0;
+}
+
+.store-list__detalhes dt {
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.store-list__detalhes dd {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--navy-950);
+}
+
+/* Endereço ocupa a linha inteira; contato e horários dividem a de baixo */
+.store-list__detalhes dl > div:first-child {
+  grid-column: 1 / -1;
+}
+
+.store-list__detalhes a {
+  color: inherit;
+  text-underline-offset: 3px;
+}
+
+@keyframes store-list-abrir {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .store-list__detalhes {
+    animation: none;
+  }
 }
 
 /* Mapa das lojas: mapa à esquerda, lista à direita (empilha no celular) */
@@ -611,10 +713,13 @@ button.pdp__cta:hover:not(:disabled) {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   gap: 64px;
-  align-items: center;
+  align-items: start;
 }
 
+/* O mapa fica parado enquanto a lista cresce ao abrir uma loja */
 .mapa-lojas {
+  position: sticky;
+  top: 32px;
   width: 100%;
   max-width: 600px;
   justify-self: center;
@@ -644,8 +749,17 @@ button.pdp__cta:hover:not(:disabled) {
 }
 
 .mapa-lojas__loja {
-  cursor: default;
+  cursor: pointer;
   transition: opacity 0.2s ease;
+}
+
+.mapa-lojas__loja:focus {
+  outline: none;
+}
+
+.mapa-lojas__loja:focus-visible .mapa-lojas__ponto {
+  stroke: var(--navy-700);
+  stroke-width: 0.5;
 }
 
 .mapa-lojas__loja.is-apagada {
@@ -706,6 +820,7 @@ button.pdp__cta:hover:not(:disabled) {
   }
 
   .mapa-lojas {
+    position: static;
     max-width: 440px;
   }
 }
@@ -849,8 +964,11 @@ button.pdp__cta:hover:not(:disabled) {
     flex-wrap: wrap;
     margin-bottom: 32px;
   }
-  .store-list li {
+  .store-list__toggle {
     flex-direction: column;
     gap: 4px;
+  }
+  .store-list__detalhes dl {
+    grid-template-columns: 1fr;
   }
 }
