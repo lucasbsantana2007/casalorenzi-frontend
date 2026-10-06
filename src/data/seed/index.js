@@ -1,5 +1,6 @@
 import { buildAtendimentos, buildPedidos, TIPOS_SOLICITACAO } from './atendimento'
 import { CATEGORIAS, LOJAS, PRODUTOS } from './catalogo'
+import { DETALHES_PRODUTOS } from './detalhesProdutos'
 import { buildEstoque, buildVariacoes } from './estoque'
 import { CLIENTES, USUARIOS } from './pessoas'
 
@@ -13,7 +14,16 @@ export function createSeed() {
   return {
     lojas: LOJAS.map((loja) => ({ ...loja })),
     categorias: [...CATEGORIAS],
-    produtos: PRODUTOS.map(({ id, nome, categoria, precoBase, genero, estacao, ativo = true }) => ({ id, nome, categoria, precoBase, genero, estacao, ativo })),
+    produtos: PRODUTOS.map(({ id, nome, categoria, precoBase, genero, estacao, ativo = true }) => ({
+      id,
+      nome,
+      categoria,
+      precoBase,
+      genero,
+      estacao,
+      ativo,
+      ...DETALHES_PRODUTOS[id],
+    })),
     variacoes,
     usuarios: [...USUARIOS, ...CLIENTES],
     estoques,

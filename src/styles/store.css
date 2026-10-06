@@ -2,6 +2,10 @@
    Estilo editorial: fotos grandes, caixa alta condensada e muito espaço. */
 .store {
   --store-font: var(--font-display);
+  /* Texto corrido da loja em Segoe UI (Windows). Onde ela não existe (iPhone, Mac, Android),
+     todos recebem a Open Sans, a mais parecida. Títulos e menus seguem na Marcellus. */
+  --font-sans: 'Segoe UI', 'Open Sans', sans-serif;
+  font-family: var(--font-sans);
   --store-gutter: 40px;
   display: flex;
   flex-direction: column;
@@ -279,6 +283,254 @@
   color: var(--navy-700);
 }
 
+a.product-card:hover h3 {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
+a.product-card:hover .product-card__image img {
+  transform: scale(1.02);
+}
+
+.product-card__image img {
+  transition: transform 0.8s ease;
+}
+
+/* Página de produto: foto ocupa toda a metade esquerda, informações à direita */
+.pdp {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  border-top: 1px solid var(--border);
+}
+
+.pdp__media {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 560px;
+  background: #f1eee8;
+}
+
+.pdp__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+}
+
+.pdp__info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 560px;
+  padding: 56px var(--store-gutter) 96px 64px;
+}
+
+.pdp__crumbs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-family: var(--store-font);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--navy-700);
+}
+
+.pdp__crumbs a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.pdp__title {
+  font-family: var(--store-font);
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--navy-950);
+}
+
+.pdp__price {
+  margin-top: 10px;
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--navy-700);
+}
+
+.pdp__options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.pdp__options--single {
+  grid-template-columns: 1fr;
+}
+
+.pdp__field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pdp__select {
+  width: 100%;
+  height: 48px;
+  padding: 0 40px 0 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: 0;
+  background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%230c1628' stroke-width='1.6'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center;
+  appearance: none;
+  color: var(--navy-950);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pdp__select:focus {
+  outline: none;
+  border-color: var(--navy-950);
+  box-shadow: var(--focus);
+}
+
+
+.pdp__cta {
+  display: grid;
+  place-items: center;
+  height: 56px;
+  margin-top: 28px;
+  background: var(--navy-950);
+  color: #fff;
+  font-family: var(--store-font);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+}
+
+a.pdp__cta:hover {
+  background: var(--navy-800);
+}
+
+.pdp__cta--off {
+  background: #8a8f99;
+  cursor: not-allowed;
+}
+
+.pdp__description {
+  margin-top: 32px;
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--navy-950);
+}
+
+.pdp__note {
+  margin-top: 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--navy-800);
+}
+
+.pdp__sections {
+  margin-top: 36px;
+  border-top: 1px solid var(--border);
+}
+
+.pdp-section {
+  border-bottom: 1px solid var(--border);
+}
+
+.pdp-section__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px 0;
+  border: 0;
+  background: none;
+  color: var(--navy-950);
+  font-family: var(--store-font);
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.pdp-section__body {
+  padding-bottom: 20px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--navy-800);
+}
+
+.pdp-section__body a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.pdp-stores {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pdp-stores li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+}
+
+.pdp-stores li + li {
+  border-top: 1px solid var(--border);
+}
+
+.pdp-stores small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pdp-stores__status {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pdp-stores__status--on { color: var(--success); }
+.pdp-stores__status--low { color: var(--warning); }
+.pdp-stores__status--off { color: var(--text-subtle); }
+
+.pdp-details {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.pdp-details dt {
+  color: var(--text-muted);
+}
+
+.pdp-details dd {
+  margin: 0;
+}
+
+.pdp__share {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--navy-950);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
 /* Lojas */
 .store-list {
   display: flex;
@@ -368,6 +620,21 @@
 }
 
 @media (max-width: 900px) {
+  .pdp {
+    grid-template-columns: 1fr;
+  }
+  .pdp__media {
+    position: relative;
+    height: 75svh;
+    min-height: 420px;
+  }
+  .pdp__info {
+    max-width: none;
+    padding: 32px var(--store-gutter) 64px;
+  }
+  .pdp__title {
+    font-size: 26px;
+  }
   .store {
     --store-gutter: 20px;
   }
