@@ -1,7 +1,6 @@
 import { motion } from 'motion/react'
 import previewCliente from '../../assets/login-preview-cliente.jpg'
 import previewEquipe from '../../assets/login-preview-equipe.jpg'
-import { FlutedBackdrop } from './FlutedBackdrop'
 
 const EASE = [0.22, 1, 0.36, 1]
 
@@ -22,7 +21,7 @@ const CONTEUDO = {
   },
   equipe: {
     eyebrow: 'Casa Lorenzi · Acesso da equipe',
-    titulo: 'Estoque, transferências e atendimento das quatro lojas, em um só lugar.',
+    titulo: 'Estoque, transferências e atendimento de todas as lojas, em um só lugar.',
     texto: 'Oscar Freire · Lago Sul · Leblon · Pátio Batel · Belvedere',
     url: 'casalorenzi.com.br/dashboard',
     imagem: previewEquipe,
@@ -30,12 +29,11 @@ const CONTEUDO = {
   },
 }
 
-// Painel de apresentação do login, com conteúdo da área (cliente ou equipe).
+// Painel de apresentação do login (azul-marinho), com conteúdo da área (cliente ou equipe).
 export function LoginShowcase({ area }) {
   const c = CONTEUDO[area]
   return (
     <div className="login-showcase">
-      <FlutedBackdrop />
 
       <div className="login-showcase__content">
         <motion.p className="login-showcase__eyebrow" {...reveal(0, 12)}>
