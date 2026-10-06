@@ -1,6 +1,7 @@
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
+import { useSacola } from '../../hooks/useSacola'
 import { useSession } from '../../hooks/useSession'
 import { BrandMark } from '../BrandMark'
 
@@ -8,16 +9,14 @@ const NAV = [
   { to: '/colecao/masculino', label: 'Masculino' },
   { to: '/colecao/feminino', label: 'Feminino' },
   { to: '/lojas', label: 'Lojas' },
-  { to: '/cliente/solicitacoes', label: 'Atendimento' },
+  { to: '/meus-pedidos', label: 'Atendimento' },
 ]
 
 // Cabeçalho da loja. `overlay`: texto claro sobre a foto do início.
 export function StoreHeader({ overlay = false }) {
-  const { usuario, isCliente, isEquipe } = useSession()
+  const { isEquipe } = useSession()
+  const { quantidadeTotal, abrir: abrirSacola } = useSacola()
   const [menuAberto, setMenuAberto] = useState(false)
-  const conta = isEquipe
-    ? { to: '/dashboard', label: 'Painel' }
-    : { to: isCliente ? '/cliente' : '/login', label: isCliente ? usuario.nome.split(' ')[0] : 'Conta' }
   const fechar = () => setMenuAberto(false)
 
   return (
@@ -35,14 +34,23 @@ export function StoreHeader({ overlay = false }) {
       </nav>
 
       <div className="store-header__actions">
-        {!isEquipe && (
-          <Link to="/cliente/pedidos" className="store-header__secondary" onClick={fechar}>
-            Pedidos
+        {/* Clientes não têm login; só a equipe logada vê o atalho do painel */}
+        {isEquipe && (
+          <Link to="/dashboard" onClick={fechar}>
+            Painel
           </Link>
         )}
-        <Link to={conta.to} onClick={fechar}>
-          {conta.label}
-        </Link>
+        <button
+          type="button"
+          className="store-header__bag"
+          onClick={() => {
+            fechar()
+            abrirSacola()
+          }}
+          aria-label={`Abrir sacola, ${quantidadeTotal} ${quantidadeTotal === 1 ? 'item' : 'itens'}`}
+        >
+          Sacola ({quantidadeTotal})
+        </button>
         <button type="button" className="store-header__menu" onClick={() => setMenuAberto((v) => !v)} aria-expanded={menuAberto} aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}>
           {menuAberto ? <X size={20} /> : <Menu size={20} />}
         </button>

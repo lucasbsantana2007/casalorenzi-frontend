@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { StoreFooter } from '../components/home/StoreFooter'
 import { StoreHeader } from '../components/home/StoreHeader'
+import { SacolaLateral } from '../components/loja/SacolaLateral'
 import { useSession } from '../hooks/useSession'
 
 // Layout público da loja (início, coleções e lojas).
@@ -24,6 +25,7 @@ export function StoreLayout() {
       <StoreHeader overlay={location.pathname === '/'} />
       <Outlet />
       <StoreFooter />
+      <SacolaLateral />
     </div>
   )
 }
