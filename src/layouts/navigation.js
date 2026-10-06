@@ -1,8 +1,9 @@
-import { ArrowLeftRight, Boxes, Headset, LayoutDashboard, Shirt, Wallet } from 'lucide-react'
+import { ArrowLeftRight, Boxes, Headset, LayoutDashboard, Shirt, ShoppingBag, Wallet } from 'lucide-react'
 
 // Itens do menu interno. `modulo` liga cada item às regras de utils/permissions.js.
 export const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, modulo: 'dashboard' },
+  { to: '/pedidos', label: 'Pedidos', icon: ShoppingBag, modulo: 'pedidos' },
   { to: '/estoque', label: 'Estoque', icon: Boxes, modulo: 'estoque' },
   { to: '/produtos', label: 'Produtos', icon: Shirt, modulo: 'produtos' },
   { to: '/transferencias', label: 'Transferências', icon: ArrowLeftRight, modulo: 'transferencias' },

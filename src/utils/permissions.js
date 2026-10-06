@@ -10,6 +10,8 @@ export const PAPEIS = {
 const ACESSO = {
   dashboard: ['ADMINISTRADOR', 'LOJISTA', 'OPERADOR'],
   estoque: ['ADMINISTRADOR', 'LOJISTA', 'OPERADOR'],
+  // Lojista e operador veem os pedidos que a própria loja expede
+  pedidos: ['ADMINISTRADOR', 'LOJISTA', 'OPERADOR'],
   produtos: ['ADMINISTRADOR'],
   transferencias: ['ADMINISTRADOR', 'OPERADOR'],
   atendimento: ['ADMINISTRADOR', 'LOJISTA'],
