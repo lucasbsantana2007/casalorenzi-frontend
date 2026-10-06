@@ -19,7 +19,7 @@ export function StoreFooter() {
         </nav>
       </div>
       <div className="store-footer__bottom">
-        <span>© {ANO} Casa Lorenzi · Oscar Freire · Iguatemi · Leblon · Pátio Batel</span>
+        <span>© {ANO} Casa Lorenzi · Oscar Freire · Lago Sul · Leblon · Pátio Batel · Belvedere</span>
         <Link to="/login/equipe" className="store-footer__staff">
           Acesso da equipe
         </Link>

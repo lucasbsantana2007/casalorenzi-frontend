@@ -89,7 +89,7 @@ const ROTEIROS = [
     mensagens: [['CLIENTE', 'O suéter de cashmere que comprei começou a formar bolinhas depois de duas lavagens à mão, seguindo a etiqueta. Gostaria de uma avaliação.', 0]],
   },
   {
-    clienteId: 106, tipoId: 6, status: 'CONCLUIDO', responsavelId: 2, dias: 9,
+    clienteId: 106, tipoId: 6, status: 'CONCLUIDO', responsavelId: 8, dias: 9,
     mensagens: [
       ['CLIENTE', 'Qual a composição do blazer Milano? Ele amassa muito em viagem?', 0],
       ['ATENDENTE', 'Gustavo, o Blazer Milano é 98% lã fria e 2% elastano, com ótima recuperação. Recomendamos transportá-lo em capa e pendurá-lo ao chegar.', 1],
@@ -119,7 +119,7 @@ const ROTEIROS = [
     clienteId: 102, tipoId: 6, status: 'AGUARDANDO_CLIENTE', responsavelId: 3, dias: 4,
     mensagens: [
       ['CLIENTE', 'O trench coat tem forro removível?', 0],
-      ['ATENDENTE', 'Ricardo, o forro não é removível, mas é em viscose leve, ideal para meia-estação. Quer que eu reserve um para você provar no Iguatemi?', 2],
+      ['ATENDENTE', 'Ricardo, o forro não é removível, mas é em viscose leve, ideal para meia-estação. Quer que eu reserve um para você provar no Lago Sul?', 2],
     ],
   },
   {

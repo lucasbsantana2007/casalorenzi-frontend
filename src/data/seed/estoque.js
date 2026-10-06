@@ -39,9 +39,9 @@ function buildTransferencias(rand, variacoes) {
     [6, 'CONCLUIDA'], [4, 'EM_TRANSITO'], [3, 'EM_TRANSITO'], [2, 'EM_TRANSITO'], [1, 'SOLICITADA'], [0, 'SOLICITADA'],
   ]
   return roteiro.map(([dias, status], index) => {
-    const lojaOrigemId = rand.int(1, 4)
-    let lojaDestinoId = rand.int(1, 4)
-    if (lojaDestinoId === lojaOrigemId) lojaDestinoId = (lojaOrigemId % 4) + 1
+    const lojaOrigemId = rand.int(1, LOJAS.length)
+    let lojaDestinoId = rand.int(1, LOJAS.length)
+    if (lojaDestinoId === lojaOrigemId) lojaDestinoId = (lojaOrigemId % LOJAS.length) + 1
     const criadoEm = daysAgo(dias, rand.int(9, 12), rand.int(0, 59))
     const recebidoEm = status === 'CONCLUIDA' ? criadoEm + rand.int(20, 60) * 3600000 : null
     return {
@@ -52,7 +52,7 @@ function buildTransferencias(rand, variacoes) {
       lojaDestinoId,
       quantidade: rand.int(1, 3),
       status,
-      solicitanteId: rand.pick([1, 2, 3, 4, 5]),
+      solicitanteId: rand.pick([1, 2, 3, 4, 5, 8]),
       responsavelId: operador(lojaOrigemId),
       criadoEm,
       enviadoEm: ['EM_TRANSITO', 'CONCLUIDA'].includes(status) ? criadoEm + 2 * 3600000 : null,
@@ -64,7 +64,7 @@ function buildTransferencias(rand, variacoes) {
 
 function eventosAleatorios(rand, loja, produto) {
   const eventos = []
-  const intensidadeVenda = { 1: 0.13, 2: 0.11, 3: 0.1, 4: 0.07 }[loja.id] * (produto.ativo === false ? 0.3 : 1)
+  const intensidadeVenda = { 1: 0.13, 2: 0.11, 3: 0.1, 4: 0.07, 5: 0.09 }[loja.id] * (produto.ativo === false ? 0.3 : 1)
   for (let dia = HISTORY_DAYS - 1; dia >= 0; dia--) {
     if (rand.chance(intensidadeVenda)) {
       eventos.push({

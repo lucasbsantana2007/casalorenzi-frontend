@@ -23,7 +23,7 @@ const CONTEUDO = {
   equipe: {
     eyebrow: 'Casa Lorenzi · Acesso da equipe',
     titulo: 'Estoque, transferências e atendimento das quatro lojas, em um só lugar.',
-    texto: 'Oscar Freire · Iguatemi São Paulo · Leblon · Pátio Batel',
+    texto: 'Oscar Freire · Lago Sul · Leblon · Pátio Batel · Belvedere',
     url: 'casalorenzi.com.br/dashboard',
     imagem: previewEquipe,
     alt: 'Prévia do painel da equipe',

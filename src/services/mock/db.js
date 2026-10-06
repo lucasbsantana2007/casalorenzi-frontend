@@ -6,7 +6,7 @@ import { statusEstoque } from '../../utils/estoque'
 // Fica salvo no navegador (localStorage): pedidos, PINs, movimentações etc. sobrevivem a recarregar
 // a página e valem em todas as abas. Mudar VERSAO descarta os dados salvos e recria a partir do seed.
 const CHAVE = 'casalorenzi.demo-db'
-const VERSAO = 2
+const VERSAO = 3
 
 function carregar() {
   try {
