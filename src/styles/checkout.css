@@ -7,7 +7,7 @@
 
 .checkout__summary {
   position: sticky;
-  top: 24px;
+  top: calc(var(--store-header-h, 125px) + 24px);
   display: flex;
   flex-direction: column;
   gap: 16px;

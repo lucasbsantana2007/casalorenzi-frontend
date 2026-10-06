@@ -20,8 +20,13 @@
 
 /* Cabeçalho */
 .store-header {
-  position: relative;
-  z-index: 20;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  /* Fundo sempre invisível e sem linha: só as letras mudam de cor (brancas sobre as fotos do início) */
+  background: transparent;
+  color: var(--navy-950);
+  transition: color 0.3s ease;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
@@ -34,10 +39,19 @@
   text-transform: uppercase;
 }
 
+/* Início: fixo por cima das fotos (sem empurrar o conteúdo) */
 .store-header--overlay {
-  position: absolute;
+  position: fixed;
   inset: 0 0 auto;
+}
+
+.store-header.is-transparent {
   color: #fff;
+}
+
+.store-header__actions,
+.store-header__nav {
+  white-space: nowrap;
 }
 
 .store-header__brand {
@@ -306,8 +320,8 @@ a.product-card:hover .product-card__image img {
 
 .pdp__media {
   position: sticky;
-  top: 0;
-  height: 100vh;
+  top: var(--store-header-h, 125px);
+  height: calc(100vh - var(--store-header-h, 125px));
   min-height: 560px;
   background: #f1eee8;
 }

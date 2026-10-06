@@ -1,5 +1,5 @@
 import { Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSacola } from '../../hooks/useSacola'
 import { useSession } from '../../hooks/useSession'
@@ -12,17 +12,53 @@ const NAV = [
   { to: '/meus-pedidos', label: 'Atendimento' },
 ]
 
-// Cabeçalho da loja. `overlay`: texto claro sobre a foto do início.
+// Fotos de abertura do início: enquanto estão sob o cabeçalho, ele fica transparente
+const HERO = '.split-hero'
+
+// Cabeçalho da loja, fixo no topo em todas as páginas.
+// `overlay` (início): transparente com texto claro sobre as fotos; ao rolar para o fundo branco, vira branco com texto escuro.
 export function StoreHeader({ overlay = false }) {
   const { isEquipe } = useSession()
   const { quantidadeTotal, abrir: abrirSacola } = useSacola()
   const [menuAberto, setMenuAberto] = useState(false)
+  const [sobreFoto, setSobreFoto] = useState(overlay)
   const fechar = () => setMenuAberto(false)
+  const ref = useRef(null)
+
+  // Publica a altura real do cabeçalho em --store-header-h (foto do produto e resumo do checkout ficam logo abaixo dele)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return undefined
+    const publicar = () => document.documentElement.style.setProperty('--store-header-h', `${el.offsetHeight}px`)
+    publicar()
+    const observador = new ResizeObserver(publicar)
+    observador.observe(el)
+    return () => observador.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!overlay) return undefined
+    // Leitura barata (uma medida); o React só re-renderiza quando o valor muda
+    const medir = () => {
+      const hero = document.querySelector(HERO)
+      const fimDaFoto = hero ? hero.getBoundingClientRect().bottom : window.innerHeight - window.scrollY
+      setSobreFoto(fimDaFoto > 80)
+    }
+    medir()
+    window.addEventListener('scroll', medir, { passive: true })
+    window.addEventListener('resize', medir)
+    return () => {
+      window.removeEventListener('scroll', medir)
+      window.removeEventListener('resize', medir)
+    }
+  }, [overlay])
+
+  const transparente = overlay && sobreFoto && !menuAberto
 
   return (
-    <header className={`store-header ${overlay ? 'store-header--overlay' : ''} ${menuAberto ? 'is-open' : ''}`}>
+    <header ref={ref} className={`store-header ${overlay ? 'store-header--overlay' : ''} ${transparente ? 'is-transparent' : ''} ${menuAberto ? 'is-open' : ''}`}>
       <Link to="/" className="store-header__brand" aria-label="Casa Lorenzi — início" onClick={fechar}>
-        <BrandMark size="sm" inverse={overlay && !menuAberto} />
+        <BrandMark size="sm" inverse={transparente} />
       </Link>
 
       <nav className="store-header__nav" aria-label="Navegação principal">
