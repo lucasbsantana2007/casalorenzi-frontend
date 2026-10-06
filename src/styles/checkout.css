@@ -1228,6 +1228,140 @@ a.drawer__btn:hover {
   margin-top: 8px;
 }
 
+/* Foto opcional ao abrir um chamado */
+.photo-attach {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.photo-attach__label {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--navy-800);
+}
+
+.photo-attach__drop {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 16px;
+  border: 1px dashed var(--border-strong);
+  background: #fff;
+  color: var(--navy-700);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.photo-attach__drop:hover,
+.photo-attach__drop.is-over {
+  border-color: var(--navy-700);
+  background: var(--navy-50);
+}
+
+.photo-attach__drop:focus-within {
+  border-color: var(--navy-950);
+  box-shadow: var(--focus);
+}
+
+.photo-attach__drop.is-busy {
+  cursor: progress;
+}
+
+.photo-attach__cta {
+  font-size: 14px;
+  color: var(--navy-950);
+}
+
+.photo-attach__cta strong {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.photo-attach__drop small {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.photo-attach__preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  background: #fff;
+}
+
+.photo-attach__preview img {
+  flex: none;
+  width: 72px;
+  height: 72px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.photo-attach__info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.photo-attach__info strong {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--navy-950);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.photo-attach__info small {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.photo-attach__remove {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--navy-800);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.photo-attach__remove:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.photo-attach__remove:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+@media (max-width: 480px) {
+  .photo-attach__preview {
+    flex-wrap: wrap;
+  }
+  .photo-attach__remove {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 /* Seleção do pedido ao abrir um chamado (seletor suspenso) */
 .order-pick {
   position: relative;

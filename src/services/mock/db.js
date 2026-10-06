@@ -20,11 +20,17 @@ function carregar() {
 
 export const db = carregar()
 
-function salvar() {
+// Fotos anexadas aos chamados (base64). Coleção separada das mensagens para as listagens não carregarem a imagem.
+db.anexos = db.anexos ?? []
+
+// Devolve false quando não conseguiu gravar (ex.: cota do localStorage cheia por causa das fotos)
+export function salvar() {
   try {
     localStorage.setItem(CHAVE, JSON.stringify({ versao: VERSAO, dados: db }))
+    return true
   } catch {
     // Sem armazenamento (aba anônima, cota cheia): os dados valem só nesta aba
+    return false
   }
 }
 
@@ -78,6 +84,12 @@ export function inPeriod(timestamp, de, ate) {
 export function usuarioResumo(id) {
   const usuario = byId(db.usuarios, id)
   return usuario ? { id: usuario.id, nome: usuario.nome, papel: usuario.papel } : null
+}
+
+// Anexo de mensagem no formato da API: `url` é um data URL pronto para <img src>
+export function anexoView(id) {
+  const anexo = id ? byId(db.anexos, id) : null
+  return anexo ? { id: anexo.id, nome: anexo.nome, tipo: anexo.tipo, url: `data:${anexo.tipo};base64,${anexo.conteudoBase64}` } : null
 }
 
 export function variacaoView(variacaoId) {

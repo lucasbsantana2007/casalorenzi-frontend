@@ -1,5 +1,6 @@
 import { formatDateTime } from '../../utils/format'
 import { Avatar } from '../ui/Avatar'
+import { AnexoImagem } from './AnexoImagem'
 
 // Histórico de mensagens. `perspectiva` define qual lado é "nosso" (alinhado à direita).
 export function MessageThread({ mensagens, perspectiva = 'ATENDENTE', nomeCliente }) {
@@ -24,6 +25,7 @@ export function MessageThread({ mensagens, perspectiva = 'ATENDENTE', nomeClient
                 <time>{formatDateTime(m.enviadoEm)}</time>
               </div>
               <p>{m.conteudo}</p>
+              {m.anexo && <AnexoImagem anexo={m.anexo} />}
             </div>
           </li>
         )

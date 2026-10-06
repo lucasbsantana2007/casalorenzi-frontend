@@ -16,10 +16,13 @@ export const pedidosService = USE_MOCKS
       // { token, pin, pinConfirmacao } → { email }
       redefinirPin: (dados) => api.post('/meus-pedidos/redefinir-pin', dados),
       // { email, pin } → chamados do e-mail com a conversa
+      // Cada mensagem traz `anexo: { id, nome, tipo, url } | null`; `url` é um data URL pronto para <img src>
       listarMinhasSolicitacoes: (dados) => api.post('/meus-pedidos/solicitacoes/consulta', dados),
       // { email, pin, id, conteudo } → chamado atualizado
       responderSolicitacao: ({ id, ...dados }) => api.post(`/meus-pedidos/solicitacoes/${id}/mensagens`, dados),
-      // { numero, email, pin, tipoSolicitacaoId, descricao } → { id, protocolo, tipo }
+      // { numero, email, pin, tipoSolicitacaoId, descricao, anexo? } → { id, protocolo, tipo }
+      // anexo (opcional): { nome, tipo, conteudoBase64 } — tipo image/jpeg, image/png ou image/webp;
+      // no máximo 2 MB depois de decodificado. A loja já reduz a foto no navegador antes de enviar
       abrirSolicitacao: (dados) => api.post('/meus-pedidos/solicitacoes', dados),
 
       // Painel (equipe)

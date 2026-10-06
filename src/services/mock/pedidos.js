@@ -1,7 +1,7 @@
 import { PIN_DEMO } from '../../context/perfisDemo'
 import { calcularFrete, somenteDigitos, ufDoCep } from '../../utils/frete'
 import { ApiError } from '../api'
-import { aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
+import { anexoView, aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, respond, salvar, usuarioResumo, variacaoView } from './db'
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PARCELAS_MAX = 6
@@ -300,8 +300,40 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
 
 // ---------- Loja: pós-venda em "Meus pedidos" ----------
 
-// { numero, email, pin, tipoSolicitacaoId, descricao } — troca, devolução, reclamação etc. sem conta
-export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descricao }) {
+// Foto opcional do chamado: mesmas regras da API (tipo, 2 MB decodificado, conteúdo de imagem de verdade)
+const TIPOS_ANEXO = ['image/jpeg', 'image/png', 'image/webp']
+const ANEXO_MAX_BYTES = 2 * 1024 * 1024
+const BASE64_VALIDO = /^[A-Za-z0-9+/]+={0,2}$/
+
+function assinaturaConfere(tipo, base64) {
+  let inicio
+  try {
+    inicio = atob(base64.slice(0, 16)) // 12 primeiros bytes
+  } catch {
+    return false
+  }
+  if (tipo === 'image/jpeg') return inicio.startsWith('\xFF\xD8\xFF')
+  if (tipo === 'image/png') return inicio.startsWith('\x89PNG')
+  return inicio.startsWith('RIFF') && inicio.slice(8, 12) === 'WEBP'
+}
+
+// → mensagem de erro, ou null se o anexo é válido
+function erroDoAnexo(anexo) {
+  const { nome, tipo, conteudoBase64 } = anexo ?? {}
+  if (!TIPOS_ANEXO.includes(tipo)) return 'A foto deve ser JPG, PNG ou WebP.'
+  if (!String(nome ?? '').trim()) return 'Informe o nome do arquivo da foto.'
+  if (typeof conteudoBase64 !== 'string' || conteudoBase64.length % 4 !== 0 || !BASE64_VALIDO.test(conteudoBase64)) {
+    return 'Não foi possível ler a foto enviada.'
+  }
+  const padding = conteudoBase64.endsWith('==') ? 2 : conteudoBase64.endsWith('=') ? 1 : 0
+  if ((conteudoBase64.length * 3) / 4 - padding > ANEXO_MAX_BYTES) return 'A foto deve ter no máximo 2 MB.'
+  if (!assinaturaConfere(tipo, conteudoBase64)) return 'O arquivo enviado não é uma imagem válida.'
+  return null
+}
+
+// { numero, email, pin, tipoSolicitacaoId, descricao, anexo? } — troca, devolução, reclamação etc. sem conta
+// anexo: { nome, tipo, conteudoBase64 } — fica junto da primeira mensagem do cliente
+export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descricao, anexo = null }) {
   try {
     verificarPin(email, pin)
   } catch (error) {
@@ -313,6 +345,19 @@ export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descri
   const tipo = byId(db.tiposSolicitacao, tipoSolicitacaoId)
   if (!tipo) return fail('Selecione o tipo de solicitação.', 422)
   if (!descricao?.trim() || descricao.trim().length < 10) return fail('Descreva sua solicitação com pelo menos 10 caracteres.', 422)
+
+  let anexoId = null
+  if (anexo) {
+    const erro = erroDoAnexo(anexo)
+    if (erro) return fail(erro, 422)
+    anexoId = nextId(db.anexos)
+    db.anexos.push({ id: anexoId, nome: String(anexo.nome).trim().slice(0, 120), tipo: anexo.tipo, conteudoBase64: anexo.conteudoBase64, criadoEm: Date.now() })
+    // Só na demonstração: o "banco" vive no localStorage (~5 MB). Sem espaço, recusa em vez de perder o chamado ao recarregar
+    if (!salvar()) {
+      db.anexos.pop()
+      return fail('Não há espaço no navegador para guardar mais fotos nesta demonstração. Envie o chamado sem a foto.', 507)
+    }
+  }
 
   const id = nextId(db.atendimentos)
   const agora = Date.now()
@@ -330,7 +375,15 @@ export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descri
     atualizadoEm: agora,
   }
   db.atendimentos.push(atendimento)
-  db.mensagens.push({ id: nextId(db.mensagens), atendimentoId: id, autorId: pedido.clienteId ?? null, autorTipo: 'CLIENTE', conteudo: descricao.trim(), enviadoEm: agora })
+  db.mensagens.push({
+    id: nextId(db.mensagens),
+    atendimentoId: id,
+    autorId: pedido.clienteId ?? null,
+    autorTipo: 'CLIENTE',
+    conteudo: descricao.trim(),
+    anexoId,
+    enviadoEm: agora,
+  })
   db.emails.push({
     para: contato.email,
     assunto: `Casa Lorenzi · Solicitação ${atendimento.protocolo} recebida`,
@@ -403,6 +456,7 @@ function solicitacaoPublicaView(a) {
         id: m.id,
         autorTipo: m.autorTipo,
         conteudo: m.conteudo,
+        anexo: anexoView(m.anexoId),
         enviadoEm: m.enviadoEm,
         autor: m.autorTipo === 'ATENDENTE' ? { nome: usuarioResumo(m.autorId)?.nome.split(' ')[0] ?? 'Equipe' } : null,
       })),

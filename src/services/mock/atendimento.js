@@ -1,5 +1,5 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
-import { byId, db, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
+import { anexoView, byId, db, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
 
 function pedidoView(pedido) {
   if (!pedido) return null
@@ -55,7 +55,7 @@ export function atendimentoView(atendimento, { detalhado = false } = {}) {
     pedido: pedidoView(byId(db.pedidos, atendimento.pedidoId)),
     mensagens: db.mensagens
       .filter((m) => m.atendimentoId === atendimento.id)
-      .map((m) => ({ ...m, autor: usuarioResumo(m.autorId) })),
+      .map(({ anexoId, ...m }) => ({ ...m, autor: usuarioResumo(m.autorId), anexo: anexoView(anexoId) })),
   }
 }
 

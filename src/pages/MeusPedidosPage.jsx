@@ -2,6 +2,7 @@ import { ChevronDown, LogOut, Send } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { MessageThread } from '../components/atendimento/MessageThread'
+import { AnexoFoto } from '../components/loja/AnexoFoto'
 import { PedidoDetalhesLoja, PedidoProgresso } from '../components/loja/PedidoDetalhesLoja'
 import { PinInput } from '../components/loja/PinInput'
 import { SeletorPedido } from '../components/loja/SeletorPedido'
@@ -341,6 +342,8 @@ function NovoChamado({ acesso, pedidos, pedidoInicial, onCriado }) {
   const [numero, setNumero] = useState(pedidoInicial || pedidos[0]?.numero || '')
   const [tipoId, setTipoId] = useState('')
   const [descricao, setDescricao] = useState('')
+  const [foto, setFoto] = useState(null) // { nome, tipo, conteudoBase64, url, tamanho } já reduzida
+  const [preparandoFoto, setPreparandoFoto] = useState(false)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
 
@@ -351,7 +354,8 @@ function NovoChamado({ acesso, pedidos, pedidoInicial, onCriado }) {
     setErro(null)
     setEnviando(true)
     try {
-      const { id } = await pedidosService.abrirSolicitacao({ ...acesso, numero, tipoSolicitacaoId: Number(tipoId), descricao })
+      const anexo = foto && { nome: foto.nome, tipo: foto.tipo, conteudoBase64: foto.conteudoBase64 }
+      const { id } = await pedidosService.abrirSolicitacao({ ...acesso, numero, tipoSolicitacaoId: Number(tipoId), descricao, anexo })
       onCriado(id)
     } catch (error) {
       setErro(error)
@@ -374,6 +378,7 @@ function NovoChamado({ acesso, pedidos, pedidoInicial, onCriado }) {
           ))}
         </select>
       </label>
+      <AnexoFoto value={foto} onChange={setFoto} onProcessando={setPreparandoFoto} />
       <label className="co-field">
         <span>Descrição</span>
         <textarea
@@ -386,7 +391,7 @@ function NovoChamado({ acesso, pedidos, pedidoInicial, onCriado }) {
         />
       </label>
       <FormError error={erro} />
-      <button type="submit" className="pdp__cta" disabled={enviando || !tipoId || descricao.trim().length < 10}>
+      <button type="submit" className="pdp__cta" disabled={enviando || preparandoFoto || !tipoId || descricao.trim().length < 10}>
         {enviando ? 'Enviando…' : 'Abrir chamado'}
       </button>
     </form>
