@@ -577,6 +577,123 @@ a.pdp__cta:hover {
   letter-spacing: 0.06em;
 }
 
+.store-list li strong,
+.store-list li span {
+  transition: color 0.2s ease;
+}
+
+.store-list li.is-ativa strong {
+  color: var(--navy-700);
+}
+
+.store-list li.is-ativa span {
+  color: var(--navy-950);
+}
+
+/* Mapa das lojas: mapa à esquerda, lista à direita (empilha no celular) */
+.lojas-mapa {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 64px;
+  align-items: center;
+}
+
+.mapa-lojas {
+  width: 100%;
+  max-width: 600px;
+  justify-self: center;
+}
+
+.mapa-lojas svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mapa-lojas__pontos {
+  fill: var(--navy-950);
+  opacity: 0.16;
+}
+
+.mapa-lojas__linha {
+  fill: none;
+  stroke: var(--navy-700);
+  stroke-width: 0.28;
+  stroke-linecap: round;
+}
+
+.mapa-lojas__viajante {
+  fill: var(--navy-700);
+}
+
+.mapa-lojas__loja {
+  cursor: default;
+  transition: opacity 0.2s ease;
+}
+
+.mapa-lojas__loja.is-apagada {
+  opacity: 0.4;
+}
+
+.mapa-lojas__ponto,
+.mapa-lojas__onda {
+  fill: var(--navy-950);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.mapa-lojas__loja.is-ativa .mapa-lojas__ponto {
+  transform: scale(1.35);
+}
+
+.mapa-lojas__onda {
+  animation: mapa-lojas-onda 2.4s ease-out infinite;
+}
+
+.mapa-lojas__loja text {
+  font-family: var(--store-font);
+  font-size: 1.85px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  fill: var(--navy-950);
+  /* contorno branco para o nome não se misturar com os pontos */
+  stroke: #fff;
+  stroke-width: 0.6px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+
+@keyframes mapa-lojas-onda {
+  from {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(3.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mapa-lojas__onda {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .lojas-mapa {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .mapa-lojas {
+    max-width: 440px;
+  }
+}
+
 /* Rodapé: faixa azul-marinho */
 .store-footer {
   display: flex;
