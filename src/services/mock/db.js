@@ -2,14 +2,45 @@ import { createSeed } from '../../data/seed'
 import { ApiError } from '../api'
 import { statusEstoque } from '../../utils/estoque'
 
-// Banco em memória usado enquanto a API real não está disponível.
-// Alterações (movimentações, transferências, mensagens...) valem até recarregar a página.
-export const db = createSeed()
+// Banco de demonstração usado enquanto a API real não está disponível.
+// Fica salvo no navegador (localStorage): pedidos, PINs, movimentações etc. sobrevivem a recarregar
+// a página e valem em todas as abas. Mudar VERSAO descarta os dados salvos e recria a partir do seed.
+const CHAVE = 'casalorenzi.demo-db'
+const VERSAO = 2
+
+function carregar() {
+  try {
+    const salvo = JSON.parse(localStorage.getItem(CHAVE))
+    if (salvo?.versao === VERSAO && salvo.dados) return salvo.dados
+  } catch {
+    // Sem armazenamento ou dado corrompido: começa do seed
+  }
+  return createSeed()
+}
+
+export const db = carregar()
+
+function salvar() {
+  try {
+    localStorage.setItem(CHAVE, JSON.stringify({ versao: VERSAO, dados: db }))
+  } catch {
+    // Sem armazenamento (aba anônima, cota cheia): os dados valem só nesta aba
+  }
+}
+
+// Outra aba alterou os dados: recarrega para não sobrescrever com uma cópia antiga
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === CHAVE) window.location.reload()
+  })
+}
 
 const LATENCIA_MS = 220
 
-// Simula a rede: atraso e cópia profunda, para que a interface nunca altere o "banco" por referência.
+// Simula a rede: grava as alterações, atrasa e devolve uma cópia profunda,
+// para que a interface nunca altere o "banco" por referência.
 export function respond(data) {
+  salvar()
   return new Promise((resolve) => setTimeout(() => resolve(structuredClone(data)), LATENCIA_MS))
 }
 

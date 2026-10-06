@@ -7,6 +7,7 @@ import './styles/layout.css'
 import './styles/pages.css'
 import './styles/login.css'
 import './styles/store.css'
+import './styles/checkout.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
