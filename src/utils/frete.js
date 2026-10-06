@@ -46,11 +46,20 @@ export function calcularFrete(cep, subtotal) {
   ]
 }
 
+// Faixas de CEP (5 primeiros dígitos) dos estados que têm loja. Espelha _FAIXAS_UF do backend.
+const FAIXAS_UF = [
+  [1000, 19999, 'SP'],
+  [20000, 28999, 'RJ'],
+  [30000, 39999, 'MG'],
+  [70000, 72799, 'DF'],
+  [73000, 73699, 'DF'],
+  [80000, 87999, 'PR'],
+]
+
 // Estado (UF) aproximado pelo CEP, usado para preferir a loja mais próxima na expedição
 export function ufDoCep(cep) {
-  const prefixo = Number(somenteDigitos(cep).slice(0, 2))
-  if (prefixo >= 1 && prefixo <= 19) return 'SP'
-  if (prefixo >= 20 && prefixo <= 28) return 'RJ'
-  if (prefixo >= 80 && prefixo <= 87) return 'PR'
-  return null
+  const prefixo = somenteDigitos(cep).slice(0, 5)
+  if (prefixo.length < 5) return null
+  const numero = Number(prefixo)
+  return FAIXAS_UF.find(([inicio, fim]) => numero >= inicio && numero <= fim)?.[2] ?? null
 }
