@@ -1,8 +1,8 @@
 # Casa Lorenzi — Frontend
 
-Plataforma integrada de gestão das lojas Casa Lorenzi: dashboard consolidado, estoque por loja e SKU com histórico, produtos, transferências entre lojas, atendimento e portal do cliente.
+Plataforma integrada de gestão das lojas Casa Lorenzi: loja online com checkout, dashboard consolidado, estoque por loja e SKU com histórico, pedidos, produtos, transferências entre lojas e atendimento.
 
-React 19 · Vite · JavaScript · React Router · lucide-react · motion e @paper-design/shaders-react (página inicial e login). O backend (FastAPI + PostgreSQL) fica em um repositório separado.
+React 19 · Vite · JavaScript · React Router · lucide-react · motion · recharts (financeiro). O backend (FastAPI + PostgreSQL) fica em um repositório separado.
 
 ## Como rodar
 
@@ -29,32 +29,27 @@ As variáveis são lidas somente em `src/config/env.js`.
 1. **Loja pública, em estilo editorial.**
    - **`/`:** duas fotos em tela cheia (Masculino e Feminino) e uma seleção curta da estação.
    - **`/colecao/masculino` e `/colecao/feminino`:** coleção com filtro por estação.
-   - **`/lojas`:** lista das lojas.
-   - **Menu:** Masculino, Feminino, Lojas e Atendimento, com Pedidos e Conta à direita. O acesso da equipe é um link discreto no rodapé.
-2. **Dois logins:**
-   - **`/login`:** clientes, acessado por "Conta" no topo do site.
-   - **`/login/equipe`:** Administrador, Lojista e Operador, acessado por "Acesso da equipe" no rodapé.
+   - **`/produto/:id`:** página do produto, com escolha de tamanho e cor.
+   - **Sacola e `/checkout`:** a sacola abre na lateral; o checkout leva a `/pedido/confirmado/:numero`.
+   - **`/lojas`:** lojas no mapa do Brasil.
+   - **Menu:** Masculino, Feminino, Lojas e Atendimento, com a Sacola à direita. "Painel" só aparece para a equipe logada. O acesso da equipe é um link discreto no rodapé.
+2. **Clientes não têm login.** No checkout, o cliente cria um PIN de 4 números. Em **`/meus-pedidos`** (link "Atendimento"), o e-mail e o PIN liberam todos os pedidos daquele e-mail e os chamados de atendimento. Quem esqueceu o PIN pede um novo em `/meus-pedidos/novo-pin`. As rotas antigas `/login`, `/cliente/*` e `/meu-pedido` redirecionam para `/meus-pedidos`.
+3. **Login da equipe em `/login/equipe`**, para Administrador, Lojista e Operador, acessado por "Acesso da equipe" no rodapé. Depois do login, a equipe vai para `/dashboard`. Quem tentou abrir uma página protegida volta para ela depois de entrar.
+4. **"Sair"** encerra a sessão e volta para a página inicial.
 
-   O papel da conta precisa corresponder ao login usado; caso contrário, a tela indica o login certo e não cria a sessão.
-3. **Depois do login**, o cliente vai para `/cliente` e a equipe para `/dashboard`. Quem tentou abrir uma página protegida volta para ela depois de entrar.
-4. **"Sair"**, nas duas áreas, encerra a sessão e volta para a página inicial.
+Com `VITE_USE_MOCKS=true`, `/login/equipe` oferece acesso rápido de demonstração para Administrador, Lojista e Operador. Qualquer e-mail da equipe entra com a senha `lorenzi2026`. Os clientes de demonstração usam o PIN `1234` em `/meus-pedidos`.
 
-Com `VITE_USE_MOCKS=true`, cada login oferece acesso rápido de demonstração: a cliente Mariana Costa em `/login`, e Administrador, Lojista e Operador em `/login/equipe`. Qualquer e-mail cadastrado entra com a senha `lorenzi2026`.
+| Perfil        | Módulos                                                                        |
+| ------------- | ------------------------------------------------------------------------------ |
+| Administrador | Dashboard, Estoque, Pedidos, Produtos, Transferências, Atendimento, Financeiro |
+| Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Pedidos, Atendimento       |
+| Operador      | Dashboard, Estoque, Pedidos, Transferências                                    |
 
-| Perfil        | Módulos                                                               |
-| ------------- | --------------------------------------------------------------------- |
-| Administrador | Dashboard, Estoque, Produtos, Transferências, Atendimento, Financeiro |
-| Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Atendimento       |
-| Operador      | Dashboard, Estoque, Transferências                                    |
-| Cliente       | Área do cliente                                                       |
+Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
+**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/meus-pedidos`, `/meus-pedidos/novo-pin` e `/login/equipe`.
 
-**Público:** `/`, `/colecao/:genero`, `/lojas`, `/login` e `/login/equipe`.
-
-**Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`.
-
-**Área do cliente:** `/cliente`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`, `/cliente/pedidos`.
+**Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`.
 
 ## Estrutura
 
@@ -89,7 +84,7 @@ export const estoqueService = USE_MOCKS ? mock : {
 
 Para conectar o backend, defina `VITE_USE_MOCKS=false`. As páginas não mudam. Para ligar um domínio de cada vez, troque o ternário só no serviço correspondente.
 
-Os mocks mantêm alterações (movimentações, transferências, mensagens, produtos) até a página ser recarregada.
+Os mocks guardam as alterações (pedidos, PINs, movimentações, transferências, mensagens, produtos) no `localStorage`, então elas continuam depois de recarregar a página.
 
 ## Contrato esperado da API
 
