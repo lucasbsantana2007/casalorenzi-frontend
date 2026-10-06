@@ -17,9 +17,9 @@ export const DETALHES_PRODUTOS = {
     cuidados: 'Lavar à mão ou na máquina em ciclo delicado, em água fria. Secar à sombra.',
   },
   4: {
-    descricao: 'Blazer de dois botões com construção meio-forrada e ombros naturais, inspirado na alfaiataria de Milão. Lapela entalhada e bolsos com lapela.',
-    composicao: 'Tecido: 100% lã. Forro: 100% cupro',
-    cuidados: 'Somente lavagem a seco. Guardar em cabide de ombro largo.',
+    descricao: 'Jaqueta em camurça macia com gola de colarinho, zíper frontal e bolsos laterais. Leve o bastante para as noites de verão na costa e quente o suficiente para a meia-estação.',
+    composicao: 'Camurça (couro bovino). Forro: 100% viscose',
+    cuidados: 'Limpeza especializada em couro. Escovar no sentido do pelo e guardar em cabide, protegida do sol.',
   },
   5: {
     descricao: 'Vestido midi em seda pura com decote em V e cintura marcada por amarração. O tecido fluido acompanha o movimento e brilha discretamente à luz do sol.',

@@ -91,8 +91,8 @@ const ROTEIROS = [
   {
     clienteId: 106, tipoId: 6, status: 'CONCLUIDO', responsavelId: 8, dias: 9,
     mensagens: [
-      ['CLIENTE', 'Qual a composição do blazer Milano? Ele amassa muito em viagem?', 0],
-      ['ATENDENTE', 'Gustavo, o Blazer Milano é 98% lã fria e 2% elastano, com ótima recuperação. Recomendamos transportá-lo em capa e pendurá-lo ao chegar.', 1],
+      ['CLIENTE', 'Qual o material da jaqueta de camurça Capri? Ela mancha com chuva?', 0],
+      ['ATENDENTE', 'Gustavo, a Jaqueta Capri é em camurça de couro bovino, com forro de viscose. Ela resiste a garoa, mas recomendamos evitar chuva forte e aplicar impermeabilizante para camurça.', 1],
       ['CLIENTE', 'Ótimo, obrigado!', 2],
     ],
   },
