@@ -1,11 +1,16 @@
 :root {
-  /* Marca */
-  --navy-950: #0c1628;
-  --navy-900: #14233d;
-  --navy-800: #1d3152;
-  --navy-700: #2a4269;
+  /* Marca (paleta Casa Lorenzi) */
+  --navy-950: #13203b;
+  --navy-900: #1c2b4b;
+  --navy-800: #26375c;
+  --navy-700: #34476e;
   --navy-100: #e6eaf1;
   --navy-50: #f1f3f7;
+
+  /* Marrom da paleta: só detalhes de destaque. Sobre fundo escuro, use o terracota (mais contraste) */
+  --marrom-600: #a34f35;
+  --marrom-700: #8a4230;
+  --terracota-500: #c26240;
 
   /* Neutros quentes */
   --bg: #f6f5f2;

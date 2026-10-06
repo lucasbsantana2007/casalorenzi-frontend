@@ -73,6 +73,12 @@
   text-decoration-thickness: 2px;
 }
 
+/* Marrom da paleta no sublinhado do menu (só sobre fundo claro; sobre a foto do início fica branco) */
+.store-header:not(.is-transparent) a:hover,
+.store-header:not(.is-transparent) a.is-active {
+  text-decoration-color: var(--marrom-600);
+}
+
 .store-header__menu {
   display: none;
   padding: 4px;
@@ -290,7 +296,7 @@
 .product-card p {
   margin-top: 4px;
   font-size: 13px;
-  color: var(--navy-700);
+  color: var(--marrom-600);
 }
 
 a.product-card:hover h3 {
@@ -365,7 +371,7 @@ a.product-card:hover .product-card__image img {
   margin-top: 10px;
   font-size: 15px;
   letter-spacing: 0.04em;
-  color: var(--navy-700);
+  color: var(--marrom-600);
 }
 
 .pdp__options {
@@ -412,7 +418,8 @@ a.product-card:hover .product-card__image img {
   place-items: center;
   height: 56px;
   margin-top: 28px;
-  background: var(--navy-950);
+  /* Botões de compra no marrom da paleta; os demais botões seguem azul-marinho */
+  background: var(--marrom-600);
   color: #fff;
   font-family: var(--store-font);
   font-size: 14px;
@@ -421,8 +428,9 @@ a.product-card:hover .product-card__image img {
   transition: background-color 0.2s;
 }
 
-a.pdp__cta:hover {
-  background: var(--navy-800);
+a.pdp__cta:hover,
+button.pdp__cta:hover:not(:disabled) {
+  background: var(--marrom-700);
 }
 
 .pdp__cta--off {
