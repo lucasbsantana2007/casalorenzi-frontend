@@ -95,7 +95,7 @@ function Linha({ arco, indice, ciclo, total, tempo }) {
   )
 }
 
-export function MapaLojas({ lojas, ativa, onAtivar }) {
+export function MapaLojas({ lojas, ativa, onAtivar, onSelecionar }) {
   const reduzirMovimento = useReducedMotion()
   const tempo = useMotionValue(0)
   const pontos = useMemo(() => caminhoDosPontos(0.24), [])
@@ -146,6 +146,16 @@ export function MapaLojas({ lojas, ativa, onAtivar }) {
               transform={`translate(${loja.posicao.x} ${loja.posicao.y})`}
               onMouseEnter={() => onAtivar?.(loja.id)}
               onMouseLeave={() => onAtivar?.(null)}
+              onClick={() => onSelecionar?.(loja.id)}
+              onKeyDown={(evento) => {
+                if (evento.key === 'Enter' || evento.key === ' ') {
+                  evento.preventDefault()
+                  onSelecionar?.(loja.id)
+                }
+              }}
+              role={onSelecionar ? 'button' : undefined}
+              tabIndex={onSelecionar ? 0 : undefined}
+              aria-label={onSelecionar ? `Ver a loja ${loja.nome}` : undefined}
             >
               <circle className="mapa-lojas__onda" r="0.9" />
               <circle className="mapa-lojas__ponto" r="0.9" />

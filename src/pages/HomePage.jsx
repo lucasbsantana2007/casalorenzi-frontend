@@ -7,7 +7,7 @@ import { useAsync } from '../hooks/useAsync'
 import { produtosService } from '../services/produtosService'
 
 // Peças em destaque no início, na ordem em que aparecem (ids dos produtos)
-const DESTAQUES = [11, 7, 6]
+const DESTAQUES = [4, 11, 7, 6]
 
 function selecaoDaEstacao(produtos) {
   return DESTAQUES.map((id) => produtos.find((p) => p.id === id)).filter(Boolean)
