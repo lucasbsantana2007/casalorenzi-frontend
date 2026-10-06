@@ -15,7 +15,7 @@ import { useSession } from '../../../hooks/useSession'
 import { atendimentoService } from '../../../services/atendimentoService'
 import { cadastrosService } from '../../../services/cadastrosService'
 import { formatDate, formatRelative } from '../../../utils/format'
-import { ATENDIMENTO_ABERTO, statusOptions } from '../../../utils/status'
+import { statusOptions } from '../../../utils/status'
 
 const PREFIXO_AUTOR = { CLIENTE: '', ATENDENTE: 'Equipe: ', SISTEMA: 'Sistema: ' }
 
@@ -78,7 +78,7 @@ export function AtendimentosPage() {
   const { usuario } = useSession()
   const equipe = useEquipe()
   const tipos = useAsync(() => cadastrosService.listarTiposSolicitacao(), []).data ?? []
-  const [aba, setAba] = useState('ABERTOS')
+  const [aba, setAba] = useState('TODOS')
   const [busca, setBusca] = useState('')
   const [tipoId, setTipoId] = useState('')
   const [responsavelId, setResponsavelId] = useState('')
@@ -89,16 +89,8 @@ export function AtendimentosPage() {
   )
 
   const todos = state.data ?? []
-  const filtroAba = {
-    ABERTOS: (a) => ATENDIMENTO_ABERTO.includes(a.status),
-    TODOS: () => true,
-  }
-  const pertence = (a, valor) => (filtroAba[valor] ? filtroAba[valor](a) : a.status === valor)
-  const tabs = [
-    { value: 'ABERTOS', label: 'Em aberto' },
-    ...statusOptions('atendimento'),
-    { value: 'TODOS', label: 'Todos' },
-  ].map((tab) => ({ ...tab, count: todos.filter((a) => pertence(a, tab.value)).length }))
+  const pertence = (a, valor) => valor === 'TODOS' || a.status === valor
+  const tabs = [{ value: 'TODOS', label: 'Todos' }, ...statusOptions('atendimento')].map((tab) => ({ ...tab, count: todos.filter((a) => pertence(a, tab.value)).length }))
 
   return (
     <>
