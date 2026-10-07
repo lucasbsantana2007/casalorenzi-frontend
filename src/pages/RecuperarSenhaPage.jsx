@@ -40,7 +40,7 @@ export function EsqueciSenhaPage() {
         </div>
         {enviado.linkDemo && (
           <div className="login__demo-link">
-            <p>Demonstração: o e-mail não é enviado de verdade. Abra o link por aqui.</p>
+            <p>Demonstração: o link também aparece aqui, sem precisar abrir o e-mail.</p>
             <Link to={enviado.linkDemo} className="login__submit login__submit--link">
               Abrir link do e-mail
             </Link>
