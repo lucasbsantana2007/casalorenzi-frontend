@@ -1,4 +1,4 @@
-import { aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, registrarLog, respond, usuarioResumo, variacaoView } from './db'
+import { aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, registrarLog, produtoRemovido, respond, usuarioResumo, variacaoView } from './db'
 
 function transferenciaView(t) {
   const { produto, ...variacao } = variacaoView(t.variacaoId)
@@ -25,6 +25,7 @@ export function listar({ status, lojaId, busca } = {}) {
 
 export function criar({ variacaoId, lojaOrigemId, lojaDestinoId, quantidade, observacao = '', usuarioId }) {
   if (!variacaoId) return fail('Selecione o item a transferir.', 422)
+  if (produtoRemovido(variacaoId)) return fail('Este produto foi removido do catálogo.', 409)
   if (Number(lojaOrigemId) === Number(lojaDestinoId)) return fail('A loja de destino deve ser diferente da origem.', 422)
   const origem = estoquePor(lojaOrigemId, variacaoId)
   if (!origem) return fail('Item não encontrado na loja de origem.', 404)

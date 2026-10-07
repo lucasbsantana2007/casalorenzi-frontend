@@ -17,6 +17,7 @@ function produtoView(produto) {
 
 export function listar({ busca, categoria, ativo } = {}) {
   const lista = db.produtos
+    .filter((p) => !p.removidoEm)
     .map(produtoView)
     .filter((p) => !categoria || p.categoria === categoria)
     .filter((p) => ativo === undefined || ativo === '' || String(p.ativo) === String(ativo))
@@ -27,17 +28,28 @@ export function listar({ busca, categoria, ativo } = {}) {
 
 export function obter(id) {
   const produto = byId(db.produtos, id)
-  return produto ? respond(produtoView(produto)) : fail('Produto não encontrado.', 404)
+  return produto && !produto.removidoEm ? respond(produtoView(produto)) : fail('Produto não encontrado.', 404)
 }
 
-function validar({ nome, categoria, precoBase, variacoes = [] }, produtoId) {
+// Coleção (página da vitrine) e estação: mesmas regras da API
+export const GENEROS = ['Masculino', 'Feminino']
+export const ESTACOES = ['Inverno', 'Verão', 'Atemporal']
+
+function validar({ nome, categoria, precoBase, genero, estacao, variacoes = [] }, produtoId) {
   if (!nome?.trim()) return 'Informe o nome do produto.'
   if (!categoria) return 'Selecione a categoria.'
+  if (!produtoId && !genero) return 'Selecione a coleção do produto: Masculino ou Feminino.'
+  if (genero && !GENEROS.includes(genero)) return 'Coleção inválida. Use Masculino ou Feminino.'
+  if (estacao && !ESTACOES.includes(estacao)) return 'Estação inválida. Use Inverno, Verão ou Atemporal.'
   if (!(Number(precoBase) > 0)) return 'Informe um preço base válido.'
   const skus = variacoes.map((v) => v.sku.trim().toUpperCase())
   if (new Set(skus).size !== skus.length) return 'Há SKUs repetidos nas variações.'
   const duplicado = db.variacoes.find((v) => v.produtoId !== produtoId && skus.includes(v.sku))
-  if (duplicado) return `O SKU ${duplicado.sku} já está em uso.`
+  if (duplicado) {
+    return byId(db.produtos, duplicado.produtoId)?.removidoEm
+      ? `O SKU ${duplicado.sku} pertence a um produto removido. Use outro SKU.`
+      : `O SKU ${duplicado.sku} já está em uso.`
+  }
   const semCusto = variacoes.find((v) => !(Number(v.precoCusto) >= 0) || v.precoCusto === '' || v.precoCusto === null || v.precoCusto === undefined)
   if (semCusto) return `Informe o preço de custo da variação ${semCusto.sku || semCusto.cor}.`
   return null
@@ -88,7 +100,7 @@ function aplicarImagem(produto, { imagem, removerImagem }) {
 // Sem espaço no navegador para a foto (só na demonstração): desfaz e avisa
 const semEspaco = () => fail('Não há espaço no navegador para guardar esta foto nesta demonstração. Use uma imagem menor ou remova fotos de outros produtos.', 507)
 
-const ROTULOS_PRODUTO = { nome: 'Nome', categoria: 'Categoria', precoBase: 'Preço de venda', ativo: 'Ativo' }
+const ROTULOS_PRODUTO = { nome: 'Nome', categoria: 'Categoria', genero: 'Coleção', estacao: 'Estação', precoBase: 'Preço de venda', ativo: 'Ativo' }
 const FORMATOS_PRODUTO = { precoBase: formatCurrency, ativo: (v) => (v ? 'Sim' : 'Não') }
 
 // Produtos são do Administrador (cadastro, preços e custos)
@@ -105,7 +117,15 @@ export function criar(dados) {
   return comoAdmin(() => {
     const erro = validar(dados)
     if (erro) return fail(erro, 422)
-    const produto = { id: nextId(db.produtos), nome: dados.nome.trim(), categoria: dados.categoria, precoBase: Number(dados.precoBase), ativo: dados.ativo ?? true }
+    const produto = {
+      id: nextId(db.produtos),
+      nome: dados.nome.trim(),
+      categoria: dados.categoria,
+      genero: dados.genero,
+      estacao: dados.estacao || 'Atemporal',
+      precoBase: Number(dados.precoBase),
+      ativo: dados.ativo ?? true,
+    }
     const { erro: erroFoto } = aplicarImagem(produto, dados)
     if (erroFoto) return fail(erroFoto, 422)
     db.produtos.push(produto)
@@ -122,10 +142,18 @@ export function criar(dados) {
 export function atualizar(id, dados) {
   return comoAdmin(() => {
     const produto = byId(db.produtos, id)
-    if (!produto) return fail('Produto não encontrado.', 404)
+    if (!produto || produto.removidoEm) return fail('Produto não encontrado.', 404)
     const erro = validar(dados, produto.id)
     if (erro) return fail(erro, 422)
-    const campos = { nome: dados.nome.trim(), categoria: dados.categoria, precoBase: Number(dados.precoBase), ativo: dados.ativo }
+    // Coleção e estação nunca ficam vazias: sem elas o produto sairia da vitrine
+    const campos = {
+      nome: dados.nome.trim(),
+      categoria: dados.categoria,
+      genero: dados.genero || produto.genero,
+      estacao: dados.estacao || produto.estacao,
+      precoBase: Number(dados.precoBase),
+      ativo: dados.ativo,
+    }
     const alteracoes = mudancas(produto, campos, ROTULOS_PRODUTO, FORMATOS_PRODUTO)
     const nomeAnterior = produto.nome
     const fotoAnterior = produto.imagemUrl
@@ -142,5 +170,28 @@ export function atualizar(id, dados) {
       registrarLog({ area: 'PRODUTOS', acao: 'EDITOU', descricao: `Editou o produto ${nomeAnterior}`, alteracoes, referencia: { tipo: 'produto', id: produto.id } })
     }
     return respond(produtoView(produto))
+  })
+}
+
+// Tira o produto da loja, do painel e do estoque; pedidos, vendas e histórico continuam (mesmas regras da API)
+export function remover(id) {
+  return comoAdmin(() => {
+    const produto = byId(db.produtos, id)
+    if (!produto || produto.removidoEm) return fail('Produto não encontrado.', 404)
+    const variacoes = new Set(db.variacoes.filter((v) => v.produtoId === produto.id).map((v) => v.id))
+    const pedidos = db.pedidos.filter((p) => p.status === 'PROCESSANDO' && p.itens.some((i) => variacoes.has(i.variacaoId))).length
+    const transferencias = db.transferencias.filter((t) => ['SOLICITADA', 'EM_TRANSITO'].includes(t.status) && variacoes.has(t.variacaoId)).length
+    if (pedidos || transferencias) {
+      const pendencias = [
+        pedidos && `${pedidos} pedido${pedidos > 1 ? 's' : ''} em processamento`,
+        transferencias && `${transferencias} transferência${transferencias > 1 ? 's' : ''} pendente${transferencias > 1 ? 's' : ''}`,
+      ].filter(Boolean)
+      return fail(`Este produto tem ${pendencias.join(' e ')}. Conclua ou cancele antes de remover.`, 409)
+    }
+    const emEstoque = db.estoques.filter((e) => variacoes.has(e.variacaoId)).reduce((soma, e) => soma + e.quantidade, 0)
+    Object.assign(produto, { ativo: false, removidoEm: Date.now() })
+    const detalhe = emEstoque ? ` (${emEstoque} peça${emEstoque !== 1 ? 's' : ''} em estoque saíram do catálogo)` : ''
+    registrarLog({ area: 'PRODUTOS', acao: 'REMOVEU', descricao: `Removeu o produto ${produto.nome}${detalhe}`, referencia: { tipo: 'produto', id: produto.id } })
+    return respond(null)
   })
 }

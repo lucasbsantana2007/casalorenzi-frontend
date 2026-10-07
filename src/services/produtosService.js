@@ -14,4 +14,7 @@ export const produtosService = USE_MOCKS
       // removerImagem: true volta à ilustração. O backend grava no S3 e devolve imagemUrl no produto
       criar: (dados) => api.post('/produtos', dados),
       atualizar: (id, dados) => api.put(`/produtos/${id}`, dados),
+      // Só Administrador. Tira o produto da loja, do painel e do estoque; pedidos, vendas e o histórico continuam.
+      // 409 se houver pedido em processamento ou transferência pendente da peça
+      remover: (id) => api.delete(`/produtos/${id}`),
     }

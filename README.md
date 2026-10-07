@@ -150,7 +150,8 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 **Produtos**
 - `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`; `precoCusto` em cada variação **só para o Administrador**). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
 - `GET /produtos/{id}`
-- `POST /produtos` e `PUT /produtos/{id}` (só Administrador) com `{ nome, categoria, precoBase, ativo, variacoes: [{ id?, sku, tamanho, cor, precoCusto }], imagem?, removerImagem? }`. Mudanças de preço, custo e foto vão para o log.
+- `POST /produtos` e `PUT /produtos/{id}` (só Administrador) com `{ nome, categoria, precoBase, ativo, genero, estacao, variacoes: [{ id?, sku, tamanho, cor, precoCusto }], imagem?, removerImagem? }`. `genero` (`Masculino` ou `Feminino`) é obrigatório no cadastro e define em qual coleção da loja o produto aparece; `estacao` é `Inverno`, `Verão` ou `Atemporal` (padrão). Produto ativo aparece na vitrine assim que é cadastrado.
+- `DELETE /produtos/{id}` (só Administrador) tira o produto da loja, do painel e do estoque; pedidos, vendas e o histórico continuam (o produto fica marcado como removido no banco). HTTP 409 se houver pedido em processamento ou transferência pendente da peça. Na tela Produtos, é a lixeira ao lado do olho e do lápis. Mudanças de preço, custo e foto vão para o log.
 - Foto do produto: `imagem: { nome, tipo, conteudoBase64 }` (JPG, PNG ou WebP, até 2 MB, já reduzida no navegador para no máximo 1280 px) troca a foto; `removerImagem: true` volta à ilustração. O backend grava no S3 e devolve `imagemUrl` no produto (e em `variacao.produto` nos pedidos), que o site usa na vitrine, no carrinho, no checkout e nos pedidos.
 
 **Transferências**
