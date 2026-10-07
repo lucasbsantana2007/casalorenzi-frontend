@@ -201,6 +201,7 @@
 .drawer-item__image {
   aspect-ratio: 4 / 5;
   overflow: hidden;
+  border-radius: 10px;
   background: #f1eee8;
 }
 
