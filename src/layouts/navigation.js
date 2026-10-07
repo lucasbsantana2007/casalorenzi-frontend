@@ -5,8 +5,8 @@ import { ArrowLeftRight, Boxes, Headset, LayoutDashboard, Settings, Shirt, Shopp
 export const NAV_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, modulo: 'dashboard' },
   { to: '/pedidos', label: 'Pedidos', icon: ShoppingBag, modulo: 'pedidos' },
-  { to: '/estoque', label: 'Estoque', icon: Boxes, modulo: 'estoque' },
   { to: '/produtos', label: 'Produtos', icon: Shirt, modulo: 'produtos' },
+  { to: '/estoque', label: 'Estoque', icon: Boxes, modulo: 'estoque' },
   { to: '/transferencias', label: 'Transferências', icon: ArrowLeftRight, modulo: 'transferencias' },
   { to: '/atendimento', label: 'Atendimento', icon: Headset, modulo: 'atendimento' },
   { to: '/financeiro', label: 'Financeiro', icon: Wallet, modulo: 'financeiro' },
