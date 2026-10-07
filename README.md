@@ -48,7 +48,7 @@ Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, 
 | Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Pedidos, Atendimento       |
 | Operador      | Dashboard, Estoque, Pedidos, Transferências                                    |
 
-Lojista e Operador veem os pedidos que a própria loja expede. O menu é uma lista simples, na mesma ordem para todos os cargos (Dashboard, Pedidos, Estoque, Produtos, Transferências, Atendimento, Financeiro e Administração), e cada cargo vê só os módulos que pode acessar. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
+Lojista e Operador veem os pedidos que a própria loja expede. O menu é uma lista simples, na mesma ordem para todos os cargos (Dashboard, Pedidos, Produtos, Estoque, Transferências, Atendimento, Financeiro e Administração), e cada cargo vê só os módulos que pode acessar. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
 **Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
