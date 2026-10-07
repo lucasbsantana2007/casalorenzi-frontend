@@ -22,7 +22,26 @@ npm run build
 | `VITE_USE_MOCKS` | `true`                  | `true` usa dados de demonstração salvos no navegador; `false` usa a API real |
 | `VITE_MODO_DEMO` | `true`                  | Selo "Dados de demonstração" no painel e acesso rápido no login (funciona também com a API, que usa as mesmas contas do seed); `false` quando houver dados reais |
 
-As variáveis são lidas somente em `src/config/env.js`.
+As variáveis são lidas somente em `src/config/env.js`. O build de produção (`npm run build`) usa
+também o `.env.production`, que liga a API real (`VITE_USE_MOCKS=false`) e o modo demonstração.
+
+## Deploy (Vercel)
+
+O site vai para a Vercel e a API, para o Render (passo a passo no README do backend). Faça a API
+primeiro, para ter o endereço dela.
+
+1. Na Vercel: **Add New > Project** e importe este repositório. Ela reconhece o Vite sozinha
+   (build `npm run build`, pasta `dist`).
+2. Em **Environment Variables**, cadastre só `VITE_API_URL` = `https://SUA-API.onrender.com/api`
+   (o `.env.production` já define `VITE_USE_MOCKS=false` e `VITE_MODO_DEMO=true`).
+3. Faça o deploy e copie o endereço do site (ex.: `https://casalorenzi.vercel.app`). Se for
+   diferente do que foi informado ao Render em `CORS_ORIGINS` e `URL_FRONTEND`, corrija lá.
+
+O `vercel.json` faz a Vercel entregar o site em qualquer endereço (`/estoque`, `/cliente/conta`,
+`/login/nova-senha?token=...`); sem ele, abrir uma dessas páginas direto ou apertar F5 daria 404.
+
+Este primeiro deploy é uma **demonstração**: o login mostra o acesso rápido e todas as contas usam a
+senha de demonstração. Para um uso real, defina `VITE_MODO_DEMO=false` na Vercel e troque as senhas.
 
 ## Fluxo de acesso e rotas
 
