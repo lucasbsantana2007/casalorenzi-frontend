@@ -31,7 +31,7 @@ export function FuncionariosPage() {
   )
   const [form, setForm] = useState({ open: false, funcionario: null })
   const [confirmar, setConfirmar] = useState(null)
-  const [convite, setConvite] = useState(null) // { nome, linkDemo }
+  const [convite, setConvite] = useState(null) // { nome, linkDemo } (linkDemo só na demonstração)
 
   async function reenviar(f) {
     const { linkDemo } = await administracaoService.reenviarConvite(f.id)
@@ -143,7 +143,8 @@ export function FuncionariosPage() {
         onClose={() => setForm({ open: false, funcionario: null })}
         onSaved={(resultado) => {
           state.reload()
-          if (resultado?.linkDemo) setConvite({ nome: resultado.funcionario.nome, linkDemo: resultado.linkDemo })
+          // Funcionário novo: o convite saiu por e-mail (editar não manda convite)
+          if (resultado?.funcionario) setConvite({ nome: resultado.funcionario.nome, linkDemo: resultado.linkDemo })
         }}
       />
       <DesativarModal
@@ -290,7 +291,7 @@ function DesativarModal({ funcionario, onClose, onDone }) {
   )
 }
 
-// Só na demonstração: mostra o link que iria por e-mail
+// Confirma o envio do convite; na demonstração (LINK_SENHA_NA_RESPOSTA=true), mostra também o link
 function ConviteModal({ convite, onClose }) {
   return (
     <Modal open={Boolean(convite)} onClose={onClose} size="sm" title="Convite enviado">
@@ -299,15 +300,21 @@ function ConviteModal({ convite, onClose }) {
           <p>
             Enviamos para <strong>{convite.nome}</strong> um e-mail com o link para criar a senha. O link vale por 7 dias.
           </p>
-          <p className="subtle">Demonstração: o e-mail não é enviado de verdade. Copie o link para testar o primeiro acesso numa janela anônima.</p>
-          <div className="convite-link">
-            <Link2 size={14} aria-hidden="true" />
-            <code>{`${window.location.origin}${convite.linkDemo}`}</code>
-          </div>
+          {convite.linkDemo && (
+            <>
+              <p className="subtle">Demonstração: o link também aparece aqui. Copie para testar o primeiro acesso numa janela anônima.</p>
+              <div className="convite-link">
+                <Link2 size={14} aria-hidden="true" />
+                <code>{`${window.location.origin}${convite.linkDemo}`}</code>
+              </div>
+            </>
+          )}
           <div className="form-actions">
-            <button type="button" className="btn btn-secondary" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}${convite.linkDemo}`)}>
-              Copiar link
-            </button>
+            {convite.linkDemo && (
+              <button type="button" className="btn btn-secondary" onClick={() => navigator.clipboard?.writeText(`${window.location.origin}${convite.linkDemo}`)}>
+                Copiar link
+              </button>
+            )}
             <button type="button" className="btn btn-primary" onClick={onClose}>
               Concluir
             </button>
