@@ -45,6 +45,7 @@ export const router = createBrowserRouter([
   },
   // Login único (Iniciar sessão): cliente vai para /cliente, equipe para /dashboard
   { path: '/login', ...publica(() => import('./pages/LoginPage'), 'LoginPage') },
+  { path: '/login/criar-conta', ...publica(() => import('./pages/CriarContaPage'), 'CriarContaPage') },
   { path: '/login/esqueci-senha', ...publica(() => import('./pages/RecuperarSenhaPage'), 'EsqueciSenhaPage') },
   { path: '/login/nova-senha', ...publica(() => import('./pages/RecuperarSenhaPage'), 'NovaSenhaPage') },
   { path: '/login/equipe', element: <Navigate to="/login" replace /> },

@@ -395,6 +395,34 @@
   }
 }
 
+/* Criar conta: campos lado a lado e aviso logo abaixo do campo */
+.login__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.login__campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.login__campo .login__erro {
+  margin-top: 0;
+}
+
+.login__dica {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+  .login__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Esqueceu a senha */
 .login__esqueci {
   align-self: flex-end;

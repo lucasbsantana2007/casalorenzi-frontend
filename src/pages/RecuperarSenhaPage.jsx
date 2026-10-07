@@ -1,38 +1,13 @@
-import { ArrowLeft, MailCheck } from 'lucide-react'
-import { MotionConfig } from 'motion/react'
+import { MailCheck } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthField } from '../components/auth/AuthField'
-import { LoginShowcase } from '../components/auth/LoginShowcase'
-import { BrandMark } from '../components/BrandMark'
+import { LayoutAcesso } from '../components/auth/LayoutAcesso'
 import { FormError } from '../components/ui/FormError'
 import { authService } from '../services/authService'
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const SENHA_MINIMA = 8
-
-// Mesmo visual do login: formulário à esquerda, frase à direita
-function LayoutSenha({ titulo, children }) {
-  return (
-    <MotionConfig reducedMotion="user">
-      <main className="login">
-        <section className="login__panel">
-          <div className="login__form-wrap">
-            <Link to="/login" className="back-link">
-              <ArrowLeft size={14} /> Iniciar sessão
-            </Link>
-            <h1 className="login__brand">
-              <BrandMark />
-              <span className="login__brand-area">{titulo}</span>
-            </h1>
-            {children}
-          </div>
-        </section>
-        <LoginShowcase />
-      </main>
-    </MotionConfig>
-  )
-}
 
 // Passo 1: pede o e-mail e envia o link para criar a senha nova
 export function EsqueciSenhaPage() {
@@ -56,7 +31,7 @@ export function EsqueciSenhaPage() {
 
   if (enviado) {
     return (
-      <LayoutSenha titulo="Nova senha">
+      <LayoutAcesso titulo="Nova senha">
         <div className="login__aviso" role="status">
           <MailCheck size={22} strokeWidth={1.5} aria-hidden="true" />
           <p>
@@ -79,12 +54,12 @@ export function EsqueciSenhaPage() {
             </button>
           </p>
         </div>
-      </LayoutSenha>
+      </LayoutAcesso>
     )
   }
 
   return (
-    <LayoutSenha titulo="Nova senha">
+    <LayoutAcesso titulo="Nova senha">
       <p className="login__intro">Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.</p>
       <form className="login__form" onSubmit={enviar}>
         <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="email" autoFocus required />
@@ -93,7 +68,7 @@ export function EsqueciSenhaPage() {
           {enviando ? 'Enviando…' : 'Enviar link'}
         </button>
       </form>
-    </LayoutSenha>
+    </LayoutAcesso>
   )
 }
 
@@ -125,17 +100,17 @@ export function NovaSenhaPage() {
 
   if (!token) {
     return (
-      <LayoutSenha titulo="Link inválido">
+      <LayoutAcesso titulo="Link inválido">
         <p className="login__intro">Este link não é válido. Peça um novo para criar a sua senha.</p>
         <Link to="/login/esqueci-senha" className="login__submit login__submit--link">
           Pedir novo link
         </Link>
-      </LayoutSenha>
+      </LayoutAcesso>
     )
   }
 
   return (
-    <LayoutSenha titulo="Nova senha">
+    <LayoutAcesso titulo="Nova senha">
       <p className="login__intro">Crie uma nova senha para a sua conta. Ela substitui a anterior.</p>
       <form className="login__form" onSubmit={salvar}>
         <AuthField label="Nova senha" type="password" value={senha} onChange={setSenha} placeholder={`Mínimo de ${SENHA_MINIMA} caracteres`} autoComplete="new-password" autoFocus required />
@@ -152,6 +127,6 @@ export function NovaSenhaPage() {
           <Link to="/login/esqueci-senha">Pedir novo link</Link>
         </p>
       )}
-    </LayoutSenha>
+    </LayoutAcesso>
   )
 }

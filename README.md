@@ -34,7 +34,7 @@ As variáveis são lidas somente em `src/config/env.js`.
    - **`/lojas`:** lojas no mapa do Brasil.
    - **`/lorenzi`:** parte da história da marca (texto de demonstração, fictício).
    - **Menu:** Masculino, Feminino, Lojas e Lorenzi. À direita, o ícone de pessoa (abre o login; com sessão, leva ao perfil do cliente ou ao painel da equipe) e o carrinho da sacola.
-2. **Conta do cliente criada no checkout.** Não há compra sem conta: no checkout o cliente se cadastra (nome, CPF, e-mail, celular e senha) ou entra na conta que já tem. O id do cliente é o CPF.
+2. **Conta do cliente.** Pode ser criada no login (`/login/criar-conta`) ou no checkout, com nome, CPF, e-mail, celular e senha. Não há compra sem conta. O id do cliente é o CPF.
 3. **Login único em `/login`** (Iniciar sessão), para clientes e equipe. Depois de entrar, o cliente vai para o perfil (`/cliente`) e a equipe para a gestão (`/dashboard`), com os módulos do seu cargo. Quem tentou abrir uma página protegida volta para ela depois de entrar. O endereço antigo `/login/equipe` redireciona para `/login`.
 4. **"Sair"** encerra a sessão e volta para a página inicial.
 
@@ -50,7 +50,7 @@ Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, 
 
 Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/esqueci-senha` e `/login/nova-senha`.
+**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
 **Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`.
 

@@ -20,7 +20,8 @@ export function LoginShowcase() {
           </p>
         </motion.blockquote>
         <motion.figcaption {...reveal(0.2, 12)}>
-          <strong>Walt Disney</strong>, desenhista e empresário americano
+          <strong>Walt Disney</strong>
+          <span>Desenhista e empresário americano</span>
         </motion.figcaption>
       </figure>
     </div>

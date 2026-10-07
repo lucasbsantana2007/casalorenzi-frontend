@@ -10,17 +10,10 @@ import { FormError } from '../components/ui/FormError'
 import { MODO_DEMO } from '../config/env'
 import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
 import { useSession } from '../hooks/useSession'
+import { destinoPara } from '../utils/destinoLogin'
 import { PAPEIS } from '../utils/permissions'
 
 const CONTAS_DEMO = [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }, ...PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] }))]
-
-// Depois de entrar: cliente vai para o perfil, equipe para a gestão. Quem tentou abrir uma
-// página protegida da própria área volta para ela.
-function destinoPara(usuario, from) {
-  const cliente = usuario.papel === 'CLIENTE'
-  if (from && cliente === from.startsWith('/cliente')) return from
-  return cliente ? '/cliente' : '/dashboard'
-}
 
 // Login único (Iniciar sessão) para clientes e equipe
 export function LoginPage() {
@@ -115,7 +108,12 @@ export function LoginPage() {
             </form>
 
             <div className="login__footer">
-              <p>Ainda não tem conta? Ela é criada na sua primeira compra, no checkout.</p>
+              <p>
+                Ainda não tem conta?{' '}
+                <Link to="/login/criar-conta" state={location.state}>
+                  Criar conta
+                </Link>
+              </p>
               {MODO_DEMO && (
                 <p>
                   Demonstração: use o acesso rápido ou a senha <code>{SENHA_DEMO}</code>.
