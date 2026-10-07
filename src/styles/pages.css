@@ -1660,3 +1660,79 @@ a.ticket-list__item:hover {
   font-size: 12.5px;
   color: var(--text-muted);
 }
+
+/* Cadastro de produto: foto */
+.foto-produto {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.foto-produto__corpo {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.foto-produto__previa {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 96px;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--text-subtle);
+}
+
+.foto-produto__previa img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.foto-produto__previa.is-vazia {
+  border-style: dashed;
+}
+
+.foto-produto__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.foto-produto__estado {
+  margin: 0;
+  font-size: 13px;
+  color: var(--navy-900);
+}
+
+.foto-produto__botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.foto-produto__erro {
+  font-size: 12.5px;
+  color: var(--danger);
+}
+
+/* Lista de produtos: miniatura ao lado do nome */
+.produto-celula {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.produto-celula img {
+  flex-shrink: 0;
+  width: 32px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--surface-muted);
+}

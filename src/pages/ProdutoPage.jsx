@@ -74,6 +74,8 @@ function Produto({ produto }) {
       tamanho: variacao.tamanho,
       sku: variacao.sku,
       preco: produto.precoBase,
+      // Foto enviada no cadastro (sem ela, o carrinho usa a ilustração do produto)
+      imagemUrl: produto.imagemUrl ?? null,
     })
   }
   const genero = produto.genero?.toLowerCase()

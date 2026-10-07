@@ -307,7 +307,7 @@ export function CheckoutPage() {
           {itens.map((item) => (
             <li key={item.variacaoId}>
               <span className="co-items__image">
-                <img src={imagemDoProduto({ id: item.produtoId })} alt="" />
+                <img src={imagemDoProduto({ id: item.produtoId, imagemUrl: item.imagemUrl })} alt="" />
                 <span className="co-items__qty">{item.quantidade}</span>
               </span>
               <span className="co-items__info">

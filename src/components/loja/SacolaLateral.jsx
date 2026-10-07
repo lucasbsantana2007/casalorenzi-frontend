@@ -61,7 +61,7 @@ export function SacolaLateral() {
               {itens.map((item) => (
                 <li key={item.variacaoId} className="drawer-item">
                   <Link to={`/produto/${item.produtoId}`} className="drawer-item__image">
-                    <img src={imagemDoProduto({ id: item.produtoId })} alt={item.nome} />
+                    <img src={imagemDoProduto({ id: item.produtoId, imagemUrl: item.imagemUrl })} alt={item.nome} />
                   </Link>
                   <div className="drawer-item__info">
                     <Link to={`/produto/${item.produtoId}`} className="drawer-item__name">

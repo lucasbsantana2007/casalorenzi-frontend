@@ -12,8 +12,9 @@ import tailleurBranco from '../assets/colecao/tailleur-branco.jpg'
 import verao from '../assets/colecao/verao.jpg'
 import vestidoPortas from '../assets/colecao/vestido-portas.jpg'
 
-// Fotos ilustrativas (Unsplash) usadas enquanto o cadastro de produtos não tem imagens.
-// Quando a API devolver `imagemUrl`, ela tem prioridade (ver imagemDoProduto).
+// Fotos ilustrativas (Unsplash) dos produtos sem foto enviada.
+// A foto enviada no cadastro (`imagemUrl`) sempre tem prioridade (ver imagemDoProduto).
+// `imagemUrl` null (sem foto) também cai na ilustração.
 const POR_PRODUTO = {
   1: camisaria,
   2: social,

@@ -10,7 +10,7 @@ function ResumoPedido({ pedido }) {
     <>
       <span className="order-pick__thumbs" aria-hidden="true">
         {pedido.itens.slice(0, 2).map((item) => (
-          <img key={item.variacaoId} src={imagemDoProduto({ id: item.variacao.produto.id })} alt="" />
+          <img key={item.variacaoId} src={imagemDoProduto(item.variacao.produto)} alt="" />
         ))}
       </span>
       <span className="order-pick__info">
