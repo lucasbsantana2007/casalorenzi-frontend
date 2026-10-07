@@ -1,8 +1,10 @@
 import { ApiError } from '../api'
-import { aplicarMovimentacao, byId, db, estoqueView, fail, inPeriod, matches, movimentacaoView, registrarLog, respond } from './db'
+import { aplicarMovimentacao, byId, db, estoqueView, fail, inPeriod, matches, movimentacaoView, produtoRemovido, registrarLog, respond } from './db'
 
-function filtrarEstoques({ busca, lojaId, categoria, status, variacaoId } = {}) {
+// incluirRemovidos: só para reconstruir o passado (posição em data)
+function filtrarEstoques({ busca, lojaId, categoria, status, variacaoId, incluirRemovidos = false } = {}) {
   return db.estoques
+    .filter((e) => incluirRemovidos || !produtoRemovido(e.variacaoId))
     .map(estoqueView)
     .filter((e) => !lojaId || e.lojaId === Number(lojaId))
     .filter((e) => !variacaoId || e.variacaoId === Number(variacaoId))
@@ -46,14 +48,16 @@ export function posicaoEmData({ data, lojaId, busca } = {}) {
   db.movimentacoes.forEach((m) => {
     if (m.criadoEm <= limite) saldos.set(m.estoqueId, (saldos.get(m.estoqueId) ?? 0) + m.quantidade)
   })
-  const itens = filtrarEstoques({ lojaId, busca })
+  const itens = filtrarEstoques({ lojaId, busca, incluirRemovidos: true })
     .map((e) => ({ ...e, quantidadeNaData: saldos.get(e.id) ?? 0 }))
     .sort((a, b) => Number(b.produto.ativo) - Number(a.produto.ativo) || a.produto.nome.localeCompare(b.produto.nome) || a.lojaId - b.lojaId)
   return respond({ data, itens })
 }
 
 export function registrarMovimentacao({ estoqueId, tipo, quantidade, origem, usuarioId }) {
-  if (!byId(db.estoques, estoqueId)) return fail('Item de estoque não encontrado.', 404)
+  const estoque = byId(db.estoques, estoqueId)
+  if (!estoque) return fail('Item de estoque não encontrado.', 404)
+  if (produtoRemovido(estoque.variacaoId)) return fail('Este produto foi removido do catálogo.', 409)
   if (!Number.isInteger(quantidade) || quantidade === 0) return fail('Informe uma quantidade válida.', 422)
   try {
     const mov = aplicarMovimentacao({ estoqueId: Number(estoqueId), tipo, quantidade, origem, usuarioId })
