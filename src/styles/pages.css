@@ -1427,6 +1427,93 @@ a.ticket-list__item:hover {
   background: var(--navy-900);
 }
 
+/* ---------- Configurações da conta (área do cliente) ---------- */
+
+.account-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.account-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.account-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.account-card__header > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--navy-900);
+}
+
+.account-card__header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.account-card__header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.account-card__header p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 13.5px;
+}
+
+.account-card--danger .account-card__header > svg {
+  color: var(--danger);
+}
+
+.account-data {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 32px;
+  margin: 0;
+}
+
+.account-data dt {
+  color: var(--text-muted);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.account-data dd {
+  margin: 4px 0 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+
+.account-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn-danger-solid {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+
+.btn-danger-solid:hover:not(:disabled) {
+  filter: brightness(0.92);
+}
+
 @media (max-width: 860px) {
   .shortcut-grid,
   .client-ticket {
@@ -1438,6 +1525,15 @@ a.ticket-list__item:hover {
 }
 
 @media (max-width: 560px) {
+  .account-card {
+    padding: 18px 16px;
+  }
+  .account-card__header {
+    flex-wrap: wrap;
+  }
+  .account-data {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .request-card {
     flex-wrap: wrap;
     gap: 10px;

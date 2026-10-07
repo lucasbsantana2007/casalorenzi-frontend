@@ -37,3 +37,12 @@ export function limparSessao() {
     })
   })
 }
+
+// Atualiza os dados do usuário da sessão (ex.: nome ou e-mail editados em Configurações da conta),
+// no mesmo armazenamento em que a sessão foi salva
+export function atualizarUsuarioSalvo(usuario) {
+  safe(() => {
+    const storage = localStorage.getItem(TOKEN_KEY) ? localStorage : sessionStorage
+    storage.setItem(USUARIO_KEY, JSON.stringify(usuario))
+  })
+}

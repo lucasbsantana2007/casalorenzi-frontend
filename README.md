@@ -52,7 +52,7 @@ Lojista e Operador veem os pedidos que a própria loja expede. No menu do Admini
 
 **Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
-**Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`.
+**Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`, `/cliente/conta` (configurações da conta: dados pessoais, senha e exclusão).
 
 **Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`, `/administracao/funcionarios`, `/administracao/lojas`, `/administracao/frete`, `/administracao/log`.
 
@@ -175,6 +175,13 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `POST /atendimentos` com `{ clienteId, tipoSolicitacaoId, pedidoId?, descricao, anexo? }`. `pedidoId` é obrigatório quando o tipo tem `exigeVenda` e precisa ser um pedido do próprio cliente. `anexo: { nome, tipo, conteudoBase64 }` é uma foto JPG, PNG ou WebP de até 2 MB, já reduzida no navegador; ela fica na primeira mensagem (`anexo_url` no banco).
 - `GET /clientes/{id}/pedidos`
 - `GET /clientes/{id}/pedidos/{numero}`
+
+**Configurações da conta** (só o cliente logado, pelo token; tela `/cliente/conta`)
+- `GET /conta` → `{ id, nome, email, cpf, telefone, clienteDesde }`
+- `PUT /conta` com `{ nome, email, telefone, senhaAtual? }` → mesma resposta. O CPF não muda. Trocar o e-mail (que é o login) exige `senhaAtual`; HTTP 409 se o e-mail já tiver conta.
+- `PUT /conta/senha` com `{ senhaAtual, senha, senhaConfirmacao }` → sem corpo (204).
+- `POST /conta/exclusao` com `{ senha }` → sem corpo (204). Apaga nome, e-mail, CPF, celular e senha e encerra o acesso; pedidos e solicitações ficam anônimos (a loja precisa deles para fins fiscais). O CPF e o e-mail ficam livres para uma conta nova.
+- Senha atual errada responde 422 (não 401, que o site trata como sessão vencida).
 
 O token recebido no login é enviado em todas as requisições como `Authorization: Bearer <token>`. "Manter conectado" guarda a sessão no `localStorage`; sem essa opção, ela fica no `sessionStorage` e termina ao fechar o navegador.
 

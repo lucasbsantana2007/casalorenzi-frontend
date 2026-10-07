@@ -6,13 +6,13 @@ const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 export const SENHA_MINIMA = 8
 
 // Só na demonstração: hash SHA-256 com o id da conta como sal (CPF no cliente). A API real usa bcrypt.
-async function hashSenha(sal, senha) {
+export async function hashSenha(sal, senha) {
   const bytes = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${sal}:${senha}`))
   return [...new Uint8Array(bytes)].map((b) => b.toString(16).padStart(2, '0')).join('')
 }
 
 // Senha trocada pelo "Esqueceu a senha?" vira hash; sem hash, vale a senha de demonstração
-const senhaConfere = async (conta, senha) => (conta.senhaHash ? conta.senhaHash === (await hashSenha(String(conta.id), senha)) : senha === SENHA_DEMO)
+export const senhaConfere = async (conta, senha) => (conta.senhaHash ? conta.senhaHash === (await hashSenha(String(conta.id), senha)) : senha === SENHA_DEMO)
 
 const sessaoDoCliente = (c) => ({ token: `demo-cliente-${c.id}`, usuario: { id: c.id, nome: c.nome, email: c.email, papel: 'CLIENTE', lojaId: null } })
 
