@@ -6,9 +6,11 @@ import * as mock from './mock/pedidos'
 export const pedidosService = USE_MOCKS
   ? mock
   : {
-      // Loja (público, sem login)
-      // { email, emailConfirmacao, pin, pinConfirmacao, nome, telefone, endereco, freteTipo, pagamento: { metodo, parcelas }, itens: [{ variacaoId, quantidade }] }
-      finalizarCompra: (dados) => api.post('/checkout', dados),
+      // Loja: checkout (exige cliente logado; o cliente vem do token, não do corpo)
+      // { endereco, freteTipo, pagamento: { metodo, parcelas }, itens: [{ variacaoId, quantidade }] }
+      // O pedido grava clienteId = CPF do cliente. 401 sem sessão de cliente
+      finalizarCompra: ({ clienteId: _clienteId, ...dados }) => api.post('/checkout', dados),
+      // Legado (compras antigas, antes do cadastro com senha):
       // { email, pin } → todos os pedidos do e-mail. POST para o PIN não ir na URL
       listarMeusPedidos: (dados) => api.post('/meus-pedidos', dados),
       // { email } → envia e-mail com link de confirmação (resposta igual exista ou não o e-mail)

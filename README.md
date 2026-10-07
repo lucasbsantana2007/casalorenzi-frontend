@@ -32,12 +32,15 @@ As variáveis são lidas somente em `src/config/env.js`.
    - **`/produto/:id`:** página do produto, com escolha de tamanho e cor.
    - **Sacola e `/checkout`:** a sacola abre na lateral; o checkout leva a `/pedido/confirmado/:numero`.
    - **`/lojas`:** lojas no mapa do Brasil.
-   - **Menu:** Masculino, Feminino, Lojas e Atendimento, com a Sacola à direita. "Painel" só aparece para a equipe logada. O acesso da equipe é um link discreto no rodapé.
-2. **Clientes não têm login.** No checkout, o cliente cria um PIN de 4 números. Em **`/meus-pedidos`** (link "Atendimento"), o e-mail e o PIN liberam todos os pedidos daquele e-mail e os chamados de atendimento. Quem esqueceu o PIN pede um novo em `/meus-pedidos/novo-pin`. As rotas antigas `/login`, `/cliente/*` e `/meu-pedido` redirecionam para `/meus-pedidos`.
-3. **Login da equipe em `/login/equipe`**, para Administrador, Lojista e Operador, acessado por "Acesso da equipe" no rodapé. Depois do login, a equipe vai para `/dashboard`. Quem tentou abrir uma página protegida volta para ela depois de entrar.
+   - **`/lorenzi`:** parte da história da marca (texto de demonstração, fictício).
+   - **Menu:** Masculino, Feminino, Lojas e Lorenzi. À direita, o ícone de pessoa (abre o login; com sessão, leva ao perfil do cliente ou ao painel da equipe) e o carrinho da sacola.
+2. **Conta do cliente criada no checkout.** Não há compra sem conta: no checkout o cliente se cadastra (nome, CPF, e-mail, celular e senha) ou entra na conta que já tem. O id do cliente é o CPF.
+3. **Login único em `/login`** (Iniciar sessão), para clientes e equipe. Depois de entrar, o cliente vai para o perfil (`/cliente`) e a equipe para a gestão (`/dashboard`), com os módulos do seu cargo. Quem tentou abrir uma página protegida volta para ela depois de entrar. O endereço antigo `/login/equipe` redireciona para `/login`.
 4. **"Sair"** encerra a sessão e volta para a página inicial.
 
-Com `VITE_USE_MOCKS=true`, `/login/equipe` oferece acesso rápido de demonstração para Administrador, Lojista e Operador. Qualquer e-mail da equipe entra com a senha `lorenzi2026`. Os clientes de demonstração usam o PIN `1234` em `/meus-pedidos`.
+Com `VITE_USE_MOCKS=true`, `/login` oferece acesso rápido de demonstração para uma cliente, Administrador, Lojista e Operador. Contas da equipe e clientes de demonstração entram com a senha `lorenzi2026`.
+
+`/meus-pedidos` (e-mail + PIN) ainda existe para compras antigas, feitas antes do cadastro com senha.
 
 | Perfil        | Módulos                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
@@ -47,7 +50,9 @@ Com `VITE_USE_MOCKS=true`, `/login/equipe` oferece acesso rápido de demonstraç
 
 Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/meus-pedidos`, `/meus-pedidos/novo-pin` e `/login/equipe`.
+**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/meus-pedidos`, `/meus-pedidos/novo-pin`, `/login`, `/login/esqueci-senha` e `/login/nova-senha`.
+
+**Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`.
 
 **Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`.
 
@@ -94,6 +99,12 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 
 **Autenticação**
 - `POST /auth/login` com `{ email, senha }` retorna `{ token, usuario: { id, nome, email, papel, lojaId } }`. Serve para equipe e clientes (`papel: 'CLIENTE'`). Em erro, use HTTP 401 com `detail`.
+- `POST /auth/cadastro` com `{ nome, cpf, email, telefone, senha, senhaConfirmacao }` cria o cliente e retorna o mesmo formato do login. O **id do cliente é o CPF** (11 dígitos, sem pontuação). Senha com no mínimo 8 caracteres, guardada com hash (bcrypt). HTTP 409 se o CPF ou o e-mail já tiverem conta.
+- `POST /auth/esqueci-senha` com `{ email }` retorna `{ enviado: true }`, exista ou não a conta (não revela quem tem cadastro). Envia um e-mail com o link `/login/nova-senha?token=...`, válido por 30 minutos e de uso único. Vale para clientes e equipe; limitar tentativas no servidor.
+- `POST /auth/redefinir-senha` com `{ token, senha, senhaConfirmacao }` troca a senha e retorna `{ email }`. HTTP 410 se o link expirou ou já foi usado; usar um link invalida os outros pendentes da mesma conta.
+
+**Checkout** (exige cliente logado)
+- `POST /checkout` com `{ endereco, freteTipo, pagamento: { metodo, parcelas }, itens: [{ variacaoId, quantidade }] }`. O cliente vem do token, não do corpo; o pedido grava `clienteId` = CPF. HTTP 401 sem sessão de cliente.
 
 **Cadastros**
 - `GET /lojas`

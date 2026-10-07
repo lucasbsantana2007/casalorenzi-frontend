@@ -50,7 +50,7 @@ export function buildPedidos(variacoes) {
 // autorTipo: CLIENTE | ATENDENTE | SISTEMA
 const ROTEIROS = [
   {
-    clienteId: 101, tipoId: 1, status: 'EM_ANDAMENTO', responsavelId: 2, dias: 2, pedidoIndex: 0,
+    clienteId: '15881399803', tipoId: 1, status: 'EM_ANDAMENTO', responsavelId: 2, dias: 2, pedidoIndex: 0,
     mensagens: [
       ['CLIENTE', 'Olá! Comprei o item {produto} ({cor}, tamanho {tamanho}), mas ficou grande. Gostaria de trocar por um tamanho menor, na mesma cor.', 0],
       ['ATENDENTE', 'Oi, Mariana! Tudo bem? Verifiquei aqui e temos a numeração menor disponível na Oscar Freire. Posso separar para você retirar a partir de amanhã?', 3],
@@ -58,7 +58,7 @@ const ROTEIROS = [
     ],
   },
   {
-    clienteId: 101, tipoId: 4, status: 'CONCLUIDO', responsavelId: 2, dias: 21, pedidoIndex: 1,
+    clienteId: '15881399803', tipoId: 4, status: 'CONCLUIDO', responsavelId: 2, dias: 21, pedidoIndex: 1,
     mensagens: [
       ['CLIENTE', 'Preciso de um pequeno ajuste no item {produto}. Vocês fazem na loja?', 0],
       ['ATENDENTE', 'Fazemos sim! O ajuste é cortesia e fica pronto em até 5 dias úteis. Pode trazer a peça na Oscar Freire.', 2],
@@ -67,29 +67,29 @@ const ROTEIROS = [
     ],
   },
   {
-    clienteId: 102, tipoId: 3, status: 'ABERTO', responsavelId: null, dias: 0, pedidoIndex: 0,
+    clienteId: '69879730917', tipoId: 3, status: 'ABERTO', responsavelId: null, dias: 0, pedidoIndex: 0,
     mensagens: [['CLIENTE', 'Meu pedido consta como enviado, mas o rastreio não atualiza há mais de uma semana. Podem verificar com a transportadora?', 0]],
   },
   {
-    clienteId: 103, tipoId: 5, status: 'AGUARDANDO_CLIENTE', responsavelId: 4, dias: 1,
+    clienteId: '11417075350', tipoId: 5, status: 'AGUARDANDO_CLIENTE', responsavelId: 4, dias: 1,
     mensagens: [
       ['CLIENTE', 'Vi no site o vestido midi de seda verde oliva no tamanho P. Tem no Leblon? Se não tiver, conseguem trazer de outra loja?', 0],
       ['ATENDENTE', 'Oi, Juliana! No Leblon não temos o P, mas a Oscar Freire tem uma peça. Consigo solicitar a transferência e ela chega em até 3 dias úteis. Posso seguir?', 4],
     ],
   },
   {
-    clienteId: 104, tipoId: 2, status: 'EM_ANDAMENTO', responsavelId: 5, dias: 3, pedidoIndex: 0,
+    clienteId: '64556815177', tipoId: 2, status: 'EM_ANDAMENTO', responsavelId: 5, dias: 3, pedidoIndex: 0,
     mensagens: [
       ['CLIENTE', 'Gostaria de devolver o item {produto}. O tamanho {tamanho} não serviu e não há numeração disponível para troca.', 0],
       ['ATENDENTE', 'Felipe, recebemos sua solicitação. O reembolso é feito na mesma forma de pagamento após a conferência da peça na loja Pátio Batel.', 6],
     ],
   },
   {
-    clienteId: 105, tipoId: 7, status: 'ABERTO', responsavelId: null, dias: 0,
+    clienteId: '88447294072', tipoId: 7, status: 'ABERTO', responsavelId: null, dias: 0,
     mensagens: [['CLIENTE', 'O suéter de cashmere que comprei começou a formar bolinhas depois de duas lavagens à mão, seguindo a etiqueta. Gostaria de uma avaliação.', 0]],
   },
   {
-    clienteId: 106, tipoId: 6, status: 'CONCLUIDO', responsavelId: 8, dias: 9,
+    clienteId: '55761698757', tipoId: 6, status: 'CONCLUIDO', responsavelId: 8, dias: 9,
     mensagens: [
       ['CLIENTE', 'Qual o material da jaqueta de camurça Capri? Ela mancha com chuva?', 0],
       ['ATENDENTE', 'Gustavo, a Jaqueta Capri é em camurça de couro bovino, com forro de viscose. Ela resiste a garoa, mas recomendamos evitar chuva forte e aplicar impermeabilizante para camurça.', 1],
@@ -97,18 +97,18 @@ const ROTEIROS = [
     ],
   },
   {
-    clienteId: 107, tipoId: 1, status: 'ABERTO', responsavelId: null, dias: 1, pedidoIndex: 0,
+    clienteId: '16897684600', tipoId: 1, status: 'ABERTO', responsavelId: null, dias: 1, pedidoIndex: 0,
     mensagens: [['CLIENTE', 'Ganhei o item {produto} de presente no tamanho {tamanho} e preciso trocar por outro tamanho. Tenho a nota fiscal.', 0]],
   },
   {
-    clienteId: 108, tipoId: 3, status: 'CONCLUIDO', responsavelId: 1, dias: 15, pedidoIndex: 1,
+    clienteId: '97880932054', tipoId: 3, status: 'CONCLUIDO', responsavelId: 1, dias: 15, pedidoIndex: 1,
     mensagens: [
       ['CLIENTE', 'Meu pedido ainda está em separação. Há previsão de envio?', 0],
       ['ATENDENTE', 'Thiago, seu pedido foi despachado hoje. O código de rastreio já está disponível no portal.', 5],
     ],
   },
   {
-    clienteId: 103, tipoId: 4, status: 'EM_ANDAMENTO', responsavelId: 4, dias: 5, pedidoIndex: 0,
+    clienteId: '11417075350', tipoId: 4, status: 'EM_ANDAMENTO', responsavelId: 4, dias: 5, pedidoIndex: 0,
     mensagens: [
       ['CLIENTE', 'Gostaria de ajustar a cintura do item {produto}. É possível?', 0],
       ['ATENDENTE', 'É possível sim, Juliana. Nossa costureira atende no Leblon às terças e quintas. Pode trazer a peça quando quiser.', 3],
@@ -116,14 +116,14 @@ const ROTEIROS = [
     ],
   },
   {
-    clienteId: 102, tipoId: 6, status: 'AGUARDANDO_CLIENTE', responsavelId: 3, dias: 4,
+    clienteId: '69879730917', tipoId: 6, status: 'AGUARDANDO_CLIENTE', responsavelId: 3, dias: 4,
     mensagens: [
       ['CLIENTE', 'O trench coat tem forro removível?', 0],
-      ['ATENDENTE', 'Ricardo, o forro não é removível, mas é em viscose leve, ideal para meia-estação. Quer que eu reserve um para você provar no Lago Sul?', 2],
+      ['ATENDENTE', 'Ricardo, o forro não é removível, mas é em viscose leve, ideal para meia-estação. Quer que eu reserve um para você provar no Lago Norte?', 2],
     ],
   },
   {
-    clienteId: 101, tipoId: 6, status: 'CONCLUIDO', responsavelId: 1, dias: 40,
+    clienteId: '15881399803', tipoId: 6, status: 'CONCLUIDO', responsavelId: 1, dias: 40,
     mensagens: [
       ['CLIENTE', 'O lenço de seda pode ser lavado à mão?', 0],
       ['ATENDENTE', 'Recomendamos lavagem a seco para preservar a estampa e o brilho da seda.', 1],

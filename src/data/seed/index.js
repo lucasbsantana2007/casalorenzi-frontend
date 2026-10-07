@@ -25,7 +25,10 @@ export function createSeed() {
       ...DETALHES_PRODUTOS[id],
     })),
     variacoes,
-    usuarios: [...USUARIOS, ...CLIENTES],
+    // Funcionários (equipe) e clientes ficam em tabelas separadas; o id do cliente é o CPF.
+    // senhaHash null: cliente de demonstração, entra com a senha de demonstração
+    usuarios: USUARIOS.map((u) => ({ ...u })),
+    clientes: CLIENTES.map((c) => ({ ...c, senhaHash: null })),
     estoques,
     movimentacoes,
     transferencias,

@@ -12,54 +12,35 @@ import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
 import { useSession } from '../hooks/useSession'
 import { PAPEIS } from '../utils/permissions'
 
-// Dois logins com a mesma tela: clientes (/login) e equipe (/login/equipe)
-const AREAS = {
-  cliente: {
-    titulo: 'Entrar',
-    descricao: 'Acesse sua conta para acompanhar pedidos e atendimentos.',
-    placeholder: 'seu@email.com',
-    contas: [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }],
-    esqueceu: 'Esqueceu a senha? Fale com a sua loja Casa Lorenzi.',
-  },
-  equipe: {
-    titulo: 'Acesso da equipe',
-    descricao: 'Painel de gestão para administradores, lojistas e operadores.',
-    placeholder: 'nome@casalorenzi.com.br',
-    contas: PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] })),
-    esqueceu: 'Esqueceu a senha? Fale com o administrador da sua loja.',
-  },
-}
+const CONTAS_DEMO = [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }, ...PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] }))]
 
-export const LoginClientePage = () => <LoginPage area="cliente" />
-export const LoginEquipePage = () => <LoginPage area="equipe" />
-
-// Destino após o login: a página que levou até aqui (se for da área do usuário) ou a área padrão
+// Depois de entrar: cliente vai para o perfil, equipe para a gestão. Quem tentou abrir uma
+// página protegida da própria área volta para ela.
 function destinoPara(usuario, from) {
   const cliente = usuario.papel === 'CLIENTE'
   if (from && cliente === from.startsWith('/cliente')) return from
   return cliente ? '/cliente' : '/dashboard'
 }
 
-function LoginPage({ area }) {
-  const config = AREAS[area]
-  const { usuario, login, logout } = useSession()
+// Login único (Iniciar sessão) para clientes e equipe
+export function LoginPage() {
+  const { usuario, login } = useSession()
   const location = useLocation()
-  const [email, setEmail] = useState('')
+  // Voltando de "Esqueceu a senha?": e-mail já preenchido e aviso de sucesso
+  const senhaNova = location.state?.senhaNova
+  const [email, setEmail] = useState(location.state?.email ?? '')
   const [senha, setSenha] = useState('')
   const [manterConectado, setManterConectado] = useState(true)
   const [entrando, setEntrando] = useState(false)
   const [error, setError] = useState(null)
 
-  // Sessão ativa da mesma área: vai direto para ela. Da outra área (ex.: cliente logado
-  // abrindo o login da equipe): mostra a tela com um aviso, em vez de redirecionar em silêncio.
-  const sessaoDeOutraArea = usuario && (usuario.papel === 'CLIENTE') !== (area === 'cliente')
-  if (usuario && !sessaoDeOutraArea) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
+  if (usuario) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
 
   async function entrar(credenciais) {
     setError(null)
     setEntrando(true)
     try {
-      await login({ ...credenciais, manterConectado, area })
+      await login({ ...credenciais, manterConectado })
     } catch (err) {
       setError(err)
       setEntrando(false)
@@ -80,44 +61,31 @@ function LoginPage({ area }) {
             <Link to="/" className="back-link">
               <ArrowLeft size={14} /> Página inicial
             </Link>
-            <BrandMark />
+            <h1 className="login__brand">
+              <BrandMark />
+              <span className="login__brand-area">Iniciar sessão</span>
+            </h1>
 
-            <div className="login__heading">
-              <h1 className="login__title">{config.titulo}</h1>
-              <p className="muted">{config.descricao}</p>
-            </div>
+            {senhaNova && (
+              <p className="login__sucesso" role="status">
+                Senha alterada. Entre com a sua nova senha.
+              </p>
+            )}
 
-            {sessaoDeOutraArea ? (
-              <div className="login__session" role="status">
-                <p>
-                  Você está conectado como <strong>{usuario.nome}</strong> ({usuario.papel === 'CLIENTE' ? 'cliente' : PAPEIS[usuario.papel]}). Para entrar com
-                  outra conta, saia primeiro.
-                </p>
-                <div className="login__session-actions">
-                  <Link to={usuario.papel === 'CLIENTE' ? '/cliente' : '/dashboard'} className="btn btn-secondary">
-                    Ir para minha área
-                  </Link>
-                  <button type="button" className="btn btn-primary" onClick={logout}>
-                    Sair e trocar de conta
-                  </button>
-                </div>
-              </div>
-            ) : (
+            {MODO_DEMO && !senhaNova && (
               <>
-              {MODO_DEMO && (
-                <>
-                  <div className="login__quick">
-                    <span className="login__quick-label">Acesso rápido de demonstração</span>
-                    <div className={`login__quick-grid login__quick-grid--${config.contas.length}`}>
-                      {config.contas.map((conta) => (
-                        <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
-                          <strong>{conta.rotulo}</strong>
-                          <span>{conta.nome}</span>
-                        </button>
-                      ))}
-                    </div>
+                <div className="login__quick">
+                  <span className="login__quick-label">Acesso rápido de demonstração</span>
+                  <div className="login__quick-grid login__quick-grid--4">
+                    {CONTAS_DEMO.map((conta) => (
+                      <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
+                        <strong>{conta.rotulo}</strong>
+                        <span>{conta.nome}</span>
+                      </button>
+                    ))}
                   </div>
-                  <div className="login__divider">ou entre com seu e-mail</div>
+                </div>
+                <div className="login__divider">ou entre com seu e-mail</div>
               </>
             )}
 
@@ -128,8 +96,12 @@ function LoginPage({ area }) {
                 entrar({ email, senha })
               }}
             >
-              <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder={config.placeholder} autoComplete="username" required />
+              <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="username" required />
               <AuthField label="Senha" type="password" value={senha} onChange={setSenha} placeholder="Digite sua senha" autoComplete="current-password" required />
+
+              <Link to="/login/esqueci-senha" className="login__esqueci">
+                Esqueceu a senha?
+              </Link>
 
               <CheckboxLine checked={manterConectado} onChange={setManterConectado}>
                 Manter conectado neste dispositivo
@@ -141,11 +113,9 @@ function LoginPage({ area }) {
                 {entrando ? 'Entrando…' : 'Entrar'}
               </button>
             </form>
-              </>
-            )}
 
             <div className="login__footer">
-              <p>{config.esqueceu}</p>
+              <p>Ainda não tem conta? Ela é criada na sua primeira compra, no checkout.</p>
               {MODO_DEMO && (
                 <p>
                   Demonstração: use o acesso rápido ou a senha <code>{SENHA_DEMO}</code>.
@@ -155,7 +125,7 @@ function LoginPage({ area }) {
           </div>
         </section>
 
-        <LoginShowcase area={area} />
+        <LoginShowcase />
       </main>
     </MotionConfig>
   )

@@ -4,14 +4,9 @@ import { getUsuarioSalvo, limparSessao, salvarSessao } from '../services/authSto
 import { podeAcessar } from '../utils/permissions'
 import { SessionContext } from './sessionContext'
 
-const LOGIN_CERTO = {
-  cliente: 'Esta é uma conta da equipe. Entre pelo "Acesso da equipe", no rodapé do site.',
-  equipe: 'Esta é uma conta de cliente. Entre por "Conta", no topo do site.',
-}
-
-// Há dois logins: clientes (/login) e equipe (/login/equipe). O papel da conta
-// (CLIENTE, ADMINISTRADOR, LOJISTA, OPERADOR) precisa corresponder ao login usado
-// e define as permissões. O token é enviado pela camada de API (Authorization: Bearer).
+// Um único login (/login) para clientes e equipe. O papel da conta (CLIENTE, ADMINISTRADOR,
+// LOJISTA, OPERADOR) define para onde a pessoa vai e o que pode acessar.
+// O token é enviado pela camada de API (Authorization: Bearer).
 export function SessionProvider({ children }) {
   const [usuario, setUsuario] = useState(getUsuarioSalvo)
 
@@ -23,12 +18,22 @@ export function SessionProvider({ children }) {
       isEquipe: Boolean(usuario) && !isCliente,
       clienteId: isCliente ? usuario.id : null,
       pode: (modulo) => Boolean(usuario) && podeAcessar(usuario.papel, modulo),
-      // area: 'cliente' | 'equipe'
-      login: async ({ email, senha, manterConectado, area }) => {
+      // somenteCliente: no checkout, só conta de cliente compra
+      login: async ({ email, senha, manterConectado, somenteCliente = false }) => {
         const sessao = await authService.login({ email, senha })
-        if ((sessao.usuario.papel === 'CLIENTE') !== (area === 'cliente')) throw new Error(LOGIN_CERTO[area])
+        if (somenteCliente && sessao.usuario.papel !== 'CLIENTE') {
+          throw new Error('Esta é uma conta da equipe. Para comprar, use uma conta de cliente.')
+        }
         salvarSessao(sessao, manterConectado)
         setUsuario(sessao.usuario)
+        return sessao.usuario
+      },
+      // Cadastro de cliente (checkout): cria a conta e já entra nela
+      cadastrar: async (dados) => {
+        const sessao = await authService.cadastrarCliente(dados)
+        salvarSessao(sessao, true)
+        setUsuario(sessao.usuario)
+        return sessao.usuario
       },
       logout: () => {
         limparSessao()

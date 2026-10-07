@@ -1,6 +1,6 @@
 export const LOJAS = [
   { id: 1, nome: 'Oscar Freire', cidade: 'São Paulo', uf: 'SP' },
-  { id: 2, nome: 'Lago Sul', cidade: 'Brasília', uf: 'DF' },
+  { id: 2, nome: 'Lago Norte', cidade: 'Brasília', uf: 'DF' },
   { id: 3, nome: 'Leblon', cidade: 'Rio de Janeiro', uf: 'RJ' },
   { id: 4, nome: 'Pátio Batel', cidade: 'Curitiba', uf: 'PR' },
   { id: 5, nome: 'Belvedere', cidade: 'Belo Horizonte', uf: 'MG' },

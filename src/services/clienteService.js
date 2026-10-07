@@ -10,7 +10,8 @@ export const clienteService = USE_MOCKS
       obterPerfil: (clienteId) => api.get(`/clientes/${clienteId}`),
       listarSolicitacoes: (clienteId) => api.get(`/clientes/${clienteId}/atendimentos`),
       obterSolicitacao: (clienteId, id) => api.get(`/clientes/${clienteId}/atendimentos/${id}`),
-      // { clienteId, tipoSolicitacaoId, pedidoId?, descricao }
+      // { clienteId, tipoSolicitacaoId, pedidoId?, descricao, anexo? }
+      // anexo: { nome, tipo, conteudoBase64 } — uma foto JPG/PNG/WebP de até 2 MB, já reduzida no navegador
       abrirSolicitacao: (dados) => api.post('/atendimentos', dados),
       listarPedidos: (clienteId) => api.get(`/clientes/${clienteId}/pedidos`),
       consultarPedido: (clienteId, numero) => api.get(`/clientes/${clienteId}/pedidos/${encodeURIComponent(numero)}`),

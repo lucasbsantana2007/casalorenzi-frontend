@@ -4,7 +4,7 @@ import { CLIENTES, USUARIOS } from '../data/seed/pessoas'
 // Exibidas com VITE_MODO_DEMO=true (as mesmas contas existem no seed do backend).
 export const PERFIS_DEMO = [1, 2, 6].map((id) => USUARIOS.find((u) => u.id === id))
 
-export const CLIENTE_DEMO = CLIENTES.find((c) => c.id === 101)
+export const CLIENTE_DEMO = CLIENTES[0]
 
 export const SENHA_DEMO = 'lorenzi2026'
 

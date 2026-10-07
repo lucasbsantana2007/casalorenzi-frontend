@@ -1,5 +1,5 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
-import { anexoView, byId, db, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
+import { anexoView, autorResumo, byId, clientePorId, db, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
 
 function pedidoView(pedido) {
   if (!pedido) return null
@@ -24,7 +24,7 @@ function contatoView(contato) {
 }
 
 function clienteView(id, contato) {
-  const cliente = byId(db.usuarios, id)
+  const cliente = clientePorId(id)
   if (!cliente) return contato ? contatoView(contato) : null
   const { id: clienteId, nome, email, telefone, clienteDesde } = cliente
   return {
@@ -43,7 +43,7 @@ export function atendimentoView(atendimento, { detalhado = false } = {}) {
   const view = {
     ...atendimento,
     tipoSolicitacao: byId(db.tiposSolicitacao, atendimento.tipoSolicitacaoId),
-    cliente: { id: atendimento.solicitanteId, nome: byId(db.usuarios, atendimento.solicitanteId)?.nome ?? atendimento.contato?.nome },
+    cliente: { id: atendimento.solicitanteId, nome: clientePorId(atendimento.solicitanteId)?.nome ?? atendimento.contato?.nome },
     responsavel: usuarioResumo(atendimento.responsavelId),
     loja: byId(db.lojas, atendimento.lojaId),
     ultimaMensagem: ultima ? { autorTipo: ultima.autorTipo, conteudo: ultima.conteudo, enviadoEm: ultima.enviadoEm } : null,
@@ -55,7 +55,7 @@ export function atendimentoView(atendimento, { detalhado = false } = {}) {
     pedido: pedidoView(byId(db.pedidos, atendimento.pedidoId)),
     mensagens: db.mensagens
       .filter((m) => m.atendimentoId === atendimento.id)
-      .map(({ anexoId, ...m }) => ({ ...m, autor: usuarioResumo(m.autorId), anexo: anexoView(anexoId) })),
+      .map(({ anexoId, ...m }) => ({ ...m, autor: autorResumo(m), anexo: anexoView(anexoId) })),
   }
 }
 

@@ -1,17 +1,19 @@
 import { Lock } from 'lucide-react'
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
-import { PinInput } from '../components/loja/PinInput'
 import { FormError } from '../components/ui/FormError'
 import { imagemDoProduto } from '../data/imagensProdutos'
 import { useSacola } from '../hooks/useSacola'
+import { useSession } from '../hooks/useSession'
 import { pedidosService } from '../services/pedidosService'
+import { cpfValido, formatarCpf, somenteDigitosCpf } from '../utils/cpf'
 import { calcularFrete, formatarCep, FRETE_GRATIS_MINIMO } from '../utils/frete'
 import { formatCurrency } from '../utils/format'
 
 const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
 const PARCELAS = [1, 2, 3, 4, 5, 6]
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const SENHA_MINIMA = 8
 
 const prazo = (dias) => `${dias} dia${dias === 1 ? '' : 's'} úte${dias === 1 ? 'l' : 'is'}`
 
@@ -27,13 +29,11 @@ function Campo({ label, children, wide = false }) {
 export function CheckoutPage() {
   const { itens, subtotal, esvaziar, abrir: abrirSacola } = useSacola()
   const navigate = useNavigate()
+  const { usuario, isCliente, login, cadastrar, logout } = useSession()
+  // Sem conta não há compra: quem não está logado cria a conta aqui ou entra na que já tem
+  const [modoConta, setModoConta] = useState('cadastro')
+  const [conta, setConta] = useState({ nome: '', cpf: '', telefone: '', email: '', senha: '', senhaConfirmacao: '' })
   const [dados, setDados] = useState({
-    email: '',
-    emailConfirmacao: '',
-    pin: '',
-    pinConfirmacao: '',
-    nome: '',
-    telefone: '',
     cep: '',
     rua: '',
     numero: '',
@@ -55,20 +55,44 @@ export function CheckoutPage() {
   const opcoesFrete = calcularFrete(dados.cep, subtotal)
   const frete = opcoesFrete.find((f) => f.tipo === freteTipo) ?? opcoesFrete[0]
   const total = subtotal + (frete?.valor ?? 0)
-  const emailsDiferentes = dados.emailConfirmacao.length > 0 && dados.email.trim().toLowerCase() !== dados.emailConfirmacao.trim().toLowerCase()
-  const emailInvalido = dados.email.length > 0 && !EMAIL_VALIDO.test(dados.email.trim())
-  const pinsDiferentes = dados.pinConfirmacao.length === 4 && dados.pin !== dados.pinConfirmacao
-  const pinIncompleto = dados.pin.length !== 4 || dados.pinConfirmacao.length !== 4
-  const setPin = (campo) => (valor) => setDados((d) => ({ ...d, [campo]: valor }))
+  const atualizarConta = (campo) => (e) => setConta((c) => ({ ...c, [campo]: e.target.value }))
+  const emailInvalido = conta.email.length > 0 && !EMAIL_VALIDO.test(conta.email.trim())
+  const cpfInvalido = somenteDigitosCpf(conta.cpf).length === 11 && !cpfValido(conta.cpf)
+  const senhaCurta = conta.senha.length > 0 && conta.senha.length < SENHA_MINIMA
+  const senhasDiferentes = conta.senhaConfirmacao.length > 0 && conta.senha !== conta.senhaConfirmacao
+  const contaPronta = isCliente
+    ? true
+    : modoConta === 'entrar'
+      ? EMAIL_VALIDO.test(conta.email.trim()) && conta.senha.length > 0
+      : conta.nome.trim().length > 0 &&
+        cpfValido(conta.cpf) &&
+        EMAIL_VALIDO.test(conta.email.trim()) &&
+        conta.senha.length >= SENHA_MINIMA &&
+        conta.senha === conta.senhaConfirmacao
+
+  const trocarModo = (modo) => {
+    setErro(null)
+    setModoConta(modo)
+    setConta((c) => ({ ...c, senha: '', senhaConfirmacao: '' }))
+  }
 
   const finalizar = async (e) => {
     e.preventDefault()
     setErro(null)
     setEnviando(true)
     try {
-      const { cep, rua, numero, complemento, bairro, cidade, uf, ...contato } = dados
+      // 1) Garante a conta: entra ou cadastra (o cadastro já deixa o cliente logado)
+      let clienteId = isCliente ? usuario.id : null
+      if (!isCliente && modoConta === 'entrar') {
+        clienteId = (await login({ email: conta.email, senha: conta.senha, manterConectado: true, somenteCliente: true })).id
+      } else if (!isCliente) {
+        clienteId = somenteDigitosCpf(conta.cpf)
+        await cadastrar({ ...conta, cpf: clienteId })
+      }
+      // 2) Fecha o pedido em nome do cliente logado
+      const { cep, rua, numero, complemento, bairro, cidade, uf } = dados
       const pedido = await pedidosService.finalizarCompra({
-        ...contato,
+        clienteId,
         endereco: { cep, rua, numero, complemento, bairro, cidade, uf },
         freteTipo: frete?.tipo,
         pagamento: { metodo, parcelas },
@@ -89,50 +113,83 @@ export function CheckoutPage() {
 
         <section className="co-step">
           <h2>
-            <span>1</span> Contato
+            <span>1</span> Sua conta
           </h2>
-          <p className="co-step__hint">Não é preciso criar conta. A confirmação da compra vai para este e-mail.</p>
-          <div className="co-grid">
-            <Campo label="E-mail" wide>
-              <input type="email" autoComplete="email" value={dados.email} onChange={set('email')} required aria-invalid={emailInvalido} />
-            </Campo>
-            <Campo label="Confirme o e-mail" wide>
-              <input
-                type="email"
-                autoComplete="off"
-                value={dados.emailConfirmacao}
-                onChange={set('emailConfirmacao')}
-                onPaste={(e) => e.preventDefault()}
-                required
-                aria-invalid={emailsDiferentes}
-              />
-              {emailInvalido && <small className="co-error">E-mail inválido.</small>}
-              {!emailInvalido && emailsDiferentes && <small className="co-error">Os e-mails não conferem.</small>}
-            </Campo>
-            <div className="co-pin">
-              <PinInput label="Crie um PIN de 4 números" value={dados.pin} onChange={setPin('pin')} autoComplete="new-password" />
-            </div>
-            <div className="co-pin">
-              <PinInput
-                label="Confirme o PIN"
-                value={dados.pinConfirmacao}
-                onChange={setPin('pinConfirmacao')}
-                onPaste={(e) => e.preventDefault()}
-                invalid={pinsDiferentes}
-                autoComplete="new-password"
-              />
-              {pinsDiferentes && <small className="co-error">Os PINs não conferem.</small>}
-            </div>
-            <p className="co-step__hint co-grid__full">
-              Com o e-mail e o PIN você acessa <strong>Meus pedidos</strong> para acompanhar entregas e pedir trocas. Já comprou antes com este e-mail? Use o mesmo PIN.
+          {isCliente ? (
+            <p className="co-account">
+              Comprando como <strong>{usuario.nome}</strong> · {usuario.email}
+              <button type="button" className="co-account__switch" onClick={logout}>
+                Não é você? Sair
+              </button>
             </p>
-            <Campo label="Nome completo">
-              <input autoComplete="name" value={dados.nome} onChange={set('nome')} required />
-            </Campo>
-            <Campo label="Celular">
-              <input type="tel" autoComplete="tel" value={dados.telefone} onChange={set('telefone')} placeholder="(11) 90000-0000" />
-            </Campo>
-          </div>
+          ) : modoConta === 'entrar' ? (
+            <>
+              <div className="co-grid">
+                <Campo label="E-mail">
+                  <input type="email" autoComplete="email" value={conta.email} onChange={atualizarConta('email')} required aria-invalid={emailInvalido} />
+                  {emailInvalido && <small className="co-error">E-mail inválido.</small>}
+                </Campo>
+                <Campo label="Senha">
+                  <input type="password" autoComplete="current-password" value={conta.senha} onChange={atualizarConta('senha')} required />
+                </Campo>
+              </div>
+              <p className="co-account__toggle">
+                Não tem conta?{' '}
+                <button type="button" onClick={() => trocarModo('cadastro')}>
+                  Criar conta
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="co-step__hint">Crie sua conta para finalizar a compra. Com ela você acompanha seus pedidos.</p>
+              <div className="co-grid">
+                <Campo label="Nome completo">
+                  <input autoComplete="name" value={conta.nome} onChange={atualizarConta('nome')} required />
+                </Campo>
+                <Campo label="CPF">
+                  <input
+                    inputMode="numeric"
+                    value={conta.cpf}
+                    onChange={(e) => setConta((c) => ({ ...c, cpf: formatarCpf(e.target.value) }))}
+                    placeholder="000.000.000-00"
+                    required
+                    aria-invalid={cpfInvalido}
+                  />
+                  {cpfInvalido && <small className="co-error">CPF inválido.</small>}
+                </Campo>
+                <Campo label="E-mail">
+                  <input type="email" autoComplete="email" value={conta.email} onChange={atualizarConta('email')} required aria-invalid={emailInvalido} />
+                  {emailInvalido && <small className="co-error">E-mail inválido.</small>}
+                </Campo>
+                <Campo label="Celular">
+                  <input type="tel" autoComplete="tel" value={conta.telefone} onChange={atualizarConta('telefone')} placeholder="(11) 90000-0000" />
+                </Campo>
+                <Campo label="Senha">
+                  <input type="password" autoComplete="new-password" value={conta.senha} onChange={atualizarConta('senha')} required aria-invalid={senhaCurta} />
+                  <small className={senhaCurta ? 'co-error' : 'co-field__hint'}>Mínimo de 8 caracteres.</small>
+                </Campo>
+                <Campo label="Confirme a senha">
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    value={conta.senhaConfirmacao}
+                    onChange={atualizarConta('senhaConfirmacao')}
+                    onPaste={(e) => e.preventDefault()}
+                    required
+                    aria-invalid={senhasDiferentes}
+                  />
+                  {senhasDiferentes && <small className="co-error">As senhas não conferem.</small>}
+                </Campo>
+              </div>
+              <p className="co-account__toggle">
+                Já tem uma conta?{' '}
+                <button type="button" onClick={() => trocarModo('entrar')}>
+                  Entrar
+                </button>
+              </p>
+            </>
+          )}
         </section>
 
         <section className="co-step">
@@ -234,7 +291,7 @@ export function CheckoutPage() {
 
         <FormError error={erro} />
 
-        <button type="submit" className="pdp__cta co-submit" disabled={enviando || emailsDiferentes || emailInvalido || pinsDiferentes || pinIncompleto || !frete}>
+        <button type="submit" className="pdp__cta co-submit" disabled={enviando || !contaPronta || !frete}>
           <Lock size={14} aria-hidden="true" />
           {enviando ? 'Processando…' : `Finalizar compra · ${formatCurrency(total)}`}
         </button>

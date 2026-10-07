@@ -1347,55 +1347,6 @@ a.ticket-list__item:hover {
   font-size: 12px;
 }
 
-.option-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 12px;
-}
-
-.option-card {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--surface);
-  cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.option-card:hover {
-  border-color: var(--text-subtle);
-}
-
-.option-card:has(input:focus-visible) {
-  box-shadow: var(--focus);
-}
-
-.option-card.is-selected {
-  border-color: var(--navy-900);
-  box-shadow: inset 0 0 0 1px var(--navy-900);
-}
-
-.option-card__category {
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-subtle);
-}
-
-.option-card strong {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.option-card > span:last-child {
-  font-size: 12.5px;
-  color: var(--text-muted);
-}
-
 .client-ticket {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
