@@ -2,7 +2,7 @@ import { USE_MOCKS } from '../config/env'
 import { api } from './api'
 import * as mock from './mock/pedidos'
 
-// Pedidos do e-commerce: checkout público, consulta pelo código e gestão no painel.
+// Pedidos do e-commerce: checkout (cliente logado) e gestão no painel.
 export const pedidosService = USE_MOCKS
   ? mock
   : {
@@ -10,22 +10,6 @@ export const pedidosService = USE_MOCKS
       // { endereco, freteTipo, pagamento: { metodo, parcelas }, itens: [{ variacaoId, quantidade }] }
       // O pedido grava clienteId = CPF do cliente. 401 sem sessão de cliente
       finalizarCompra: ({ clienteId: _clienteId, ...dados }) => api.post('/checkout', dados),
-      // Legado (compras antigas, antes do cadastro com senha):
-      // { email, pin } → todos os pedidos do e-mail. POST para o PIN não ir na URL
-      listarMeusPedidos: (dados) => api.post('/meus-pedidos', dados),
-      // { email } → envia e-mail com link de confirmação (resposta igual exista ou não o e-mail)
-      solicitarNovoPin: (dados) => api.post('/meus-pedidos/esqueci-pin', dados),
-      // { token, pin, pinConfirmacao } → { email }
-      redefinirPin: (dados) => api.post('/meus-pedidos/redefinir-pin', dados),
-      // { email, pin } → chamados do e-mail com a conversa
-      // Cada mensagem traz `anexo: { id, nome, tipo, url } | null`; `url` é um data URL pronto para <img src>
-      listarMinhasSolicitacoes: (dados) => api.post('/meus-pedidos/solicitacoes/consulta', dados),
-      // { email, pin, id, conteudo } → chamado atualizado
-      responderSolicitacao: ({ id, ...dados }) => api.post(`/meus-pedidos/solicitacoes/${id}/mensagens`, dados),
-      // { numero, email, pin, tipoSolicitacaoId, descricao, anexo? } → { id, protocolo, tipo }
-      // anexo (opcional): { nome, tipo, conteudoBase64 } — tipo image/jpeg, image/png ou image/webp;
-      // no máximo 2 MB depois de decodificado. A loja já reduz a foto no navegador antes de enviar
-      abrirSolicitacao: (dados) => api.post('/meus-pedidos/solicitacoes', dados),
 
       // Painel (equipe)
       // filtros: { status, lojaId, canal, busca }

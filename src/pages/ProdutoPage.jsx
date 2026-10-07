@@ -176,8 +176,8 @@ function Produto({ produto }) {
 
           <Secao titulo="Trocas e devoluções">
             <p>
-              Trocas por outro tamanho, cor ou modelo e devoluções em até 30 dias após o recebimento. É só entrar em{' '}
-              <Link to="/meus-pedidos">Meus pedidos</Link> com o e-mail e o PIN da compra.
+              Trocas por outro tamanho, cor ou modelo e devoluções em até 30 dias após o recebimento. É só entrar na{' '}
+              <Link to="/cliente/solicitacoes/nova">sua conta</Link> e abrir uma solicitação.
             </p>
           </Secao>
 

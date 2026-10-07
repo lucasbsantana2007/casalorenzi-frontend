@@ -41,8 +41,6 @@ export const router = createBrowserRouter([
       { path: 'produto/:id', ...publica(() => import('./pages/ProdutoPage'), 'ProdutoPage') },
       { path: 'checkout', ...publica(() => import('./pages/CheckoutPage'), 'CheckoutPage') },
       { path: 'pedido/confirmado/:numero', ...publica(() => import('./pages/PedidoConfirmadoPage'), 'PedidoConfirmadoPage') },
-      { path: 'meus-pedidos', ...publica(() => import('./pages/MeusPedidosPage'), 'MeusPedidosPage') },
-      { path: 'meus-pedidos/novo-pin', ...publica(() => import('./pages/NovoPinPage'), 'NovoPinPage') },
     ],
   },
   // Login único (Iniciar sessão): cliente vai para /cliente, equipe para /dashboard
@@ -89,7 +87,9 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  { path: '/meu-pedido', element: <Navigate to="/meus-pedidos" replace /> },
+  // Endereços antigos (e-mails e favoritos) levam aos pedidos da conta; sem sessão, ao login
+  { path: '/meus-pedidos/*', element: <Navigate to="/cliente/pedidos" replace /> },
+  { path: '/meu-pedido', element: <Navigate to="/cliente/pedidos" replace /> },
   {
     path: '*',
     element: (

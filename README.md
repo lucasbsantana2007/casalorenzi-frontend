@@ -40,7 +40,7 @@ As variáveis são lidas somente em `src/config/env.js`.
 
 Com `VITE_USE_MOCKS=true`, `/login` oferece acesso rápido de demonstração para uma cliente, Administrador, Lojista e Operador. Contas da equipe e clientes de demonstração entram com a senha `lorenzi2026`.
 
-`/meus-pedidos` (e-mail + PIN) ainda existe para compras antigas, feitas antes do cadastro com senha.
+Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, que não existe mais) levam para os pedidos da conta (`/cliente/pedidos`).
 
 | Perfil        | Módulos                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
@@ -50,7 +50,7 @@ Com `VITE_USE_MOCKS=true`, `/login` oferece acesso rápido de demonstração par
 
 Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/meus-pedidos`, `/meus-pedidos/novo-pin`, `/login`, `/login/esqueci-senha` e `/login/nova-senha`.
+**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/esqueci-senha` e `/login/nova-senha`.
 
 **Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`.
 
@@ -89,7 +89,7 @@ export const estoqueService = USE_MOCKS ? mock : {
 
 Para conectar o backend, defina `VITE_USE_MOCKS=false`. As páginas não mudam. Para ligar um domínio de cada vez, troque o ternário só no serviço correspondente.
 
-Os mocks guardam as alterações (pedidos, PINs, movimentações, transferências, mensagens, produtos) no `localStorage`, então elas continuam depois de recarregar a página.
+Os mocks guardam as alterações (contas, pedidos, movimentações, transferências, mensagens, produtos) no `localStorage`, então elas continuam depois de recarregar a página.
 
 ## Contrato esperado da API
 
