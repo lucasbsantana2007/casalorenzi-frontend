@@ -145,6 +145,12 @@ export function variacaoView(variacaoId) {
   return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo, imagemUrl: produto.imagemUrl ?? null } }
 }
 
+// Produto removido do catálogo (some da loja, do painel e do estoque; o histórico continua)
+export function produtoRemovido(variacaoId) {
+  const variacao = byId(db.variacoes, variacaoId)
+  return Boolean(variacao && byId(db.produtos, variacao.produtoId)?.removidoEm)
+}
+
 export function estoqueView(estoque) {
   const { produto, ...variacao } = variacaoView(estoque.variacaoId)
   return {

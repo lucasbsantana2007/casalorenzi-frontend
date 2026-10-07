@@ -1,10 +1,12 @@
-import { Eye, Pencil, Plus, Shirt } from 'lucide-react'
+import { Eye, Pencil, Plus, Shirt, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { ProdutoFormModal } from '../../components/produtos/ProdutoFormModal'
 import { VariacoesModal } from '../../components/produtos/VariacoesModal'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { DataTable } from '../../components/ui/DataTable'
 import { EmptyState } from '../../components/ui/EmptyState'
+import { FormError } from '../../components/ui/FormError'
+import { Modal } from '../../components/ui/Modal'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { StatusBadge } from '../../components/ui/StatusBadge'
@@ -31,6 +33,8 @@ export function ProdutosPage() {
   const state = useAsync(() => produtosService.listar({ busca: buscaDebounced, categoria, ativo }), [buscaDebounced, categoria, ativo])
   const [variacoesDe, setVariacoesDe] = useState(null)
   const [form, setForm] = useState({ open: false, produto: null })
+  const [removendo, setRemovendo] = useState(null)
+  const [removido, setRemovido] = useState(null)
 
   const columns = [
     {
@@ -79,6 +83,9 @@ export function ProdutosPage() {
           <button type="button" className="btn btn-ghost btn-icon" onClick={() => setForm({ open: true, produto: p })} aria-label={`Editar ${p.nome}`} title="Editar">
             <Pencil size={15} />
           </button>
+          <button type="button" className="btn btn-ghost btn-icon btn-icon--danger" onClick={() => setRemovendo(p)} aria-label={`Remover ${p.nome}`} title="Remover">
+            <Trash2 size={15} />
+          </button>
         </div>
       ),
     },
@@ -113,12 +120,73 @@ export function ProdutosPage() {
         {state.data && <span className="toolbar__summary">{state.data.length} produtos</span>}
       </div>
 
+      {removido && (
+        <p className="form-success" role="status">
+          {removido} foi removido do catálogo.
+        </p>
+      )}
+
       <AsyncContent state={state} empty={<EmptyState icon={Shirt} title="Nenhum produto encontrado" description="Ajuste os filtros ou cadastre um novo produto." />}>
         {(produtos) => <DataTable columns={columns} rows={produtos} onRowClick={setVariacoesDe} caption="Produtos" />}
       </AsyncContent>
 
       <VariacoesModal produto={variacoesDe} onClose={() => setVariacoesDe(null)} />
+      <RemoverProdutoModal
+        produto={removendo}
+        onClose={() => setRemovendo(null)}
+        onRemovido={(nome) => {
+          setRemovendo(null)
+          setRemovido(nome)
+          state.reload()
+        }}
+      />
       <ProdutoFormModal open={form.open} produto={form.produto} categorias={categorias} onClose={() => setForm({ open: false, produto: null })} onSaved={state.reload} />
     </>
+  )
+}
+
+// Confirmação antes de remover: o produto sai da loja, do painel e do estoque; o histórico continua
+function RemoverProdutoModal({ produto, onClose, onRemovido }) {
+  return (
+    <Modal open={Boolean(produto)} onClose={onClose} size="sm" title={produto ? `Remover ${produto.nome}?` : ''}>
+      {produto && <ConfirmarRemocao produto={produto} onClose={onClose} onRemovido={onRemovido} />}
+    </Modal>
+  )
+}
+
+function ConfirmarRemocao({ produto, onClose, onRemovido }) {
+  const [removendo, setRemovendo] = useState(false)
+  const [erro, setErro] = useState(null)
+
+  async function remover() {
+    setErro(null)
+    setRemovendo(true)
+    try {
+      await produtosService.remover(produto.id)
+      onRemovido(produto.nome)
+    } catch (err) {
+      setErro(err)
+      setRemovendo(false)
+    }
+  }
+
+  return (
+    <div className="stack">
+      <p>O produto sai da loja, desta lista e do estoque. Pedidos, vendas e o histórico de movimentações continuam registrados. Não dá para desfazer.</p>
+      {produto.estoqueTotal > 0 && (
+        <p className="muted">
+          Ainda há <strong>{formatNumber(produto.estoqueTotal)}</strong> {produto.estoqueTotal === 1 ? 'peça' : 'peças'} em estoque nas lojas. Elas deixam de aparecer no estoque.
+        </p>
+      )}
+      <FormError error={erro} />
+      <div className="form-actions">
+        <button type="button" className="btn btn-secondary" onClick={onClose} disabled={removendo}>
+          Cancelar
+        </button>
+        <button type="button" className="btn btn-danger-solid" onClick={remover} disabled={removendo}>
+          <Trash2 size={14} aria-hidden="true" /> {removendo ? 'Removendo…' : 'Remover produto'}
+        </button>
+      </div>
+    </div>
   )
 }
