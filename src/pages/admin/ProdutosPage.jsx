@@ -13,6 +13,7 @@ import { useCategorias } from '../../hooks/useCadastros'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { produtosService } from '../../services/produtosService'
 import { formatCurrency, formatNumber } from '../../utils/format'
+import { faixaDeMargem } from '../../utils/margem'
 
 const resumoGrade = (variacoes) => {
   const cores = [...new Set(variacoes.map((v) => v.cor))]
@@ -33,7 +34,8 @@ export function ProdutosPage() {
   const columns = [
     { key: 'nome', header: 'Produto', render: (p) => <span className="cell-main">{p.nome}</span> },
     { key: 'categoria', header: 'Categoria', render: (p) => <span className="tag">{p.categoria}</span> },
-    { key: 'precoBase', header: 'Preço base', align: 'right', render: (p) => <span className="nowrap">{formatCurrency(p.precoBase)}</span> },
+    { key: 'precoBase', header: 'Preço de venda', align: 'right', render: (p) => <span className="nowrap">{formatCurrency(p.precoBase)}</span> },
+    { key: 'margem', header: 'Margem', align: 'right', render: (p) => <span className="nowrap">{faixaDeMargem(p.precoBase, p.variacoes) ?? '—'}</span> },
     {
       key: 'variacoes',
       header: 'Variações',

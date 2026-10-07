@@ -386,7 +386,7 @@ a.ticket-list__item:hover {
 .variant-editor__head,
 .variant-editor__row {
   display: grid;
-  grid-template-columns: 1fr 90px 1.3fr 40px;
+  grid-template-columns: 1fr 80px 1.3fr 110px 40px;
   gap: 8px;
   align-items: center;
 }
@@ -1463,4 +1463,200 @@ a.ticket-list__item:hover {
   .stat-card__value {
     font-size: 18px;
   }
+}
+
+/* ---------- Central administrativa ---------- */
+.cell-sub--wrap {
+  max-width: 320px;
+  white-space: normal;
+}
+
+.form-alerta {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  background: var(--warning-bg, #fdf6e7);
+  font-size: 13px;
+  color: var(--navy-900);
+}
+
+.form-ok {
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--success, #2f7d4f);
+}
+
+.convite-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--navy-50);
+  color: var(--navy-800);
+}
+
+.convite-link code {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+/* Frete: configuração geral e tabela editável por região */
+.frete-geral {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px 32px;
+}
+
+.frete-geral .field {
+  max-width: 320px;
+}
+
+.frete-tabela th,
+.frete-tabela td {
+  padding: 8px 10px;
+  vertical-align: middle;
+}
+
+.frete-tabela__grupo {
+  text-align: center;
+  border-left: 1px solid var(--border);
+}
+
+.frete-tabela__regiao {
+  min-width: 150px;
+  font-weight: 500;
+  text-align: left;
+}
+
+.input--num {
+  width: 84px;
+  height: 34px;
+  padding: 0 8px;
+  text-align: right;
+}
+
+.input--prazo {
+  width: 56px;
+}
+
+.frete-tabela__diferenca {
+  font-variant-numeric: tabular-nums;
+  color: var(--success, #2f7d4f);
+}
+
+.frete-tabela__diferenca.is-negativa {
+  color: var(--danger);
+}
+
+.frete-simulador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px 16px;
+}
+
+.frete-simulador .field {
+  width: 200px;
+}
+
+/* Log de ações */
+.log-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.log-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+}
+
+.log-item + .log-item {
+  border-top: 1px solid var(--border);
+}
+
+.log-item__corpo p {
+  margin: 0;
+}
+
+.log-item__linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.log-item__area {
+  margin-left: 6px;
+}
+
+.log-item__descricao {
+  margin-top: 2px !important;
+  font-size: 14px;
+  color: var(--navy-950);
+}
+
+.log-item__alteracoes {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 8px 0 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  font-size: 12.5px;
+  list-style: none;
+}
+
+.log-item__alteracoes li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.log-item__campo {
+  color: var(--text-muted);
+}
+
+.log-item__de {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.log-item__para {
+  font-weight: 500;
+  color: var(--navy-950);
+}
+
+.log-item__quando {
+  font-size: 12px;
+  white-space: nowrap;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .log-item {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .log-item__quando {
+    grid-column: 2;
+  }
+}
+
+/* Detalhe do pedido: custo do frete (só Administrador) */
+.order-admin-totals__custo dt,
+.order-admin-totals__custo dd {
+  font-size: 12.5px;
+  color: var(--text-muted);
 }

@@ -1,6 +1,6 @@
 import { calcularFrete, somenteDigitos, ufDoCep } from '../../utils/frete'
 import { ApiError } from '../api'
-import { aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, respond, salvar, usuarioResumo, variacaoView } from './db'
+import { aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, registrarLog, respond, salvar, usuarioDaSessao, usuarioResumo, variacaoView } from './db'
 
 const PARCELAS_MAX = 6
 
@@ -21,7 +21,8 @@ function escolherLojaExpedicao(itens, cep) {
     const cobertos = itens.filter((i) => saldoNaLoja(loja.id, i.variacaoId) >= i.quantidade).length
     return cobertos * 10 + (loja.uf === uf ? 1 : 0)
   }
-  return [...db.lojas].sort((a, b) => pontuar(b) - pontuar(a))[0]
+  // Loja desativada no cadastro não despacha pedidos
+  return db.lojas.filter((l) => l.ativa !== false).sort((a, b) => pontuar(b) - pontuar(a))[0]
 }
 
 // Cria transferências das outras lojas para a loja de expedição quando falta peça nela
@@ -29,7 +30,7 @@ function planejarTransferencias(pedido) {
   pedido.itens.forEach((item) => {
     let falta = item.quantidade - saldoNaLoja(pedido.lojaId, item.variacaoId)
     const doadoras = db.lojas
-      .filter((l) => l.id !== pedido.lojaId)
+      .filter((l) => l.id !== pedido.lojaId && l.ativa !== false)
       .map((l) => ({ loja: l, saldo: saldoNaLoja(l.id, item.variacaoId) }))
       .filter((d) => d.saldo > 0)
       .sort((a, b) => b.saldo - a.saldo)
@@ -74,8 +75,12 @@ function registrar(pedido, status, usuarioId = null, observacao = '') {
 
 export function pedidoAdminView(pedido) {
   const cliente = clientePorId(pedido.clienteId)
+  // O custo do frete é do Administrador; Lojista e Operador veem só o que o cliente pagou
+  const veCusto = usuarioDaSessao()?.papel === 'ADMINISTRADOR'
+  const { custo: _custo, ...freteSemCusto } = pedido.frete ?? {}
   return {
     ...pedido,
+    frete: pedido.frete ? (veCusto ? pedido.frete : freteSemCusto) : null,
     contato: pedido.contato ?? (cliente ? { nome: cliente.nome, email: cliente.email, telefone: cliente.telefone } : null),
     loja: byId(db.lojas, pedido.lojaId),
     itens: pedido.itens.map((item) => ({
@@ -101,7 +106,7 @@ function pedidoPublicoView(pedido) {
     codigoRastreio: pedido.codigoRastreio,
     contato: pedido.contato ? { nome: pedido.contato.nome, email: pedido.contato.email } : null,
     endereco: pedido.endereco ?? null,
-    frete: pedido.frete ?? null,
+    frete: pedido.frete ? { tipo: pedido.frete.tipo, label: pedido.frete.label, valor: pedido.frete.valor, prazoDias: pedido.frete.prazoDias } : null,
     pagamento: pedido.pagamento ?? null,
     subtotal: pedido.subtotal ?? pedido.total,
     total: pedido.total,
@@ -136,7 +141,8 @@ export function finalizarCompra(dados) {
   }
 
   const subtotal = itens.reduce((sum, i) => sum + i.precoUnitario * i.quantidade, 0)
-  const frete = calcularFrete(e.cep, subtotal).find((f) => f.tipo === dados.freteTipo)
+  // Com custo: o pedido guarda quanto o frete custou para a loja (só o painel vê)
+  const frete = calcularFrete(e.cep, subtotal, db.frete).find((f) => f.tipo === dados.freteTipo)
   if (!frete) return fail('Escolha uma opção de frete para o CEP informado.', 422)
   const metodo = dados.pagamento?.metodo
   if (!['PIX', 'CARTAO'].includes(metodo)) return fail('Escolha a forma de pagamento.', 422)
@@ -200,6 +206,7 @@ export function obter(id) {
 export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
   const pedido = byId(db.pedidos, id)
   if (!pedido) return fail('Pedido não encontrado.', 404)
+  let descricao = null
 
   try {
     if (lojaId !== undefined) {
@@ -207,6 +214,7 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
       const loja = byId(db.lojas, lojaId)
       if (!loja) return fail('Loja inválida.', 422)
       if (loja.id !== pedido.lojaId) {
+        descricao = `Mudou a expedição do pedido ${pedido.numero} de ${byId(db.lojas, pedido.lojaId).nome} para ${loja.nome}`
         cancelarTransferenciasPendentes(pedido.id)
         pedido.lojaId = loja.id
         planejarTransferencias(pedido)
@@ -227,14 +235,17 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
       )
       Object.assign(pedido, { status, codigoRastreio: codigoRastreio.trim().toUpperCase() })
       registrar(pedido, status, usuarioId, `Rastreio ${pedido.codigoRastreio}`)
+      descricao = `Marcou o pedido ${pedido.numero} como enviado (rastreio ${pedido.codigoRastreio})`
     } else if (status === 'ENTREGUE' && pedido.status === 'ENVIADO') {
       pedido.status = status
       registrar(pedido, status, usuarioId)
+      descricao = `Marcou o pedido ${pedido.numero} como entregue`
     } else if (status === 'CANCELADO' && pedido.status === 'PROCESSANDO') {
       cancelarTransferenciasPendentes(pedido.id)
       pedido.status = status
       if (pedido.pagamento) pedido.pagamento = { ...pedido.pagamento, status: 'ESTORNADO' }
       registrar(pedido, status, usuarioId, 'Pagamento estornado')
+      descricao = `Cancelou o pedido ${pedido.numero} e estornou o pagamento`
     } else {
       return fail('Mudança de status não permitida.', 409)
     }
@@ -242,6 +253,7 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
     if (error instanceof ApiError) return fail(error.message, error.status)
     throw error
   }
+  if (descricao) registrarLog({ area: 'PEDIDOS', acao: 'ATUALIZOU', descricao, referencia: { tipo: 'pedido', id: pedido.id } })
   return respond(pedidoAdminView(pedido))
 }
 

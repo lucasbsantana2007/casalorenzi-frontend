@@ -16,6 +16,7 @@ const ACESSO = {
   transferencias: ['ADMINISTRADOR', 'OPERADOR'],
   atendimento: ['ADMINISTRADOR', 'LOJISTA'],
   financeiro: ['ADMINISTRADOR'],
+  administracao: ['ADMINISTRADOR'],
 }
 
 export function podeAcessar(papel, modulo) {

@@ -36,6 +36,15 @@ export const STATUS = {
     ENTREGUE: { label: 'Entregue', tone: 'success' },
     CANCELADO: { label: 'Cancelado', tone: 'neutral' },
   },
+  funcionario: {
+    ATIVO: { label: 'Ativo', tone: 'success' },
+    CONVITE: { label: 'Convite pendente', tone: 'info' },
+    INATIVO: { label: 'Desativado', tone: 'neutral' },
+  },
+  loja: {
+    true: { label: 'Ativa', tone: 'success' },
+    false: { label: 'Desativada', tone: 'neutral' },
+  },
   movimentacao: {
     ENTRADA: { label: 'Entrada', tone: 'success' },
     VENDA: { label: 'Venda', tone: 'neutral' },
@@ -60,4 +69,15 @@ export const etapaDoAtendimento = (status) => ETAPAS_ATENDIMENTO.find((e) => e.s
 
 export function statusOptions(type) {
   return Object.entries(STATUS[type]).map(([value, { label }]) => ({ value, label }))
+}
+
+// Áreas do log de ações (central administrativa)
+export const AREAS_LOG = {
+  FUNCIONARIOS: 'Funcionários',
+  LOJAS: 'Lojas',
+  FRETE: 'Frete',
+  PRODUTOS: 'Produtos',
+  PEDIDOS: 'Pedidos',
+  TRANSFERENCIAS: 'Transferências',
+  ESTOQUE: 'Estoque',
 }

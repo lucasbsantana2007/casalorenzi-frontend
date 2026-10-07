@@ -3,11 +3,12 @@ import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { FormError } from '../components/ui/FormError'
 import { imagemDoProduto } from '../data/imagensProdutos'
+import { useCondicoesFrete } from '../hooks/useCadastros'
 import { useSacola } from '../hooks/useSacola'
 import { useSession } from '../hooks/useSession'
 import { pedidosService } from '../services/pedidosService'
 import { cpfValido, formatarCpf, somenteDigitosCpf } from '../utils/cpf'
-import { calcularFrete, formatarCep, FRETE_GRATIS_MINIMO } from '../utils/frete'
+import { calcularFrete, formatarCep } from '../utils/frete'
 import { formatCurrency } from '../utils/format'
 
 const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
@@ -15,7 +16,7 @@ const PARCELAS = [1, 2, 3, 4, 5, 6]
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const SENHA_MINIMA = 8
 
-const prazo = (dias) => `${dias} dia${dias === 1 ? '' : 's'} úte${dias === 1 ? 'l' : 'is'}`
+const prazo = (dias) => `${dias} dia${dias === 1 ? '' : 's'} ${dias === 1 ? 'útil' : 'úteis'}`
 
 function Campo({ label, children, wide = false }) {
   return (
@@ -47,12 +48,13 @@ export function CheckoutPage() {
   const [parcelas, setParcelas] = useState(1)
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
+  const condicoesFrete = useCondicoesFrete()
 
   // Depois de finalizar, a sacola esvazia; não volta para cá
   if (!itens.length && !enviando) return <Navigate to="/" replace />
 
   const set = (campo) => (e) => setDados((d) => ({ ...d, [campo]: e.target.value }))
-  const opcoesFrete = calcularFrete(dados.cep, subtotal)
+  const opcoesFrete = calcularFrete(dados.cep, subtotal, condicoesFrete)
   const frete = opcoesFrete.find((f) => f.tipo === freteTipo) ?? opcoesFrete[0]
   const total = subtotal + (frete?.valor ?? 0)
   const atualizarConta = (campo) => (e) => setConta((c) => ({ ...c, [campo]: e.target.value }))
@@ -238,6 +240,8 @@ export function CheckoutPage() {
           <div className="co-options" role="radiogroup" aria-label="Frete">
             {dados.cep.length < 9 ? (
               <p className="co-step__hint">Informe o CEP para ver as opções de frete.</p>
+            ) : !condicoesFrete ? (
+              <p className="co-step__hint">Calculando o frete…</p>
             ) : !opcoesFrete.length ? (
               <p className="co-error">Ainda não entregamos neste CEP.</p>
             ) : (
@@ -330,8 +334,8 @@ export function CheckoutPage() {
             <dd>{formatCurrency(total)}</dd>
           </div>
         </dl>
-        {subtotal < FRETE_GRATIS_MINIMO && (
-          <p className="co-step__hint">Frete Padrão grátis a partir de {formatCurrency(FRETE_GRATIS_MINIMO)}.</p>
+        {condicoesFrete && subtotal < condicoesFrete.gratisMinimo && (
+          <p className="co-step__hint">Frete Padrão grátis a partir de {formatCurrency(condicoesFrete.gratisMinimo)}.</p>
         )}
         <button type="button" className="bag-summary__continue" onClick={abrirSacola}>
           Editar sacola

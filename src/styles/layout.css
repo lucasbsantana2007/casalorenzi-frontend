@@ -85,6 +85,36 @@
   box-shadow: inset 2px 0 0 #d9c7a3;
 }
 
+/* Menu do Administrador: grupos que abrem e fecham */
+.sidebar__grupo-seta {
+  margin-left: auto;
+  transition: transform 0.2s ease;
+}
+
+.sidebar__grupo-botao[aria-expanded='true'] .sidebar__grupo-seta {
+  transform: rotate(180deg);
+}
+
+/* Grupo fechado com a página atual dentro: marca o grupo */
+.sidebar__grupo-botao.is-ativo-dentro {
+  color: #fff;
+  box-shadow: inset 2px 0 0 #d9c7a3;
+}
+
+.sidebar__grupo-itens {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 6px 21px;
+  padding-left: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar__link--sub {
+  height: 34px;
+  font-size: 13px;
+}
+
 .sidebar__link--muted {
   height: 34px;
   font-size: 12.5px;

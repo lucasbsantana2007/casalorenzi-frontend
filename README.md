@@ -44,7 +44,7 @@ Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, 
 
 | Perfil        | Módulos                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
-| Administrador | Dashboard, Estoque, Pedidos, Produtos, Transferências, Atendimento, Financeiro |
+| Administrador | Dashboard, Estoque, Pedidos, Produtos, Transferências, Atendimento, Financeiro, Administração |
 | Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Pedidos, Atendimento       |
 | Operador      | Dashboard, Estoque, Pedidos, Transferências                                    |
 
@@ -54,7 +54,7 @@ Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam e
 
 **Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`.
 
-**Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`.
+**Painel interno:** `/dashboard`, `/estoque`, `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/produtos`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`, `/administracao/funcionarios`, `/administracao/lojas`, `/administracao/frete`, `/administracao/log`.
 
 ## Estrutura
 
@@ -112,6 +112,19 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `GET /usuarios?papel=`
 - `GET /tipos-solicitacao?ativo=true`
 
+**Central administrativa** (só Administrador; 403 para os demais cargos; cada alteração grava no log quem fez, a partir do token)
+- `GET /admin/funcionarios?busca&papel&lojaId&status` e `POST /admin/funcionarios` com `{ nome, email, papel, lojaId }`. O funcionário novo recebe por e-mail um convite (link de uso único, 7 dias) para criar a senha; antes disso não entra.
+- `PUT /admin/funcionarios/{id}`; `PATCH /admin/funcionarios/{id}/status` com `{ ativo }` (422 ao desativar a si mesmo ou o último Administrador ativo); `POST /admin/funcionarios/{id}/convite` reenvia o convite.
+- Funcionário desativado recebe 403 no `POST /auth/login` (só depois da senha certa, para não revelar quem é da equipe).
+- `GET /admin/lojas`, `POST /admin/lojas` e `PUT /admin/lojas/{id}` com `{ nome, cidade, uf, endereco, telefone, horarios: string[], ativa }`. Loja nova nasce com estoque zerado de todas as variações; loja inativa sai do site e da expedição.
+- `GET /admin/log?area&usuarioId&busca` → `[{ area, acao, descricao, alteracoes: [{ campo, de, para }], usuario, criadoEm }]`. Áreas: `FUNCIONARIOS`, `LOJAS`, `FRETE`, `PRODUTOS`, `PEDIDOS`, `TRANSFERENCIAS`, `ESTOQUE`.
+
+**Frete**
+- `GET /frete/condicoes` (público) → `{ gratisMinimo, expressoAtivo, regioes: [{ regiao, nome, padrao: { valor, prazoDias }, expresso }] }`, sem custo.
+- `GET /frete/config` e `PUT /frete/config` (Administrador): a mesma estrutura com `custo` em cada faixa.
+- `POST /frete/simulacao` (Administrador) com `{ cep, subtotal }` → `[{ tipo, label, valor, custo, prazoDias, resultado }]`.
+- O pedido guarda o frete com `custo`; só o Administrador recebe o custo no `GET /pedidos/{id}`.
+
 **Dashboard e financeiro**
 - `GET /dashboard/resumo?lojaId=` retorna `{ indicadores, resumoPorLoja, alertas, movimentacoesRecentes, atendimentosRecentes }`
 - `GET /financeiro/resumo`
@@ -125,9 +138,9 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - Tipos: `ENTRADA`, `VENDA`, `DEVOLUCAO`, `AJUSTE`, `TRANSFERENCIA_SAIDA`, `TRANSFERENCIA_ENTRADA`
 
 **Produtos**
-- `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
+- `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`; `precoCusto` em cada variação **só para o Administrador**). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
 - `GET /produtos/{id}`
-- `POST /produtos` e `PUT /produtos/{id}` com `{ nome, categoria, precoBase, ativo, variacoes: [{ id?, sku, tamanho, cor }] }`
+- `POST /produtos` e `PUT /produtos/{id}` (só Administrador) com `{ nome, categoria, precoBase, ativo, variacoes: [{ id?, sku, tamanho, cor, precoCusto }] }`. Mudanças de preço e custo vão para o log.
 
 **Transferências**
 - `GET /transferencias?status&lojaId&busca`
