@@ -173,7 +173,7 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `GET /clientes/{id}`
 - `GET /clientes/{id}/atendimentos`
 - `GET /clientes/{id}/atendimentos/{atendimentoId}`
-- `POST /atendimentos` com `{ clienteId, tipoSolicitacaoId, pedidoId?, descricao, anexo? }`. `pedidoId` é obrigatório quando o tipo tem `exigeVenda` e precisa ser um pedido do próprio cliente. `anexo: { nome, tipo, conteudoBase64 }` é uma foto JPG, PNG ou WebP de até 2 MB, já reduzida no navegador; ela fica na primeira mensagem (`anexo_url` no banco).
+- `POST /atendimentos` com `{ clienteId, tipoSolicitacaoId, pedidoId?, descricao, anexo? }`. `pedidoId` é obrigatório quando o tipo tem `exigeVenda` e precisa ser um pedido do próprio cliente. `anexo: { nome, tipo, conteudoBase64 }` é uma foto JPG, PNG ou WebP de até 2 MB, já reduzida no navegador; ela fica na primeira mensagem e volta como `anexo: { id, nome, tipo, url }` (`url` pronto para `<img src>`; o arquivo fica no banco, na tabela `anexos`).
 - `GET /clientes/{id}/pedidos`
 - `GET /clientes/{id}/pedidos/{numero}`
 
