@@ -31,6 +31,10 @@ function margemTexto(preco, variacoes) {
   return faixa ? `Margem bruta: ${faixa}` : 'Preencha o custo das variações para ver a margem.'
 }
 
+// Coleção (página Masculino ou Feminino da loja) e estação (filtro dentro da coleção)
+const GENEROS = ['Masculino', 'Feminino']
+const ESTACOES = ['Atemporal', 'Inverno', 'Verão']
+
 const novaVariacao = () => ({ chave: crypto.randomUUID(), sku: '', cor: '', tamanho: '', precoCusto: '', skuEditado: false })
 
 // produto = null → cadastro; produto preenchido → edição
@@ -46,6 +50,8 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
   const [form, setForm] = useState({
     nome: produto?.nome ?? '',
     categoria: produto?.categoria ?? '',
+    genero: produto?.genero ?? '',
+    estacao: produto?.estacao ?? 'Atemporal',
     precoBase: produto?.precoBase ?? '',
     ativo: produto?.ativo ?? true,
   })
@@ -123,6 +129,21 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
         </Field>
         <Field label="Preço de venda (R$)" hint={margemTexto(form.precoBase, variacoes)}>
           <input className="input" type="number" min="0" step="0.01" value={form.precoBase} onChange={set('precoBase')} required />
+        </Field>
+        <Field label="Coleção" hint="Em qual página da loja o produto aparece.">
+          <select className="select" value={form.genero} onChange={set('genero')} required>
+            <option value="">Selecione…</option>
+            {GENEROS.map((g) => (
+              <option key={g}>{g}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="Estação" hint="Atemporal aparece em todos os filtros de estação.">
+          <select className="select" value={form.estacao} onChange={set('estacao')}>
+            {ESTACOES.map((e) => (
+              <option key={e}>{e}</option>
+            ))}
+          </select>
         </Field>
         <label className="checkbox span-2">
           <input type="checkbox" checked={form.ativo} onChange={set('ativo')} />
