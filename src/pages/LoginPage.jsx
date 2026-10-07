@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { AuthField } from '../components/auth/AuthField'
 import { CheckboxLine } from '../components/auth/CheckboxLine'
@@ -14,8 +14,13 @@ const CONTAS_DEMO = [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }, ...PERFIS_DEMO.map(
 
 // Login único (Iniciar sessão) para clientes e equipe
 export function LoginPage() {
-  const { usuario, login } = useSession()
+  const { usuario, login, logout } = useSession()
   const location = useLocation()
+  // Vindo da exclusão da conta: encerra aqui a sessão (a conta já não existe) e mostra o aviso
+  const contaExcluida = location.state?.contaExcluida
+  useEffect(() => {
+    if (contaExcluida && usuario) logout()
+  }, [contaExcluida, usuario, logout])
   // Voltando de "Esqueceu a senha?": e-mail já preenchido e aviso de sucesso
   const senhaNova = location.state?.senhaNova
   const [email, setEmail] = useState(location.state?.email ?? '')
@@ -24,7 +29,7 @@ export function LoginPage() {
   const [entrando, setEntrando] = useState(false)
   const [error, setError] = useState(null)
 
-  if (usuario) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
+  if (usuario && !contaExcluida) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
 
   async function entrar(credenciais) {
     setError(null)
@@ -45,6 +50,11 @@ export function LoginPage() {
 
   return (
     <LayoutAcesso titulo="Entrar" subtitulo="Acompanhe seus pedidos, trocas e solicitações." voltar={{ to: '/', label: 'Página inicial' }}>
+      {contaExcluida && (
+        <p className="login__sucesso" role="status">
+          Sua conta foi excluída e seus dados pessoais foram apagados.
+        </p>
+      )}
       {senhaNova && (
         <p className="login__sucesso" role="status">
           Senha alterada. Entre com a sua nova senha.

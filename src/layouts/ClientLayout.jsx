@@ -9,6 +9,7 @@ const LINKS = [
   { to: '/cliente', label: 'Minha conta', end: true },
   { to: '/cliente/solicitacoes', label: 'Solicitações' },
   { to: '/cliente/pedidos', label: 'Pedidos' },
+  { to: '/cliente/conta', label: 'Configurações' },
 ]
 
 // Área do cliente: mesmo cabeçalho e rodapé da loja, com navegação própria abaixo.

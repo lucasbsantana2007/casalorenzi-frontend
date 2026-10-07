@@ -21,6 +21,7 @@ import { PedidosPage as PedidosAdminPage } from './pages/admin/pedidos/PedidosPa
 import { ProdutosPage } from './pages/admin/ProdutosPage'
 import { TransferenciasPage } from './pages/admin/TransferenciasPage'
 import { ClienteHomePage } from './pages/cliente/ClienteHomePage'
+import { ContaPage } from './pages/cliente/ContaPage'
 import { MinhasSolicitacoesPage } from './pages/cliente/MinhasSolicitacoesPage'
 import { NovaSolicitacaoPage } from './pages/cliente/NovaSolicitacaoPage'
 import { PedidosPage } from './pages/cliente/PedidosPage'
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <ClienteHomePage /> },
       { path: 'pedidos', element: <PedidosPage /> },
+      { path: 'conta', element: <ContaPage /> },
       { path: 'solicitacoes', element: <MinhasSolicitacoesPage /> },
       { path: 'solicitacoes/nova', element: <NovaSolicitacaoPage /> },
       { path: 'solicitacoes/:id', element: <SolicitacaoDetalhePage /> },

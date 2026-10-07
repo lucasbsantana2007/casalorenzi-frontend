@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { authService } from '../services/authService'
-import { getUsuarioSalvo, limparSessao, salvarSessao } from '../services/authStorage'
+import { atualizarUsuarioSalvo, getUsuarioSalvo, limparSessao, salvarSessao } from '../services/authStorage'
 import { podeAcessar } from '../utils/permissions'
 import { SessionContext } from './sessionContext'
 
@@ -34,6 +34,12 @@ export function SessionProvider({ children }) {
         salvarSessao(sessao, true)
         setUsuario(sessao.usuario)
         return sessao.usuario
+      },
+      // Dados da conta editados (nome, e-mail): o cabeçalho e a sessão salva mostram o novo valor
+      atualizarUsuario: (dados) => {
+        const novo = { ...usuario, ...dados }
+        atualizarUsuarioSalvo(novo)
+        setUsuario(novo)
       },
       logout: () => {
         limparSessao()
