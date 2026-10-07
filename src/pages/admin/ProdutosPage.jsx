@@ -43,7 +43,16 @@ export function ProdutosPage() {
         </span>
       ),
     },
-    { key: 'categoria', header: 'Categoria', render: (p) => <span className="tag">{p.categoria}</span> },
+    {
+      key: 'categoria',
+      header: 'Categoria',
+      render: (p) => (
+        <span className="produto-categoria">
+          <span className="tag">{p.categoria}</span>
+          <span className="subtle">{p.genero ?? 'Sem coleção'}</span>
+        </span>
+      ),
+    },
     { key: 'precoBase', header: 'Preço de venda', align: 'right', render: (p) => <span className="nowrap">{formatCurrency(p.precoBase)}</span> },
     { key: 'margem', header: 'Margem', align: 'right', render: (p) => <span className="nowrap">{faixaDeMargem(p.precoBase, p.variacoes) ?? '—'}</span> },
     {

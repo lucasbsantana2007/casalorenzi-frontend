@@ -1818,6 +1818,14 @@ a.ticket-list__item:hover {
 }
 
 /* Lista de produtos: miniatura ao lado do nome */
+.produto-categoria {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  font-size: 12px;
+}
+
 .produto-celula {
   display: flex;
   align-items: center;

@@ -30,9 +30,16 @@ export function obter(id) {
   return produto ? respond(produtoView(produto)) : fail('Produto não encontrado.', 404)
 }
 
-function validar({ nome, categoria, precoBase, variacoes = [] }, produtoId) {
+// Coleção (página da vitrine) e estação: mesmas regras da API
+export const GENEROS = ['Masculino', 'Feminino']
+export const ESTACOES = ['Inverno', 'Verão', 'Atemporal']
+
+function validar({ nome, categoria, precoBase, genero, estacao, variacoes = [] }, produtoId) {
   if (!nome?.trim()) return 'Informe o nome do produto.'
   if (!categoria) return 'Selecione a categoria.'
+  if (!produtoId && !genero) return 'Selecione a coleção do produto: Masculino ou Feminino.'
+  if (genero && !GENEROS.includes(genero)) return 'Coleção inválida. Use Masculino ou Feminino.'
+  if (estacao && !ESTACOES.includes(estacao)) return 'Estação inválida. Use Inverno, Verão ou Atemporal.'
   if (!(Number(precoBase) > 0)) return 'Informe um preço base válido.'
   const skus = variacoes.map((v) => v.sku.trim().toUpperCase())
   if (new Set(skus).size !== skus.length) return 'Há SKUs repetidos nas variações.'
@@ -88,7 +95,7 @@ function aplicarImagem(produto, { imagem, removerImagem }) {
 // Sem espaço no navegador para a foto (só na demonstração): desfaz e avisa
 const semEspaco = () => fail('Não há espaço no navegador para guardar esta foto nesta demonstração. Use uma imagem menor ou remova fotos de outros produtos.', 507)
 
-const ROTULOS_PRODUTO = { nome: 'Nome', categoria: 'Categoria', precoBase: 'Preço de venda', ativo: 'Ativo' }
+const ROTULOS_PRODUTO = { nome: 'Nome', categoria: 'Categoria', genero: 'Coleção', estacao: 'Estação', precoBase: 'Preço de venda', ativo: 'Ativo' }
 const FORMATOS_PRODUTO = { precoBase: formatCurrency, ativo: (v) => (v ? 'Sim' : 'Não') }
 
 // Produtos são do Administrador (cadastro, preços e custos)
@@ -105,7 +112,15 @@ export function criar(dados) {
   return comoAdmin(() => {
     const erro = validar(dados)
     if (erro) return fail(erro, 422)
-    const produto = { id: nextId(db.produtos), nome: dados.nome.trim(), categoria: dados.categoria, precoBase: Number(dados.precoBase), ativo: dados.ativo ?? true }
+    const produto = {
+      id: nextId(db.produtos),
+      nome: dados.nome.trim(),
+      categoria: dados.categoria,
+      genero: dados.genero,
+      estacao: dados.estacao || 'Atemporal',
+      precoBase: Number(dados.precoBase),
+      ativo: dados.ativo ?? true,
+    }
     const { erro: erroFoto } = aplicarImagem(produto, dados)
     if (erroFoto) return fail(erroFoto, 422)
     db.produtos.push(produto)
@@ -125,7 +140,15 @@ export function atualizar(id, dados) {
     if (!produto) return fail('Produto não encontrado.', 404)
     const erro = validar(dados, produto.id)
     if (erro) return fail(erro, 422)
-    const campos = { nome: dados.nome.trim(), categoria: dados.categoria, precoBase: Number(dados.precoBase), ativo: dados.ativo }
+    // Coleção e estação nunca ficam vazias: sem elas o produto sairia da vitrine
+    const campos = {
+      nome: dados.nome.trim(),
+      categoria: dados.categoria,
+      genero: dados.genero || produto.genero,
+      estacao: dados.estacao || produto.estacao,
+      precoBase: Number(dados.precoBase),
+      ativo: dados.ativo,
+    }
     const alteracoes = mudancas(produto, campos, ROTULOS_PRODUTO, FORMATOS_PRODUTO)
     const nomeAnterior = produto.nome
     const fotoAnterior = produto.imagemUrl
