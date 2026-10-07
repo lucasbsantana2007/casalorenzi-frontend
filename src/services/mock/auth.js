@@ -21,7 +21,9 @@ export async function login({ email, senha }) {
   const alvo = String(email ?? '').trim().toLowerCase()
   const usuario = db.usuarios.find((u) => u.email.toLowerCase() === alvo)
   if (usuario) {
+    if (usuario.convitePendente) return fail('Esta conta ainda não tem senha. Use o link do convite enviado por e-mail para criá-la.', 401)
     if (!(await senhaConfere(usuario, senha))) return fail('E-mail ou senha incorretos.', 401)
+    if (usuario.ativo === false) return fail('Esta conta está desativada. Fale com o administrador.', 403)
     const { id, nome, papel, lojaId = null } = usuario
     return respond({ token: `demo-${id}`, usuario: { id, nome, email: usuario.email, papel, lojaId } })
   }
@@ -66,6 +68,13 @@ const VALIDADE_LINK_MS = 30 * 60 * 1000
 db.emails = db.emails ?? []
 db.resetsSenha = db.resetsSenha ?? {} // token → { tabela: 'clientes' | 'usuarios', id, expiraEm }
 
+// Link de uso único para criar ou trocar a senha (esqueceu a senha e convite de funcionário novo)
+export function criarLinkSenha(tabela, id, validadeMs) {
+  const token = crypto.randomUUID()
+  db.resetsSenha[token] = { tabela, id, expiraEm: Date.now() + validadeMs }
+  return `/login/nova-senha?token=${token}`
+}
+
 const contaPorEmail = (email) => {
   const usuario = db.usuarios.find((u) => u.email.toLowerCase() === email)
   if (usuario) return { tabela: 'usuarios', conta: usuario }
@@ -79,10 +88,8 @@ export function solicitarNovaSenha({ email }) {
   if (!EMAIL_VALIDO.test(alvo)) return fail('Informe um e-mail válido.', 422)
   const encontrada = contaPorEmail(alvo)
   let linkDemo = null
-  if (encontrada) {
-    const token = crypto.randomUUID()
-    db.resetsSenha[token] = { tabela: encontrada.tabela, id: encontrada.conta.id, expiraEm: Date.now() + VALIDADE_LINK_MS }
-    linkDemo = `/login/nova-senha?token=${token}`
+  if (encontrada && encontrada.conta.ativo !== false) {
+    linkDemo = criarLinkSenha(encontrada.tabela, encontrada.conta.id, VALIDADE_LINK_MS)
     db.emails.push({
       para: encontrada.conta.email,
       assunto: 'Casa Lorenzi · Crie uma nova senha',
@@ -106,6 +113,8 @@ export async function redefinirSenha({ token, senha, senhaConfirmacao }) {
   const conta = db[pedido.tabela].find((c) => String(c.id) === String(pedido.id))
   if (!conta) return fail('Conta não encontrada.', 404)
   conta.senhaHash = await hashSenha(String(conta.id), senha)
+  // Funcionário novo: criar a senha pelo convite libera o acesso
+  delete conta.convitePendente
   // Um link usado invalida os outros pendentes da mesma conta
   Object.keys(db.resetsSenha).forEach((t) => {
     if (db.resetsSenha[t].tabela === pedido.tabela && String(db.resetsSenha[t].id) === String(pedido.id)) delete db.resetsSenha[t]

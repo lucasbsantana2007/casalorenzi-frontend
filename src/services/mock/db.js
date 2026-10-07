@@ -1,12 +1,13 @@
 import { createSeed } from '../../data/seed'
 import { ApiError } from '../api'
+import { getUsuarioSalvo } from '../authStorage'
 import { statusEstoque } from '../../utils/estoque'
 
 // Banco de demonstração usado enquanto a API real não está disponível.
 // Fica salvo no navegador (localStorage): pedidos, PINs, movimentações etc. sobrevivem a recarregar
 // a página e valem em todas as abas. Mudar VERSAO descarta os dados salvos e recria a partir do seed.
 const CHAVE = 'casalorenzi.demo-db'
-const VERSAO = 5
+const VERSAO = 7
 
 function carregar() {
   try {
@@ -19,6 +20,9 @@ function carregar() {
 }
 
 export const db = carregar()
+
+// Log de ações da equipe (central administrativa): quem fez o quê e quando
+db.logs = db.logs ?? []
 
 // Fotos anexadas aos chamados (base64). Coleção separada das mensagens para as listagens não carregarem a imagem.
 db.anexos = db.anexos ?? []
@@ -90,6 +94,37 @@ export function autorResumo({ autorTipo, autorId }) {
   return cliente ? { id: cliente.id, nome: cliente.nome, papel: 'CLIENTE' } : null
 }
 
+// ---- Sessão, permissão e log ----
+// Na API real, quem faz a ação vem do token. Aqui, da sessão salva no navegador.
+export function usuarioDaSessao() {
+  const sessao = getUsuarioSalvo()
+  return sessao && sessao.papel !== 'CLIENTE' ? byId(db.usuarios, sessao.id) ?? null : null
+}
+
+// Lança 403 se quem está logado não é Administrador ativo
+export function exigirAdmin() {
+  const usuario = usuarioDaSessao()
+  if (!usuario || usuario.papel !== 'ADMINISTRADOR' || usuario.ativo === false) {
+    throw new ApiError('Apenas administradores podem fazer isso.', { status: 403 })
+  }
+  return usuario
+}
+
+// Lista o que mudou entre dois objetos, com rótulos legíveis. formatos: { campo: (valor) => texto }
+export function mudancas(antes, depois, rotulos, formatos = {}) {
+  return Object.entries(rotulos)
+    .filter(([campo]) => JSON.stringify(antes?.[campo] ?? null) !== JSON.stringify(depois?.[campo] ?? null))
+    .map(([campo, rotulo]) => {
+      const fmt = formatos[campo] ?? ((v) => (v === null || v === undefined || v === '' ? '—' : Array.isArray(v) ? v.join('; ') : String(v)))
+      return { campo: rotulo, de: fmt(antes?.[campo]), para: fmt(depois?.[campo]) }
+    })
+}
+
+// area: FUNCIONARIOS | LOJAS | FRETE | PRODUTOS | PEDIDOS | TRANSFERENCIAS | ESTOQUE
+export function registrarLog({ area, acao, descricao, alteracoes = [], referencia = null }) {
+  db.logs.push({ id: nextId(db.logs), usuarioId: usuarioDaSessao()?.id ?? null, area, acao, descricao, alteracoes, referencia, criadoEm: Date.now() })
+}
+
 // ---- Projeções: o formato "enriquecido" que esperamos receber da API ----
 
 export function usuarioResumo(id) {
@@ -103,8 +138,9 @@ export function anexoView(id) {
   return anexo ? { id: anexo.id, nome: anexo.nome, tipo: anexo.tipo, url: `data:${anexo.tipo};base64,${anexo.conteudoBase64}` } : null
 }
 
+// Sem o preço de custo: esta projeção aparece em pedidos e solicitações do cliente
 export function variacaoView(variacaoId) {
-  const variacao = byId(db.variacoes, variacaoId)
+  const { precoCusto: _precoCusto, ...variacao } = byId(db.variacoes, variacaoId)
   const produto = byId(db.produtos, variacao.produtoId)
   return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo } }
 }

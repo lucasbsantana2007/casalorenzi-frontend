@@ -614,6 +614,10 @@
   box-shadow: var(--shadow-md);
 }
 
+.modal--sm {
+  max-width: 420px;
+}
+
 .modal--md {
   max-width: 520px;
 }

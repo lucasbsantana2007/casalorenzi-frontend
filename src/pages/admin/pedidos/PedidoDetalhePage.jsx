@@ -119,6 +119,15 @@ function PedidoDetalhe({ pedido, onChange }) {
                   <dd>{pedido.frete.valor === 0 ? 'Grátis' : formatCurrency(pedido.frete.valor)}</dd>
                 </div>
               )}
+              {pedido.frete?.custo !== undefined && (
+                <div className="order-admin-totals__custo">
+                  <dt>Custo do frete para a loja</dt>
+                  <dd>
+                    {formatCurrency(pedido.frete.custo)}
+                    <small> · {pedido.frete.valor - pedido.frete.custo >= 0 ? 'sobra' : 'loja paga'} {formatCurrency(Math.abs(pedido.frete.valor - pedido.frete.custo))}</small>
+                  </dd>
+                </div>
+              )}
               <div className="order-admin-totals__total">
                 <dt>Total</dt>
                 <dd>{formatCurrency(pedido.total)}</dd>

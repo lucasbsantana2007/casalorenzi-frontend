@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { GRID_BRASIL } from '../../data/mapaBrasil'
-import { COORDENADAS_LOJAS, LOJA_MATRIZ } from '../../data/coordenadasLojas'
+import { COORDENADAS_LOJAS, LOJA_MATRIZ_ID } from '../../data/coordenadasLojas'
 
 // Mapa de pontos do Brasil com as lojas. Linhas animadas saem da matriz para cada unidade.
 // Adaptado do componente WorldMap (dotted-map + framer-motion) para o padrão do projeto:
@@ -103,11 +103,11 @@ export function MapaLojas({ lojas, ativa, onAtivar, onSelecionar }) {
   const noMapa = useMemo(
     () =>
       lojas
-        .filter((loja) => COORDENADAS_LOJAS[loja.nome])
-        .map((loja) => ({ ...loja, ...COORDENADAS_LOJAS[loja.nome], posicao: projetar(COORDENADAS_LOJAS[loja.nome]) })),
+        .filter((loja) => COORDENADAS_LOJAS[loja.id])
+        .map((loja) => ({ ...loja, ...COORDENADAS_LOJAS[loja.id], posicao: projetar(COORDENADAS_LOJAS[loja.id]) })),
     [lojas],
   )
-  const matriz = noMapa.find((loja) => loja.nome === LOJA_MATRIZ)
+  const matriz = noMapa.find((loja) => loja.id === LOJA_MATRIZ_ID)
   const arcos = useMemo(
     () => (matriz ? noMapa.filter((loja) => loja !== matriz).map((loja) => curva(matriz.posicao, loja.posicao)) : []),
     [noMapa, matriz],

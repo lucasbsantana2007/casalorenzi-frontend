@@ -1,6 +1,7 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { produtosService } from '../../services/produtosService'
+import { faixaDeMargem } from '../../utils/margem'
 import { Field } from '../ui/Field'
 import { FormError } from '../ui/FormError'
 import { Modal } from '../ui/Modal'
@@ -23,12 +24,17 @@ function sugerirSku(nome, cor, tamanho) {
   return `CL-${prefixo}-${semAcento(cor).slice(0, 3)}-${semAcento(tamanho).replace(/\s/g, '')}`
 }
 
-const novaVariacao = () => ({ chave: crypto.randomUUID(), sku: '', cor: '', tamanho: '', skuEditado: false })
+function margemTexto(preco, variacoes) {
+  const faixa = faixaDeMargem(preco, variacoes)
+  return faixa ? `Margem bruta: ${faixa}` : 'Preencha o custo das variações para ver a margem.'
+}
+
+const novaVariacao = () => ({ chave: crypto.randomUUID(), sku: '', cor: '', tamanho: '', precoCusto: '', skuEditado: false })
 
 // produto = null → cadastro; produto preenchido → edição
 export function ProdutoFormModal({ open, produto, categorias, onClose, onSaved }) {
   return (
-    <Modal open={open} onClose={onClose} size="lg" title={produto ? 'Editar produto' : 'Novo produto'} description="Dados comerciais e grade de variações (SKU, cor e tamanho).">
+    <Modal open={open} onClose={onClose} size="lg" title={produto ? 'Editar produto' : 'Novo produto'} description="Dados comerciais e grade de variações (SKU, cor, tamanho e preço de custo).">
       {open && <ProdutoForm produto={produto} categorias={categorias} onClose={onClose} onSaved={onSaved} />}
     </Modal>
   )
@@ -68,7 +74,7 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
     const dados = {
       ...form,
       precoBase: Number(form.precoBase),
-      variacoes: variacoes.filter((v) => v.sku.trim()).map(({ id, sku, cor, tamanho }) => ({ id, sku, cor, tamanho })),
+      variacoes: variacoes.filter((v) => v.sku.trim()).map(({ id, sku, cor, tamanho, precoCusto }) => ({ id, sku, cor, tamanho, precoCusto: precoCusto === '' ? '' : Number(precoCusto) })),
     }
     try {
       if (produto) await produtosService.atualizar(produto.id, dados)
@@ -96,7 +102,7 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
             ))}
           </select>
         </Field>
-        <Field label="Preço base (R$)">
+        <Field label="Preço de venda (R$)" hint={margemTexto(form.precoBase, variacoes)}>
           <input className="input" type="number" min="0" step="0.01" value={form.precoBase} onChange={set('precoBase')} required />
         </Field>
         <label className="checkbox span-2">
@@ -111,6 +117,7 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
           <span>Cor</span>
           <span>Tamanho</span>
           <span>SKU</span>
+          <span>Custo (R$)</span>
           <span />
         </div>
         {variacoes.map((v, index) => (
@@ -118,6 +125,17 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
             <input className="input" value={v.cor} onChange={(e) => setVariacao(v.chave, 'cor', e.target.value)} placeholder="Cor" aria-label={`Cor da variação ${index + 1}`} required />
             <input className="input" value={v.tamanho} onChange={(e) => setVariacao(v.chave, 'tamanho', e.target.value)} placeholder="Tam." aria-label={`Tamanho da variação ${index + 1}`} required />
             <input className="input mono" value={v.sku} onChange={(e) => setVariacao(v.chave, 'sku', e.target.value)} placeholder="CL-XXX-COR-TAM" aria-label={`SKU da variação ${index + 1}`} required />
+            <input
+              className="input"
+              type="number"
+              min="0"
+              step="0.01"
+              value={v.precoCusto ?? ''}
+              onChange={(e) => setVariacao(v.chave, 'precoCusto', e.target.value)}
+              placeholder="0,00"
+              aria-label={`Preço de custo da variação ${index + 1}`}
+              required
+            />
             {v.id ? (
               <span className="subtle" title="Variações com histórico de estoque não podem ser removidas">Salva</span>
             ) : (

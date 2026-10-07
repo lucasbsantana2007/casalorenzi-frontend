@@ -1,5 +1,4 @@
-// Cálculo de frete por região do CEP (tabela de demonstração; na API real vem da transportadora).
-export const FRETE_GRATIS_MINIMO = 1000
+// Frete por região do CEP. Valores, custos e prazos vêm da configuração (Administração > Frete).
 
 // Faixas de CEP por região: [início, fim, região]
 const FAIXAS = [
@@ -11,15 +10,6 @@ const FAIXAS = [
   [40000000, 65999999, 'NORDESTE'],
   [66000000, 69999999, 'NORTE'],
 ]
-
-const TABELA = {
-  SP: { padrao: [19.9, 3], expresso: [39.9, 1] },
-  SUDESTE: { padrao: [29.9, 5], expresso: [59.9, 2] },
-  SUL: { padrao: [34.9, 6], expresso: [64.9, 3] },
-  CENTRO_OESTE: { padrao: [39.9, 7], expresso: [74.9, 3] },
-  NORDESTE: { padrao: [44.9, 9], expresso: [84.9, 4] },
-  NORTE: { padrao: [54.9, 12], expresso: [99.9, 5] },
-}
 
 export const somenteDigitos = (valor = '') => String(valor).replace(/\D/g, '')
 
@@ -34,15 +24,16 @@ export function regiaoDoCep(cep) {
   return FAIXAS.find(([inicio, fim]) => numero >= inicio && numero <= fim)?.[2] ?? null
 }
 
-// Opções de frete para o CEP e o subtotal da sacola; [] se o CEP não for atendido
-export function calcularFrete(cep, subtotal) {
-  const regiao = regiaoDoCep(cep)
+// Opções de frete para o CEP e o subtotal, segundo a configuração; [] se o CEP não for atendido.
+// O custo só vem junto quando a configuração o tem (painel e servidor; o site recebe sem custo).
+export function calcularFrete(cep, subtotal, config) {
+  const regiao = config?.regioes.find((r) => r.regiao === regiaoDoCep(cep))
   if (!regiao) return []
-  const { padrao, expresso } = TABELA[regiao]
-  const gratis = subtotal >= FRETE_GRATIS_MINIMO
+  const gratis = subtotal >= config.gratisMinimo
+  const opcao = (tipo, label, faixa, valor) => ({ tipo, label, valor, prazoDias: faixa.prazoDias, ...(faixa.custo !== undefined && { custo: faixa.custo }) })
   return [
-    { tipo: 'PADRAO', label: 'Padrão', valor: gratis ? 0 : padrao[0], prazoDias: padrao[1] },
-    { tipo: 'EXPRESSO', label: 'Expresso', valor: expresso[0], prazoDias: expresso[1] },
+    opcao('PADRAO', 'Padrão', regiao.padrao, gratis ? 0 : regiao.padrao.valor),
+    ...(config.expressoAtivo ? [opcao('EXPRESSO', 'Expresso', regiao.expresso, regiao.expresso.valor)] : []),
   ]
 }
 

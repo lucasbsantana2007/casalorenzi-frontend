@@ -1,4 +1,4 @@
-import { aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
+import { aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, registrarLog, respond, usuarioResumo, variacaoView } from './db'
 
 function transferenciaView(t) {
   const { produto, ...variacao } = variacaoView(t.variacaoId)
@@ -48,6 +48,12 @@ export function criar({ variacaoId, lojaOrigemId, lojaDestinoId, quantidade, obs
     observacao,
   }
   db.transferencias.push(transferencia)
+  registrarLog({
+    area: 'TRANSFERENCIAS',
+    acao: 'SOLICITOU',
+    descricao: `Solicitou a transferência ${transferencia.codigo}: ${quantidade}× ${byId(db.variacoes, variacaoId).sku} de ${byId(db.lojas, lojaOrigemId).nome} para ${byId(db.lojas, lojaDestinoId).nome}`,
+    referencia: { tipo: 'transferencia', id },
+  })
   return respond(transferenciaView(transferencia))
 }
 
@@ -73,5 +79,7 @@ export function atualizarStatus(id, { status, usuarioId }) {
   } catch (error) {
     return fail(error.message, error.status)
   }
+  const verbo = { EM_TRANSITO: 'Enviou', CONCLUIDA: 'Recebeu', CANCELADA: 'Cancelou' }[status]
+  registrarLog({ area: 'TRANSFERENCIAS', acao: status, descricao: `${verbo} a transferência ${rota}`, referencia: { tipo: 'transferencia', id: t.id } })
   return respond(transferenciaView(t))
 }

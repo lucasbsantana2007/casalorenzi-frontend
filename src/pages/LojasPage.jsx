@@ -1,11 +1,12 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { MapaLojas } from '../components/loja/MapaLojas'
-import { DETALHES_LOJAS } from '../data/detalhesLojas'
+import { FOTOS_LOJAS } from '../data/fotosLojas'
 import { useLojas } from '../hooks/useCadastros'
 
 export function LojasPage() {
-  const lojas = useLojas()
+  // Loja desativada no cadastro sai do site
+  const lojas = useLojas().filter((loja) => loja.ativa !== false)
   // Passar o mouse na lista acende o ponto no mapa, e vice-versa
   const [ativa, setAtiva] = useState(null)
   // Loja com foto e informações abertas: clique no nome ou no ponto do mapa
@@ -28,7 +29,7 @@ export function LojasPage() {
         <MapaLojas lojas={lojas} ativa={ativa ?? aberta} onAtivar={setAtiva} onSelecionar={abrirPeloMapa} />
         <ul className="store-list">
           {lojas.map((loja) => {
-            const detalhes = DETALHES_LOJAS[loja.nome]
+            const detalhes = loja.endereco ? { ...loja, foto: FOTOS_LOJAS[loja.id] } : null
             const estaAberta = aberta === loja.id
             return (
               <li
@@ -56,24 +57,28 @@ export function LojasPage() {
                 </button>
                 {detalhes && estaAberta && (
                   <div className="store-list__detalhes" id={`loja-${loja.id}-detalhes`}>
-                    <img src={detalhes.foto} alt={`Fachada da Casa Lorenzi ${loja.nome}`} />
+                    {detalhes.foto && <img src={detalhes.foto} alt={`Fachada da Casa Lorenzi ${loja.nome}`} />}
                     <dl>
                       <div>
                         <dt>Endereço</dt>
                         <dd>{detalhes.endereco}</dd>
                       </div>
-                      <div>
-                        <dt>Contato</dt>
-                        <dd>
-                          <a href={`tel:${detalhes.telefone.replace(/[^\d+]/g, '')}`}>{detalhes.telefone}</a>
-                        </dd>
-                      </div>
-                      <div>
-                        <dt>Horários</dt>
-                        {detalhes.horarios.map((linha) => (
-                          <dd key={linha}>{linha}</dd>
-                        ))}
-                      </div>
+                      {detalhes.telefone && (
+                        <div>
+                          <dt>Contato</dt>
+                          <dd>
+                            <a href={`tel:${detalhes.telefone.replace(/[^\d+]/g, '')}`}>{detalhes.telefone}</a>
+                          </dd>
+                        </div>
+                      )}
+                      {detalhes.horarios?.length > 0 && (
+                        <div>
+                          <dt>Horários</dt>
+                          {detalhes.horarios.map((linha) => (
+                            <dd key={linha}>{linha}</dd>
+                          ))}
+                        </div>
+                      )}
                     </dl>
                   </div>
                 )}

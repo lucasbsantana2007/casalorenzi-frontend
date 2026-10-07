@@ -2,8 +2,8 @@ import { Minus, Plus, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { imagemDoProduto } from '../../data/imagensProdutos'
+import { useCondicoesFrete } from '../../hooks/useCadastros'
 import { useSacola } from '../../hooks/useSacola'
-import { FRETE_GRATIS_MINIMO } from '../../utils/frete'
 import { formatCurrency } from '../../utils/format'
 
 // Sacola lateral: abre por cima da página ao clicar em "Sacola" ou ao adicionar uma peça
@@ -11,7 +11,8 @@ export function SacolaLateral() {
   const { itens, subtotal, quantidadeTotal, maxPorItem, aberta, fechar, alterarQuantidade, remover } = useSacola()
   const painelRef = useRef(null)
   const { pathname } = useLocation()
-  const faltaFreteGratis = FRETE_GRATIS_MINIMO - subtotal
+  const frete = useCondicoesFrete()
+  const faltaFreteGratis = frete ? frete.gratisMinimo - subtotal : 0
 
   // Fecha ao trocar de página (ex.: clicou num produto ou em "Finalizar compra")
   useEffect(() => {

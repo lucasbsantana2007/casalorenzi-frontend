@@ -1,5 +1,5 @@
 import { ApiError } from '../api'
-import { aplicarMovimentacao, byId, db, estoqueView, fail, inPeriod, matches, movimentacaoView, respond } from './db'
+import { aplicarMovimentacao, byId, db, estoqueView, fail, inPeriod, matches, movimentacaoView, registrarLog, respond } from './db'
 
 function filtrarEstoques({ busca, lojaId, categoria, status, variacaoId } = {}) {
   return db.estoques
@@ -57,7 +57,14 @@ export function registrarMovimentacao({ estoqueId, tipo, quantidade, origem, usu
   if (!Number.isInteger(quantidade) || quantidade === 0) return fail('Informe uma quantidade válida.', 422)
   try {
     const mov = aplicarMovimentacao({ estoqueId: Number(estoqueId), tipo, quantidade, origem, usuarioId })
-    return respond(movimentacaoView(mov))
+    const view = movimentacaoView(mov)
+    registrarLog({
+      area: 'ESTOQUE',
+      acao: tipo,
+      descricao: `Registrou ${quantidade > 0 ? '+' : ''}${quantidade} un. (${tipo.toLowerCase()}) de ${view.variacao.sku} na loja ${view.loja.nome}`,
+      referencia: { tipo: 'estoque', id: Number(estoqueId) },
+    })
+    return respond(view)
   } catch (error) {
     if (error instanceof ApiError) return fail(error.message, error.status)
     throw error
