@@ -18,7 +18,7 @@ function exportarCsv(porLoja, periodo) {
 }
 
 const ATALHOS = [
-  { to: '/produtos', label: 'Cadastrar produto', descricao: 'Preços e variações', icon: PackagePlus },
+  { to: '/estoque', label: 'Cadastrar produto', descricao: 'Preços e variações', icon: PackagePlus },
   { to: '/estoque/historico', label: 'Posição em data', descricao: 'Estoque em um dia passado', icon: History },
   { to: '/transferencias', label: 'Transferências', descricao: 'Remanejar entre lojas', icon: ArrowLeftRight },
 ]

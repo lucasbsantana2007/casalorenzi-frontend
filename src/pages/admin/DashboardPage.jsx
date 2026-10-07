@@ -66,14 +66,14 @@ function DashboardContent({ resumo, pode }) {
   return (
     <>
       <section className="kpi-grid" aria-label="Indicadores">
-        <StatCard label="Peças em estoque" value={formatNumber(ind.estoqueTotal)} hint={`${ind.variacoesAtivas} SKUs · ${ind.produtosAtivos} produtos ativos`} icon={Boxes} to="/estoque" />
+        <StatCard label="Peças em estoque" value={formatNumber(ind.estoqueTotal)} hint={`${ind.variacoesAtivas} SKUs · ${ind.produtosAtivos} produtos ativos`} icon={Boxes} to="/estoque/posicao" />
         <StatCard
           label="Estoque baixo"
           value={formatNumber(ind.itensEstoqueBaixo + ind.itensSemEstoque)}
           hint={`${ind.itensSemEstoque} sem estoque · ${ind.itensEstoqueBaixo} abaixo do mínimo`}
           icon={TriangleAlert}
           tone={ind.itensSemEstoque > 0 ? 'danger' : 'warning'}
-          to="/estoque?status=ALERTA"
+          to="/estoque/posicao?status=ALERTA"
         />
         <StatCard
           label="Atendimentos abertos"

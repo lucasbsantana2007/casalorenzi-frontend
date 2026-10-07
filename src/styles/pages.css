@@ -179,6 +179,17 @@ a.ticket-list__item:hover {
   display: block;
 }
 
+.cell-link.qty:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.section-heading h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
 .cell-link:hover .cell-main {
   color: var(--navy-700);
   text-decoration: underline;

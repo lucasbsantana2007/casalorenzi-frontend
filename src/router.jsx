@@ -13,12 +13,12 @@ import { LogPage } from './pages/admin/administracao/LogPage'
 import { LojasAdminPage } from './pages/admin/administracao/LojasAdminPage'
 import { DashboardPage } from './pages/admin/DashboardPage'
 import { EstoqueDetalhePage } from './pages/admin/estoque/EstoqueDetalhePage'
+import { EstoqueInicio } from './pages/admin/estoque/EstoqueInicio'
 import { EstoquePage } from './pages/admin/estoque/EstoquePage'
 import { MovimentacoesPage } from './pages/admin/estoque/MovimentacoesPage'
 import { PosicaoEmDataPage } from './pages/admin/estoque/PosicaoEmDataPage'
 import { PedidoDetalhePage } from './pages/admin/pedidos/PedidoDetalhePage'
 import { PedidosPage as PedidosAdminPage } from './pages/admin/pedidos/PedidosPage'
-import { ProdutosPage } from './pages/admin/ProdutosPage'
 import { TransferenciasPage } from './pages/admin/TransferenciasPage'
 import { ClienteHomePage } from './pages/cliente/ClienteHomePage'
 import { ContaPage } from './pages/cliente/ContaPage'
@@ -74,13 +74,16 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       { path: 'dashboard', element: protegida('dashboard', <DashboardPage />) },
-      { path: 'estoque', element: protegida('estoque', <EstoquePage />) },
+      // Estoque reúne Produtos (aba inicial de quem gerencia produtos), posição atual, posição em data e movimentações
+      { path: 'estoque', element: protegida('estoque', <EstoqueInicio />) },
+      { path: 'estoque/posicao', element: protegida('estoque', <EstoquePage />) },
       { path: 'estoque/historico', element: protegida('estoque', <PosicaoEmDataPage />) },
       { path: 'estoque/movimentacoes', element: protegida('estoque', <MovimentacoesPage />) },
       { path: 'estoque/:id', element: protegida('estoque', <EstoqueDetalhePage />) },
       { path: 'pedidos', element: protegida('pedidos', <PedidosAdminPage />) },
       { path: 'pedidos/:id', element: protegida('pedidos', <PedidoDetalhePage />) },
-      { path: 'produtos', element: protegida('produtos', <ProdutosPage />) },
+      // Endereço antigo da tela Produtos, que agora é uma aba de Estoque
+      { path: 'produtos', element: <Navigate to="/estoque" replace /> },
       { path: 'transferencias', element: protegida('transferencias', <TransferenciasPage />) },
       { path: 'atendimento', element: protegida('atendimento', <AtendimentosPage />) },
       { path: 'atendimento/:id', element: protegida('atendimento', <AtendimentoDetalhePage />) },
