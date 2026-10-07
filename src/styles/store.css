@@ -73,7 +73,7 @@
   display: flex;
   align-items: center;
   justify-self: end;
-  gap: 32px;
+  gap: 20px;
 }
 
 .store-header a:hover,
@@ -87,6 +87,46 @@
 .store-header:not(.is-transparent) a:hover,
 .store-header:not(.is-transparent) a.is-active {
   text-decoration-color: var(--marrom-600);
+}
+
+/* Ícones do canto direito: conta (boneco) e sacola (carrinho) */
+.store-header__icon {
+  display: inline-flex;
+  padding: 4px;
+  color: inherit;
+}
+
+/* Sacola: ícone de carrinho com a quantidade por cima */
+.store-header__bag {
+  position: relative;
+  display: inline-flex;
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.store-header__bag-count {
+  position: absolute;
+  top: -4px;
+  right: -6px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--navy-950);
+  color: #fff;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 17px;
+  text-align: center;
+}
+
+/* Sobre a foto do início o cabeçalho é claro: inverte o número */
+.store-header.is-transparent .store-header__bag-count {
+  background: #fff;
+  color: var(--navy-950);
 }
 
 .store-header__menu {
@@ -822,6 +862,114 @@ button.pdp__cta:hover:not(:disabled) {
   .mapa-lojas {
     position: static;
     max-width: 440px;
+  }
+}
+
+/* Aba Lorenzi: história da marca, em capítulos que alternam foto e texto */
+.historia__intro {
+  max-width: 720px;
+  margin: 0 auto 96px;
+  text-align: center;
+}
+
+.historia__eyebrow,
+.historia__marco {
+  margin: 0 0 16px;
+  font-family: var(--store-font);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--marrom-600);
+}
+
+.historia__lead {
+  margin: 28px 0 0;
+  font-family: var(--store-font);
+  font-size: 24px;
+  line-height: 1.4;
+  color: var(--navy-950);
+  text-wrap: balance;
+}
+
+.historia__capitulos {
+  display: flex;
+  flex-direction: column;
+  gap: 112px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.historia__capitulo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 72px;
+  align-items: center;
+}
+
+/* Foto à direita nos capítulos pares */
+.historia__capitulo:nth-child(even) .historia__foto {
+  order: 2;
+}
+
+.historia__capitulo--texto {
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.historia__foto {
+  margin: 0;
+}
+
+.historia__foto img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.historia__texto .store-heading {
+  margin-bottom: 24px;
+  line-height: 1.15;
+}
+
+.historia__texto p:not(.historia__marco) {
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--navy-900);
+}
+
+.historia__fim {
+  display: flex;
+  justify-content: center;
+  margin: 112px 0 48px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+
+@media (max-width: 900px) {
+  .historia__intro {
+    margin-bottom: 64px;
+  }
+  .historia__lead {
+    font-size: 20px;
+  }
+  .historia__capitulos {
+    gap: 72px;
+  }
+  .historia__capitulo {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+  .historia__capitulo:nth-child(even) .historia__foto {
+    order: 0;
+  }
+  .historia__foto img {
+    aspect-ratio: 4 / 3;
   }
 }
 

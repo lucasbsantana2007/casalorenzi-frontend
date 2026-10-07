@@ -1,4 +1,4 @@
-import { Menu, X } from 'lucide-react'
+import { Menu, ShoppingCart, User, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSacola } from '../../hooks/useSacola'
@@ -9,13 +9,21 @@ const NAV = [
   { to: '/colecao/masculino', label: 'Masculino' },
   { to: '/colecao/feminino', label: 'Feminino' },
   { to: '/lojas', label: 'Lojas' },
-  { to: '/meus-pedidos', label: 'Atendimento' },
+  { to: '/lorenzi', label: 'Lorenzi' },
 ]
+
+// Boneco do cabeçalho: abre o login; com sessão, leva cada um para a sua área
+function itemDaConta({ isCliente, isEquipe }) {
+  if (isCliente) return { to: '/cliente', label: 'Minha conta' }
+  if (isEquipe) return { to: '/dashboard', label: 'Painel' }
+  return { to: '/login', label: 'Iniciar sessão' }
+}
 
 // Cabeçalho da loja: fica no topo da página e sai de vista ao rolar (não acompanha a rolagem).
 // `overlay` (início): por cima das fotos, com texto claro.
 export function StoreHeader({ overlay = false }) {
-  const { isEquipe } = useSession()
+  const sessao = useSession()
+  const conta = itemDaConta(sessao)
   const { quantidadeTotal, abrir: abrirSacola } = useSacola()
   const [menuAberto, setMenuAberto] = useState(false)
   const fechar = () => setMenuAberto(false)
@@ -36,12 +44,9 @@ export function StoreHeader({ overlay = false }) {
       </nav>
 
       <div className="store-header__actions">
-        {/* Clientes não têm login; só a equipe logada vê o atalho do painel */}
-        {isEquipe && (
-          <Link to="/dashboard" onClick={fechar}>
-            Painel
-          </Link>
-        )}
+        <Link to={conta.to} className="store-header__icon" aria-label={conta.label} title={conta.label} onClick={fechar}>
+          <User size={20} strokeWidth={1.5} aria-hidden="true" />
+        </Link>
         <button
           type="button"
           className="store-header__bag"
@@ -51,7 +56,8 @@ export function StoreHeader({ overlay = false }) {
           }}
           aria-label={`Abrir sacola, ${quantidadeTotal} ${quantidadeTotal === 1 ? 'item' : 'itens'}`}
         >
-          Sacola ({quantidadeTotal})
+          <ShoppingCart size={20} strokeWidth={1.5} aria-hidden="true" />
+          {quantidadeTotal > 0 && <span className="store-header__bag-count">{quantidadeTotal}</span>}
         </button>
         <button type="button" className="store-header__menu" onClick={() => setMenuAberto((v) => !v)} aria-expanded={menuAberto} aria-label={menuAberto ? 'Fechar menu' : 'Abrir menu'}>
           {menuAberto ? <X size={20} /> : <Menu size={20} />}

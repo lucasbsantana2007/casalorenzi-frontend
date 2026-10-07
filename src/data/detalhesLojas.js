@@ -1,5 +1,5 @@
 import belvedere from '../assets/lojas/belvedere.jpg'
-import lagoSul from '../assets/lojas/lago-sul.jpg'
+import lagoNorte from '../assets/lojas/lago-norte.jpg'
 import leblon from '../assets/lojas/leblon.jpg'
 import oscarFreire from '../assets/lojas/oscar-freire.jpg'
 import patioBatel from '../assets/lojas/patio-batel.jpg'
@@ -12,8 +12,8 @@ export const DETALHES_LOJAS = {
     telefone: '+55 11 93394-9003',
     horarios: ['Quarta a domingo: 10:00–18:00'],
   },
-  'Lago Sul': {
-    foto: lagoSul,
+  'Lago Norte': {
+    foto: lagoNorte,
     endereco: 'Shopping Iguatemi, 1º Piso - St. de Habitações Individuais Norte CA 4, Lago Norte, Brasília - DF',
     telefone: '+55 61 99674-1929',
     horarios: ['Segunda a sábado: 10:00–22:00', 'Domingo: 12:00–20:00'],
