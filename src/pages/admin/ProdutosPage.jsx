@@ -9,6 +9,7 @@ import { PageHeader } from '../../components/ui/PageHeader'
 import { SearchInput } from '../../components/ui/SearchInput'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { imagemDoProduto } from '../../data/imagensProdutos'
 import { useCategorias } from '../../hooks/useCadastros'
 import { useDebouncedValue } from '../../hooks/useDebouncedValue'
 import { produtosService } from '../../services/produtosService'
@@ -32,7 +33,16 @@ export function ProdutosPage() {
   const [form, setForm] = useState({ open: false, produto: null })
 
   const columns = [
-    { key: 'nome', header: 'Produto', render: (p) => <span className="cell-main">{p.nome}</span> },
+    {
+      key: 'nome',
+      header: 'Produto',
+      render: (p) => (
+        <span className="produto-celula">
+          <img src={imagemDoProduto(p)} alt="" loading="lazy" />
+          <span className="cell-main">{p.nome}</span>
+        </span>
+      ),
+    },
     { key: 'categoria', header: 'Categoria', render: (p) => <span className="tag">{p.categoria}</span> },
     { key: 'precoBase', header: 'Preço de venda', align: 'right', render: (p) => <span className="nowrap">{formatCurrency(p.precoBase)}</span> },
     { key: 'margem', header: 'Margem', align: 'right', render: (p) => <span className="nowrap">{faixaDeMargem(p.precoBase, p.variacoes) ?? '—'}</span> },

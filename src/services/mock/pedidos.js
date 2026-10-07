@@ -276,8 +276,8 @@ function assinaturaConfere(tipo, base64) {
   return inicio.startsWith('RIFF') && inicio.slice(8, 12) === 'WEBP'
 }
 
-// → mensagem de erro, ou null se o anexo é válido
-function erroDoAnexo(anexo) {
+// → mensagem de erro, ou null se o anexo é válido (também usado na foto do produto)
+export function erroDoAnexo(anexo) {
   const { nome, tipo, conteudoBase64 } = anexo ?? {}
   if (!TIPOS_ANEXO.includes(tipo)) return 'A foto deve ser JPG, PNG ou WebP.'
   if (!String(nome ?? '').trim()) return 'Informe o nome do arquivo da foto.'

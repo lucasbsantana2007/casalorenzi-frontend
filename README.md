@@ -140,7 +140,8 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 **Produtos**
 - `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`; `precoCusto` em cada variação **só para o Administrador**). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
 - `GET /produtos/{id}`
-- `POST /produtos` e `PUT /produtos/{id}` (só Administrador) com `{ nome, categoria, precoBase, ativo, variacoes: [{ id?, sku, tamanho, cor, precoCusto }] }`. Mudanças de preço e custo vão para o log.
+- `POST /produtos` e `PUT /produtos/{id}` (só Administrador) com `{ nome, categoria, precoBase, ativo, variacoes: [{ id?, sku, tamanho, cor, precoCusto }], imagem?, removerImagem? }`. Mudanças de preço, custo e foto vão para o log.
+- Foto do produto: `imagem: { nome, tipo, conteudoBase64 }` (JPG, PNG ou WebP, até 2 MB, já reduzida no navegador para no máximo 1280 px) troca a foto; `removerImagem: true` volta à ilustração. O backend grava no S3 e devolve `imagemUrl` no produto (e em `variacao.produto` nos pedidos), que o site usa na vitrine, no carrinho, no checkout e nos pedidos.
 
 **Transferências**
 - `GET /transferencias?status&lojaId&busca`
@@ -169,4 +170,4 @@ O token recebido no login é enviado em todas as requisições como `Authorizati
 
 ## Imagens
 
-As fotos da vitrine (`src/assets/colecao/`) são do [Unsplash](https://unsplash.com/license), de uso livre, e servem só para ilustrar. Quando a API devolver `imagemUrl` nos produtos, ela substitui automaticamente a foto ilustrativa (`src/data/imagensProdutos.js`).
+As fotos da vitrine (`src/assets/colecao/`) são do [Unsplash](https://unsplash.com/license), de uso livre, e servem só para ilustrar. A foto enviada no cadastro do produto (Produtos › Editar › Foto do produto) substitui a ilustração em todo o site (`src/data/imagensProdutos.js`).

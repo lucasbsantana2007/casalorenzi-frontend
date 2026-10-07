@@ -1,10 +1,12 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { imagemDoProduto } from '../../data/imagensProdutos'
 import { produtosService } from '../../services/produtosService'
 import { faixaDeMargem } from '../../utils/margem'
 import { Field } from '../ui/Field'
 import { FormError } from '../ui/FormError'
 import { Modal } from '../ui/Modal'
+import { FotoProdutoCampo } from './FotoProdutoCampo'
 
 const semAcento = (texto) =>
   texto
@@ -34,7 +36,7 @@ const novaVariacao = () => ({ chave: crypto.randomUUID(), sku: '', cor: '', tama
 // produto = null → cadastro; produto preenchido → edição
 export function ProdutoFormModal({ open, produto, categorias, onClose, onSaved }) {
   return (
-    <Modal open={open} onClose={onClose} size="lg" title={produto ? 'Editar produto' : 'Novo produto'} description="Dados comerciais e grade de variações (SKU, cor, tamanho e preço de custo).">
+    <Modal open={open} onClose={onClose} size="lg" title={produto ? 'Editar produto' : 'Novo produto'} description="Foto, dados comerciais e grade de variações (SKU, cor, tamanho e preço de custo).">
       {open && <ProdutoForm produto={produto} categorias={categorias} onClose={onClose} onSaved={onSaved} />}
     </Modal>
   )
@@ -50,6 +52,9 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
   const [variacoes, setVariacoes] = useState(
     produto?.variacoes.map((v) => ({ ...v, chave: String(v.id), skuEditado: true })) ?? [novaVariacao()],
   )
+  const [foto, setFoto] = useState(null) // nova foto já reduzida: { nome, tipo, conteudoBase64, url, tamanho }
+  const [fotoRemovida, setFotoRemovida] = useState(false)
+  const [preparandoFoto, setPreparandoFoto] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
@@ -74,6 +79,8 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
     const dados = {
       ...form,
       precoBase: Number(form.precoBase),
+      imagem: foto && { nome: foto.nome, tipo: foto.tipo, conteudoBase64: foto.conteudoBase64 },
+      removerImagem: fotoRemovida && !foto,
       variacoes: variacoes.filter((v) => v.sku.trim()).map(({ id, sku, cor, tamanho, precoCusto }) => ({ id, sku, cor, tamanho, precoCusto: precoCusto === '' ? '' : Number(precoCusto) })),
     }
     try {
@@ -90,6 +97,18 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
 
   return (
     <form className="stack" onSubmit={handleSubmit}>
+      <FotoProdutoCampo
+        foto={foto}
+        atual={produto ? imagemDoProduto(produto) : null}
+        temFotoEnviada={Boolean(produto?.imagemUrl)}
+        removida={fotoRemovida}
+        onEscolher={(nova) => {
+          setFoto(nova)
+          setFotoRemovida(false)
+        }}
+        onRemover={() => (foto ? setFoto(null) : setFotoRemovida(true))}
+        onProcessando={setPreparandoFoto}
+      />
       <div className="form-grid">
         <Field label="Nome do produto" className="span-2">
           <input className="input" value={form.nome} onChange={set('nome')} placeholder="Ex.: Camisa de Linho Toscana" required />
@@ -156,7 +175,7 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
         <button type="button" className="btn btn-secondary" onClick={onClose}>
           Cancelar
         </button>
-        <button type="submit" className="btn btn-primary" disabled={saving}>
+        <button type="submit" className="btn btn-primary" disabled={saving || preparandoFoto}>
           {saving ? 'Salvando…' : produto ? 'Salvar alterações' : 'Cadastrar produto'}
         </button>
       </div>

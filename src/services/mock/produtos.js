@@ -1,5 +1,6 @@
 import { formatCurrency } from '../../utils/format'
-import { byId, db, exigirAdmin, fail, matches, mudancas, nextId, registrarLog, respond, usuarioDaSessao } from './db'
+import { byId, db, exigirAdmin, fail, matches, mudancas, nextId, registrarLog, respond, salvar, usuarioDaSessao } from './db'
+import { erroDoAnexo } from './pedidos'
 
 // O preço de custo só vai para o Administrador; a vitrine usa a mesma listagem
 function produtoView(produto) {
@@ -66,6 +67,27 @@ function salvarVariacoes(produtoId, variacoes) {
   return alteracoes
 }
 
+// Foto do produto. imagem: { nome, tipo, conteudoBase64 } troca a foto; removerImagem: true volta à ilustração.
+// Na demonstração vira data URL no "banco" (localStorage, ~5 MB); na API real vai para o S3 e volta como imagemUrl.
+// → { erro } se a foto é inválida, ou { alteracao } para o log (null se a foto não mudou)
+function aplicarImagem(produto, { imagem, removerImagem }) {
+  if (imagem) {
+    const erro = erroDoAnexo(imagem)
+    if (erro) return { erro }
+    const tinhaFoto = Boolean(produto.imagemUrl)
+    produto.imagemUrl = `data:${imagem.tipo};base64,${imagem.conteudoBase64}`
+    return { alteracao: { campo: 'Foto', de: tinhaFoto ? 'Foto anterior' : 'Ilustração', para: imagem.nome } }
+  }
+  if (removerImagem && produto.imagemUrl) {
+    delete produto.imagemUrl
+    return { alteracao: { campo: 'Foto', de: 'Foto enviada', para: 'Ilustração' } }
+  }
+  return { alteracao: null }
+}
+
+// Sem espaço no navegador para a foto (só na demonstração): desfaz e avisa
+const semEspaco = () => fail('Não há espaço no navegador para guardar esta foto nesta demonstração. Use uma imagem menor ou remova fotos de outros produtos.', 507)
+
 const ROTULOS_PRODUTO = { nome: 'Nome', categoria: 'Categoria', precoBase: 'Preço de venda', ativo: 'Ativo' }
 const FORMATOS_PRODUTO = { precoBase: formatCurrency, ativo: (v) => (v ? 'Sim' : 'Não') }
 
@@ -84,7 +106,13 @@ export function criar(dados) {
     const erro = validar(dados)
     if (erro) return fail(erro, 422)
     const produto = { id: nextId(db.produtos), nome: dados.nome.trim(), categoria: dados.categoria, precoBase: Number(dados.precoBase), ativo: dados.ativo ?? true }
+    const { erro: erroFoto } = aplicarImagem(produto, dados)
+    if (erroFoto) return fail(erroFoto, 422)
     db.produtos.push(produto)
+    if (produto.imagemUrl && !salvar()) {
+      db.produtos.pop()
+      return semEspaco()
+    }
     salvarVariacoes(produto.id, dados.variacoes ?? [])
     registrarLog({ area: 'PRODUTOS', acao: 'CADASTROU', descricao: `Cadastrou o produto ${produto.nome} (${formatCurrency(produto.precoBase)})`, referencia: { tipo: 'produto', id: produto.id } })
     return respond(produtoView(produto))
@@ -100,6 +128,14 @@ export function atualizar(id, dados) {
     const campos = { nome: dados.nome.trim(), categoria: dados.categoria, precoBase: Number(dados.precoBase), ativo: dados.ativo }
     const alteracoes = mudancas(produto, campos, ROTULOS_PRODUTO, FORMATOS_PRODUTO)
     const nomeAnterior = produto.nome
+    const fotoAnterior = produto.imagemUrl
+    const { erro: erroFoto, alteracao: alteracaoFoto } = aplicarImagem(produto, dados)
+    if (erroFoto) return fail(erroFoto, 422)
+    if (alteracaoFoto && produto.imagemUrl && !salvar()) {
+      produto.imagemUrl = fotoAnterior
+      return semEspaco()
+    }
+    if (alteracaoFoto) alteracoes.push(alteracaoFoto)
     Object.assign(produto, campos)
     alteracoes.push(...salvarVariacoes(produto.id, dados.variacoes ?? []))
     if (alteracoes.length) {

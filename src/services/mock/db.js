@@ -142,7 +142,7 @@ export function anexoView(id) {
 export function variacaoView(variacaoId) {
   const { precoCusto: _precoCusto, ...variacao } = byId(db.variacoes, variacaoId)
   const produto = byId(db.produtos, variacao.produtoId)
-  return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo } }
+  return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo, imagemUrl: produto.imagemUrl ?? null } }
 }
 
 export function estoqueView(estoque) {
