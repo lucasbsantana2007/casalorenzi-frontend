@@ -19,7 +19,7 @@ npm run build
 | Variável         | Padrão                  | Descrição                                                          |
 | ---------------- | ----------------------- | ------------------------------------------------------------------ |
 | `VITE_API_URL`   | `http://127.0.0.1:8000/api` | Endereço da API FastAPI, já com o prefixo `/api`                |
-| `VITE_USE_MOCKS` | `true`                  | `true` usa dados de demonstração em memória; `false` usa a API real |
+| `VITE_USE_MOCKS` | `true`                  | `true` usa dados de demonstração salvos no navegador; `false` usa a API real |
 | `VITE_MODO_DEMO` | `true`                  | Selo "Dados de demonstração" no painel e acesso rápido no login (funciona também com a API, que usa as mesmas contas do seed); `false` quando houver dados reais |
 
 As variáveis são lidas somente em `src/config/env.js`.
@@ -48,7 +48,7 @@ Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, 
 | Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Pedidos, Atendimento       |
 | Operador      | Dashboard, Estoque, Pedidos, Transferências                                    |
 
-Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
+Lojista e Operador veem os pedidos que a própria loja expede. No menu do Administrador, os módulos ficam em grupos que abrem e fecham (Vendas: Pedidos, Atendimento e Financeiro; Catálogo e estoque: Estoque, Produtos e Transferências); os outros cargos têm o menu simples. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
 **Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
@@ -64,16 +64,20 @@ src/
   services/
     api.js               cliente HTTP único (fetch, erros do FastAPI, token Bearer)
     *Service.js          um serviço por domínio: endpoints reais OU mock (mesma interface)
-    mock/                implementação em memória dos mesmos serviços
-  data/seed/             dados de demonstração determinísticos (catálogo, pessoas, histórico)
-  context/               sessão (login/logout, usuário e permissões)
-  hooks/                 useAsync, useDebouncedValue, useSession, useCadastros
-  layouts/               AdminLayout (sidebar) e ClientLayout (portal)
+    mock/                implementação dos mesmos serviços com dados salvos no navegador
+  data/
+    seed/                dados de demonstração determinísticos (catálogo, pessoas, frete, histórico)
+    imagensProdutos.js   fotos ilustrativas dos produtos (a foto enviada no cadastro tem prioridade)
+    fotosLojas.js, coordenadasLojas.js, mapaBrasil.js   fotos e mapa da página Lojas (pelo id da loja)
+  assets/                logo, fotos da coleção, das lojas e do login
+  context/               sessão (login/logout, usuário e permissões) e sacola
+  hooks/                 useAsync, useDebouncedValue, useSession, useSacola, useCadastros
+  layouts/               StoreLayout (loja), AdminLayout + Sidebar (painel) e ClientLayout (área do cliente)
   components/ui/         PageHeader, StatCard, StatusBadge, DataTable, Modal, Tabs, estados...
-  components/<domínio>/  modais e componentes de estoque, produtos e atendimento
-  pages/admin, pages/cliente
-  styles/                tokens e CSS (base, componentes, layout, páginas)
-  utils/                 formatação, status, permissões, regras de estoque
+  components/<domínio>/  loja, home, auth (telas de acesso), produtos, estoque, atendimento, financeiro
+  pages/                 loja pública e telas de acesso; pages/admin (painel, incl. administracao/) e pages/cliente
+  styles/                tokens e CSS (base, componentes, layout, páginas, loja, checkout, login)
+  utils/                 formatação, status, permissões, frete, CPF, margem, imagens, regras de estoque
 ```
 
 ### Troca de mock para API real
@@ -89,7 +93,9 @@ export const estoqueService = USE_MOCKS ? mock : {
 
 Para conectar o backend, defina `VITE_USE_MOCKS=false`. As páginas não mudam. Para ligar um domínio de cada vez, troque o ternário só no serviço correspondente.
 
-Os mocks guardam as alterações (contas, pedidos, movimentações, transferências, mensagens, produtos) no `localStorage`, então elas continuam depois de recarregar a página.
+Os mocks guardam as alterações (contas, pedidos, movimentações, transferências, mensagens, produtos, frete, log) no `localStorage`, então elas continuam depois de recarregar a página.
+
+O banco de demonstração tem uma versão (`VERSAO` em `src/services/mock/db.js`). Ao mudar a estrutura dos dados (por exemplo, uma tabela ou um campo novo no seed), suba a versão: cada navegador descarta os dados salvos e recria tudo a partir do seed. Sem isso, quem já abriu o site fica com dados no formato antigo e as telas novas podem quebrar.
 
 ## Contrato esperado da API
 
@@ -107,7 +113,7 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `POST /checkout` com `{ endereco, freteTipo, pagamento: { metodo, parcelas }, itens: [{ variacaoId, quantidade }] }`. O cliente vem do token, não do corpo; o pedido grava `clienteId` = CPF. HTTP 401 sem sessão de cliente.
 
 **Cadastros**
-- `GET /lojas`
+- `GET /lojas` (público) → `[{ id, nome, cidade, uf, endereco, telefone, horarios: string[], ativa }]`. A página Lojas mostra só as ativas.
 - `GET /categorias`
 - `GET /usuarios?papel=`
 - `GET /tipos-solicitacao?ativo=true`
@@ -127,7 +133,11 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 
 **Dashboard e financeiro**
 - `GET /dashboard/resumo?lojaId=` retorna `{ indicadores, resumoPorLoja, alertas, movimentacoesRecentes, atendimentosRecentes }`
-- `GET /financeiro/resumo`
+- `GET /financeiro/resumo?de&ate&comparar&agrupar&lojas&canais&categorias&generos` (listas separadas por vírgula)
+
+**Pedidos (painel)**
+- `GET /pedidos?status&lojaId&canal&busca` e `GET /pedidos/{id}` (com itens, loja de expedição, transferências e histórico). Lojista e Operador veem os pedidos da própria loja.
+- `PATCH /pedidos/{id}` com `{ lojaId }` (troca a loja de expedição antes do envio), `{ status: 'ENVIADO', codigoRastreio }`, `{ status: 'ENTREGUE' }` ou `{ status: 'CANCELADO' }` (estorna o pagamento). Cada mudança vai para o log.
 
 **Estoque** (chave: loja + variação)
 - `GET /estoque?busca&lojaId&categoria&status&variacaoId`. `status`: `NORMAL | BAIXO | SEM_ESTOQUE | ALERTA` (`ALERTA` = baixo ou zerado)
@@ -162,7 +172,7 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - `GET /clientes/{id}`
 - `GET /clientes/{id}/atendimentos`
 - `GET /clientes/{id}/atendimentos/{atendimentoId}`
-- `POST /atendimentos` com `{ clienteId, tipoSolicitacaoId, pedidoId?, descricao }`. `pedidoId` é obrigatório quando o tipo tem `exigeVenda`.
+- `POST /atendimentos` com `{ clienteId, tipoSolicitacaoId, pedidoId?, descricao, anexo? }`. `pedidoId` é obrigatório quando o tipo tem `exigeVenda` e precisa ser um pedido do próprio cliente. `anexo: { nome, tipo, conteudoBase64 }` é uma foto JPG, PNG ou WebP de até 2 MB, já reduzida no navegador; ela fica na primeira mensagem (`anexo_url` no banco).
 - `GET /clientes/{id}/pedidos`
 - `GET /clientes/{id}/pedidos/{numero}`
 
@@ -170,4 +180,4 @@ O token recebido no login é enviado em todas as requisições como `Authorizati
 
 ## Imagens
 
-As fotos da vitrine (`src/assets/colecao/`) são do [Unsplash](https://unsplash.com/license), de uso livre, e servem só para ilustrar. A foto enviada no cadastro do produto (Produtos › Editar › Foto do produto) substitui a ilustração em todo o site (`src/data/imagensProdutos.js`).
+As fotos da vitrine (`src/assets/colecao/`) são do [Unsplash](https://unsplash.com/license), de uso livre, e servem só para ilustrar. As fotos das lojas (`src/assets/lojas/`) e a foto da tela de login (`src/assets/login/`, em duas resoluções) vieram do material da marca. A foto enviada no cadastro do produto (Produtos › Editar › Foto do produto) substitui a ilustração em todo o site (`src/data/imagensProdutos.js`).
