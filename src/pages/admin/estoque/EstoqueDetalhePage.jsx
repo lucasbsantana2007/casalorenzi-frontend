@@ -22,8 +22,8 @@ export function EstoqueDetalhePage() {
 
   return (
     <>
-      <Link to="/estoque" className="back-link">
-        <ArrowLeft size={14} /> Estoque
+      <Link to="/estoque/posicao" className="back-link">
+        <ArrowLeft size={14} /> Posição atual
       </Link>
       <AsyncContent state={state} isEmpty={() => false}>
         {(item) => <Detalhe item={item} onChange={state.reload} />}

@@ -270,6 +270,22 @@
   border-bottom: 0;
 }
 
+/* Tabela cruzada (ex.: estoque por loja): o cabeçalho de cada linha tem aparência de célula */
+.table--cruzada tbody th {
+  padding: 12px;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.table--cruzada tbody tr:last-child th {
+  border-bottom: 0;
+}
+
 .table tbody tr:hover {
   background: var(--surface-muted);
 }

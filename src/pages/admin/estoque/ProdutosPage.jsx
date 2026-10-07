@@ -1,22 +1,24 @@
 import { Eye, Pencil, Plus, Shirt, Trash2 } from 'lucide-react'
 import { useState } from 'react'
-import { ProdutoFormModal } from '../../components/produtos/ProdutoFormModal'
-import { VariacoesModal } from '../../components/produtos/VariacoesModal'
-import { AsyncContent } from '../../components/ui/AsyncContent'
-import { DataTable } from '../../components/ui/DataTable'
-import { EmptyState } from '../../components/ui/EmptyState'
-import { FormError } from '../../components/ui/FormError'
-import { Modal } from '../../components/ui/Modal'
-import { PageHeader } from '../../components/ui/PageHeader'
-import { SearchInput } from '../../components/ui/SearchInput'
-import { StatusBadge } from '../../components/ui/StatusBadge'
-import { useAsync } from '../../hooks/useAsync'
-import { imagemDoProduto } from '../../data/imagensProdutos'
-import { useCategorias } from '../../hooks/useCadastros'
-import { useDebouncedValue } from '../../hooks/useDebouncedValue'
-import { produtosService } from '../../services/produtosService'
-import { formatCurrency, formatNumber } from '../../utils/format'
-import { faixaDeMargem } from '../../utils/margem'
+import { Link } from 'react-router-dom'
+import { EstoqueTabs } from '../../../components/estoque/EstoqueTabs'
+import { ProdutoFormModal } from '../../../components/produtos/ProdutoFormModal'
+import { EstoqueProdutoModal } from '../../../components/produtos/EstoqueProdutoModal'
+import { AsyncContent } from '../../../components/ui/AsyncContent'
+import { DataTable } from '../../../components/ui/DataTable'
+import { EmptyState } from '../../../components/ui/EmptyState'
+import { FormError } from '../../../components/ui/FormError'
+import { Modal } from '../../../components/ui/Modal'
+import { PageHeader } from '../../../components/ui/PageHeader'
+import { SearchInput } from '../../../components/ui/SearchInput'
+import { StatusBadge } from '../../../components/ui/StatusBadge'
+import { useAsync } from '../../../hooks/useAsync'
+import { imagemDoProduto } from '../../../data/imagensProdutos'
+import { useCategorias } from '../../../hooks/useCadastros'
+import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
+import { produtosService } from '../../../services/produtosService'
+import { formatCurrency, formatNumber } from '../../../utils/format'
+import { faixaDeMargem } from '../../../utils/margem'
 
 const resumoGrade = (variacoes) => {
   const cores = [...new Set(variacoes.map((v) => v.cor))]
@@ -69,7 +71,22 @@ export function ProdutosPage() {
         </>
       ),
     },
-    { key: 'estoqueTotal', header: 'Estoque na rede', align: 'right', render: (p) => <span className="qty">{formatNumber(p.estoqueTotal)}</span> },
+    {
+      key: 'estoqueTotal',
+      header: 'Estoque na rede',
+      align: 'right',
+      // Leva à posição atual por loja, já filtrada pelo produto
+      render: (p) => (
+        <Link
+          to={`/estoque/posicao?busca=${encodeURIComponent(p.nome)}`}
+          className="qty cell-link"
+          onClick={(e) => e.stopPropagation()}
+          title="Ver o estoque deste produto em cada loja"
+        >
+          {formatNumber(p.estoqueTotal)}
+        </Link>
+      ),
+    },
     { key: 'ativo', header: 'Status', render: (p) => <StatusBadge type="produto" value={p.ativo} /> },
     {
       key: 'acoes',
@@ -77,7 +94,7 @@ export function ProdutosPage() {
       align: 'right',
       render: (p) => (
         <div className="row-actions" onClick={(e) => e.stopPropagation()}>
-          <button type="button" className="btn btn-ghost btn-icon" onClick={() => setVariacoesDe(p)} aria-label={`Ver variações de ${p.nome}`} title="Ver variações">
+          <button type="button" className="btn btn-ghost btn-icon" onClick={() => setVariacoesDe(p)} aria-label={`Ver variações e estoque de ${p.nome}`} title="Ver variações e estoque por loja">
             <Eye size={15} />
           </button>
           <button type="button" className="btn btn-ghost btn-icon" onClick={() => setForm({ open: true, produto: p })} aria-label={`Editar ${p.nome}`} title="Editar">
@@ -94,15 +111,17 @@ export function ProdutosPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Catálogo"
-        title="Produtos"
-        description="Cadastro de produtos e da grade de variações (SKU, cor e tamanho) compartilhada por todas as lojas."
+        eyebrow="Operação"
+        title="Estoque"
+        description="Produtos e grade de variações (SKU, cor e tamanho) compartilhada por todas as lojas, com o estoque de cada peça na rede."
         actions={
           <button type="button" className="btn btn-primary" onClick={() => setForm({ open: true, produto: null })}>
             <Plus size={16} /> Novo produto
           </button>
         }
       />
+
+      <EstoqueTabs />
 
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por nome, categoria ou SKU" />
@@ -130,7 +149,7 @@ export function ProdutosPage() {
         {(produtos) => <DataTable columns={columns} rows={produtos} onRowClick={setVariacoesDe} caption="Produtos" />}
       </AsyncContent>
 
-      <VariacoesModal produto={variacoesDe} onClose={() => setVariacoesDe(null)} />
+      <EstoqueProdutoModal produto={variacoesDe} onClose={() => setVariacoesDe(null)} />
       <RemoverProdutoModal
         produto={removendo}
         onClose={() => setRemovendo(null)}
