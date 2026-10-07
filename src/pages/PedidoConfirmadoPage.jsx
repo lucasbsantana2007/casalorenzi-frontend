@@ -19,7 +19,7 @@ export function PedidoConfirmadoPage() {
               Enviamos a confirmação para <strong>{pedido.contato?.email}</strong>.{' '}
             </>
           ) : null}
-          Para acompanhar a entrega ou pedir trocas e ajuda, acesse <Link to="/meus-pedidos">Meus pedidos</Link> com o seu e-mail e o PIN que você criou.
+          Para acompanhar a entrega ou pedir trocas e ajuda, entre na sua conta com o seu e-mail e a sua senha.
         </p>
       </div>
 

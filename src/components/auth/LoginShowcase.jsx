@@ -1,6 +1,4 @@
 import { motion } from 'motion/react'
-import previewCliente from '../../assets/login-preview-cliente.jpg'
-import previewEquipe from '../../assets/login-preview-equipe.jpg'
 
 const EASE = [0.22, 1, 0.36, 1]
 
@@ -10,54 +8,21 @@ const reveal = (delay = 0, y = 16, blur = 6) => ({
   transition: { duration: 0.8, delay, ease: EASE },
 })
 
-const CONTEUDO = {
-  cliente: {
-    eyebrow: 'Casa Lorenzi · Sua conta',
-    titulo: 'Seus pedidos e atendimentos, acompanhados de perto.',
-    texto: 'Trocas, devoluções, ajustes de costura e rastreio de entregas.',
-    url: 'casalorenzi.com.br/cliente',
-    imagem: previewCliente,
-    alt: 'Prévia da área do cliente',
-  },
-  equipe: {
-    eyebrow: 'Casa Lorenzi · Acesso da equipe',
-    titulo: 'Estoque, transferências e atendimento de todas as lojas, em um só lugar.',
-    texto: 'Oscar Freire · Lago Sul · Leblon · Pátio Batel · Belvedere',
-    url: 'casalorenzi.com.br/dashboard',
-    imagem: previewEquipe,
-    alt: 'Prévia do painel da equipe',
-  },
-}
-
-// Painel de apresentação do login (azul-marinho), com conteúdo da área (cliente ou equipe).
-export function LoginShowcase({ area }) {
-  const c = CONTEUDO[area]
+// Painel azul-marinho do login: só uma frase de impacto
+export function LoginShowcase() {
   return (
     <div className="login-showcase">
-
-      <div className="login-showcase__content">
-        <motion.p className="login-showcase__eyebrow" {...reveal(0, 12)}>
-          {c.eyebrow}
-        </motion.p>
-        <motion.h2 className="login-showcase__title" {...reveal(0.12, 18, 8)}>
-          {c.titulo}
-        </motion.h2>
-        <motion.p className="login-showcase__text" {...reveal(0.2, 18, 8)}>
-          {c.texto}
-        </motion.p>
-      </div>
-
-      <div className="login-showcase__mockup">
-        <motion.div className="login-showcase__window" {...reveal(0.3, 72, 10)} transition={{ duration: 1, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}>
-          <div className="login-showcase__bar" aria-hidden="true">
-            <span />
-            <span />
-            <span />
-            <small>{c.url}</small>
-          </div>
-          <img src={c.imagem} alt={c.alt} />
-        </motion.div>
-      </div>
+      <figure className="login-showcase__quote">
+        <motion.blockquote {...reveal(0, 18, 8)}>
+          <p>
+            <span className="login-showcase__aspas">“</span>A melhor maneira de iniciar é parar de falar e começar a fazer!
+            <span className="login-showcase__aspas">”</span>
+          </p>
+        </motion.blockquote>
+        <motion.figcaption {...reveal(0.2, 12)}>
+          <strong>Walt Disney</strong>, desenhista e empresário americano
+        </motion.figcaption>
+      </figure>
     </div>
   )
 }

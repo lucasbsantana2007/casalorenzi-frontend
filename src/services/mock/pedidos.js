@@ -1,7 +1,7 @@
 import { PIN_DEMO } from '../../context/perfisDemo'
 import { calcularFrete, somenteDigitos, ufDoCep } from '../../utils/frete'
 import { ApiError } from '../api'
-import { anexoView, aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, respond, salvar, usuarioResumo, variacaoView } from './db'
+import { anexoView, aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, respond, salvar, usuarioResumo, variacaoView } from './db'
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PARCELAS_MAX = 6
@@ -9,7 +9,8 @@ const PARCELAS_MAX = 6
 db.emails = db.emails ?? []
 
 // ---------- PIN de "Meus pedidos" ----------
-// Sem login de cliente: e-mail + PIN de 4 dígitos (criado no checkout) dão acesso aos pedidos.
+// Legado: antes do cadastro com senha, e-mail + PIN de 4 dígitos davam acesso aos pedidos.
+// Compras novas não criam PIN (o cliente tem conta); a página Meus pedidos ainda vai mudar.
 // Na API real o PIN fica com hash (bcrypt) e as tentativas são limitadas no servidor.
 const PIN_VALIDO = /^\d{4}$/
 const TENTATIVAS_MAX = 5
@@ -19,9 +20,9 @@ const normalizarEmail = (email) => String(email ?? '').trim().toLowerCase()
 // email → { pin, erros, bloqueadoAte }; clientes de demonstração já têm PIN
 db.pins =
   db.pins ??
-  Object.fromEntries(db.usuarios.filter((u) => u.papel === 'CLIENTE').map((u) => [u.email.toLowerCase(), { pin: PIN_DEMO, erros: 0, bloqueadoAte: 0 }]))
+  Object.fromEntries(db.clientes.map((u) => [u.email.toLowerCase(), { pin: PIN_DEMO, erros: 0, bloqueadoAte: 0 }]))
 
-const emailDoPedido = (p) => normalizarEmail(p.contato?.email ?? byId(db.usuarios, p.clienteId)?.email)
+const emailDoPedido = (p) => normalizarEmail(p.contato?.email ?? clientePorId(p.clienteId)?.email)
 
 function verificarPin(email, pin) {
   const registro = db.pins[normalizarEmail(email)]
@@ -102,7 +103,7 @@ function registrar(pedido, status, usuarioId = null, observacao = '') {
 }
 
 export function pedidoAdminView(pedido) {
-  const cliente = byId(db.usuarios, pedido.clienteId)
+  const cliente = clientePorId(pedido.clienteId)
   return {
     ...pedido,
     contato: pedido.contato ?? (cliente ? { nome: cliente.nome, email: cliente.email, telefone: cliente.telefone } : null),
@@ -141,19 +142,12 @@ function pedidoPublicoView(pedido) {
 
 // ---------- Loja: checkout ----------
 
-// { email, emailConfirmacao, nome, telefone, endereco: { cep, rua, numero, complemento, bairro, cidade, uf },
+// Só cliente com conta compra. { clienteId, endereco: { cep, rua, numero, complemento, bairro, cidade, uf },
 //   freteTipo, pagamento: { metodo: 'PIX' | 'CARTAO', parcelas }, itens: [{ variacaoId, quantidade }] }
+// clienteId (CPF) só existe no mock: a API real identifica o cliente pelo token da sessão.
 export function finalizarCompra(dados) {
-  const email = dados.email?.trim().toLowerCase()
-  if (!email || !EMAIL_VALIDO.test(email)) return fail('Informe um e-mail válido.', 422)
-  if (email !== dados.emailConfirmacao?.trim().toLowerCase()) return fail('Os e-mails não conferem.', 422)
-  if (!dados.nome?.trim()) return fail('Informe o nome completo.', 422)
-  if (!PIN_VALIDO.test(String(dados.pin ?? ''))) return fail('O PIN deve ter 4 números.', 422)
-  if (dados.pin !== dados.pinConfirmacao) return fail('Os PINs não conferem.', 422)
-  const pinExistente = db.pins[email]
-  if (pinExistente && pinExistente.pin !== dados.pin) {
-    return fail('Este e-mail já tem um PIN. Use o mesmo PIN das suas compras anteriores.', 409)
-  }
+  const cliente = clientePorId(dados.clienteId)
+  if (!cliente) return fail('Entre ou crie sua conta para finalizar a compra.', 401)
   const e = dados.endereco ?? {}
   if (somenteDigitos(e.cep).length !== 8 || !e.rua?.trim() || !e.numero?.trim() || !e.bairro?.trim() || !e.cidade?.trim() || !e.uf?.trim()) {
     return fail('Preencha o endereço de entrega completo.', 422)
@@ -178,14 +172,12 @@ export function finalizarCompra(dados) {
   if (!['PIX', 'CARTAO'].includes(metodo)) return fail('Escolha a forma de pagamento.', 422)
   const parcelas = metodo === 'CARTAO' ? Math.min(Math.max(Number(dados.pagamento.parcelas) || 1, 1), PARCELAS_MAX) : 1
 
-  // Cliente com conta: liga o pedido a ela pelo e-mail
-  const cliente = db.usuarios.find((u) => u.papel === 'CLIENTE' && u.email.toLowerCase() === email)
   const loja = escolherLojaExpedicao(itens, e.cep)
   const agora = Date.now()
   const pedido = {
     id: nextId(db.pedidos),
     numero: proximoNumero(),
-    clienteId: cliente?.id ?? null,
+    clienteId: cliente.id,
     lojaId: loja.id,
     canal: 'E-commerce',
     status: 'PROCESSANDO',
@@ -194,22 +186,21 @@ export function finalizarCompra(dados) {
     itens,
     subtotal,
     total: subtotal + frete.valor,
-    contato: { nome: dados.nome.trim(), email, telefone: dados.telefone?.trim() ?? '' },
+    contato: { nome: cliente.nome, email: cliente.email, telefone: cliente.telefone ?? '' },
     endereco: { ...e, cep: somenteDigitos(e.cep) },
     frete,
     pagamento: { metodo, parcelas, status: 'APROVADO' },
     historico: [],
   }
-  if (!pinExistente) db.pins[email] = { pin: dados.pin, erros: 0, bloqueadoAte: 0 }
   registrar(pedido, 'PROCESSANDO', null, `Pagamento aprovado · expedição: ${loja.nome}`)
   db.pedidos.push(pedido)
   planejarTransferencias(pedido)
 
   // E-mail de confirmação (simulado: fica registrado em db.emails)
   db.emails.push({
-    para: email,
+    para: cliente.email,
     assunto: `Casa Lorenzi · Pedido ${pedido.numero} confirmado`,
-    corpo: `Olá, ${pedido.contato.nome.split(' ')[0]}. Recebemos seu pedido ${pedido.numero}. Para acompanhar a entrega e pedir trocas, devoluções ou ajuda, acesse Meus pedidos com este e-mail e o PIN que você criou.`,
+    corpo: `Olá, ${cliente.nome.split(' ')[0]}. Recebemos seu pedido ${pedido.numero}. Para acompanhar a entrega e pedir trocas, devoluções ou ajuda, entre na sua conta com este e-mail e a sua senha.`,
     pedidoId: pedido.id,
     enviadoEm: agora,
   })
@@ -331,6 +322,21 @@ function erroDoAnexo(anexo) {
   return null
 }
 
+// Valida e guarda a foto de um chamado (área do cliente ou Meus pedidos). → id do anexo, ou null sem foto
+export function guardarAnexo(anexo) {
+  if (!anexo) return null
+  const erro = erroDoAnexo(anexo)
+  if (erro) throw new ApiError(erro, { status: 422 })
+  const id = nextId(db.anexos)
+  db.anexos.push({ id, nome: String(anexo.nome).trim().slice(0, 120), tipo: anexo.tipo, conteudoBase64: anexo.conteudoBase64, criadoEm: Date.now() })
+  // Só na demonstração: o "banco" vive no localStorage (~5 MB). Sem espaço, recusa em vez de perder o chamado ao recarregar
+  if (!salvar()) {
+    db.anexos.pop()
+    throw new ApiError('Não há espaço no navegador para guardar mais fotos nesta demonstração. Envie a solicitação sem a foto.', { status: 507 })
+  }
+  return id
+}
+
 // { numero, email, pin, tipoSolicitacaoId, descricao, anexo? } — troca, devolução, reclamação etc. sem conta
 // anexo: { nome, tipo, conteudoBase64 } — fica junto da primeira mensagem do cliente
 export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descricao, anexo = null }) {
@@ -341,22 +347,16 @@ export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descri
   }
   const pedido = db.pedidos.find((p) => p.numero === numero && emailDoPedido(p) === normalizarEmail(email))
   if (!pedido) return fail('Pedido não encontrado.', 404)
-  const contato = pedido.contato ?? byId(db.usuarios, pedido.clienteId)
+  const contato = pedido.contato ?? clientePorId(pedido.clienteId)
   const tipo = byId(db.tiposSolicitacao, tipoSolicitacaoId)
   if (!tipo) return fail('Selecione o tipo de solicitação.', 422)
   if (!descricao?.trim() || descricao.trim().length < 10) return fail('Descreva sua solicitação com pelo menos 10 caracteres.', 422)
 
   let anexoId = null
-  if (anexo) {
-    const erro = erroDoAnexo(anexo)
-    if (erro) return fail(erro, 422)
-    anexoId = nextId(db.anexos)
-    db.anexos.push({ id: anexoId, nome: String(anexo.nome).trim().slice(0, 120), tipo: anexo.tipo, conteudoBase64: anexo.conteudoBase64, criadoEm: Date.now() })
-    // Só na demonstração: o "banco" vive no localStorage (~5 MB). Sem espaço, recusa em vez de perder o chamado ao recarregar
-    if (!salvar()) {
-      db.anexos.pop()
-      return fail('Não há espaço no navegador para guardar mais fotos nesta demonstração. Envie o chamado sem a foto.', 507)
-    }
+  try {
+    anexoId = guardarAnexo(anexo)
+  } catch (error) {
+    return fail(error.message, error.status)
   }
 
   const id = nextId(db.atendimentos)
@@ -438,7 +438,7 @@ export function redefinirPin({ token, pin, pinConfirmacao }) {
 // ---------- Loja: minhas solicitações ----------
 
 const doEmail = (atendimento, email) =>
-  normalizarEmail(atendimento.contato?.email ?? byId(db.usuarios, atendimento.solicitanteId)?.email) === email
+  normalizarEmail(atendimento.contato?.email ?? clientePorId(atendimento.solicitanteId)?.email) === email
 
 // Visão do cliente: sem dados internos (responsável, loja); da equipe aparece só o primeiro nome
 function solicitacaoPublicaView(a) {

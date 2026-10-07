@@ -1,6 +1,6 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
 import { atendimentoView } from './atendimento'
-import { db, estoqueView, movimentacaoView, respond, usuarioResumo } from './db'
+import { clientePorId, db, estoqueView, movimentacaoView, respond } from './db'
 
 const DIA = 86400000
 
@@ -61,7 +61,7 @@ export function obterResumo({ lojaId } = {}) {
       alertas.push({
         nivel: 'warning',
         titulo: `Atendimento sem responsável · ${a.protocolo}`,
-        descricao: `${usuarioResumo(a.solicitanteId)?.nome} aguarda retorno`,
+        descricao: `${clientePorId(a.solicitanteId)?.nome ?? a.contato?.nome ?? 'Cliente'} aguarda retorno`,
         link: `/atendimento/${a.id}`,
       }),
     )

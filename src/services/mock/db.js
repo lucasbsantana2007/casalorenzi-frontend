@@ -6,7 +6,7 @@ import { statusEstoque } from '../../utils/estoque'
 // Fica salvo no navegador (localStorage): pedidos, PINs, movimentações etc. sobrevivem a recarregar
 // a página e valem em todas as abas. Mudar VERSAO descarta os dados salvos e recria a partir do seed.
 const CHAVE = 'casalorenzi.demo-db'
-const VERSAO = 3
+const VERSAO = 5
 
 function carregar() {
   try {
@@ -60,6 +60,10 @@ export function nextId(collection) {
 
 export const byId = (collection, id) => collection.find((item) => item.id === Number(id))
 
+// Clientes: o id é o CPF (texto com 11 dígitos), por isso não passa pelo Number() do byId
+export const clientePorId = (id) => (id ? db.clientes.find((c) => c.id === String(id)) : undefined)
+export const clientePorEmail = (email) => db.clientes.find((c) => c.email.toLowerCase() === String(email ?? '').trim().toLowerCase())
+
 export function normalize(text = '') {
   return text
     .normalize('NFD')
@@ -77,6 +81,13 @@ export function inPeriod(timestamp, de, ate) {
   if (de && timestamp < new Date(`${de}T00:00:00`).getTime()) return false
   if (ate && timestamp > new Date(`${ate}T23:59:59`).getTime()) return false
   return true
+}
+
+// Autor de uma mensagem de atendimento: cliente (pelo CPF) ou alguém da equipe
+export function autorResumo({ autorTipo, autorId }) {
+  if (autorTipo !== 'CLIENTE') return usuarioResumo(autorId)
+  const cliente = clientePorId(autorId)
+  return cliente ? { id: cliente.id, nome: cliente.nome, papel: 'CLIENTE' } : null
 }
 
 // ---- Projeções: o formato "enriquecido" que esperamos receber da API ----
