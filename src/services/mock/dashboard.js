@@ -1,11 +1,14 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
 import { atendimentoView } from './atendimento'
-import { clientePorId, db, estoqueView, movimentacaoView, respond } from './db'
+import { clientePorId, db, estoqueView, movimentacaoView, respond, usuarioDaSessao } from './db'
 
 const DIA = 86400000
 
 // Consolida os indicadores da tela inicial. Na API real: GET /dashboard/resumo
 export function obterResumo({ lojaId } = {}) {
+  // Lojista vê sempre a própria loja, qualquer que seja o filtro (mesma regra da API)
+  const sessao = usuarioDaSessao()
+  if (sessao?.papel === 'LOJISTA' && sessao.lojaId) lojaId = sessao.lojaId
   const daLoja = (id) => !lojaId || id === Number(lojaId)
   const estoques = db.estoques.filter((e) => daLoja(e.lojaId)).map(estoqueView)
   const ativos = estoques.filter((e) => e.produto.ativo)

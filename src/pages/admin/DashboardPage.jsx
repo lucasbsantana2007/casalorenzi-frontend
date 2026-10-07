@@ -25,8 +25,9 @@ const ALERTA_ICONE = { danger: CircleAlert, warning: TriangleAlert, info: Info }
 export function DashboardPage() {
   const { usuario, pode } = useSession()
   const lojas = useLojas()
-  // Lojista abre o dashboard já filtrado pela própria loja
-  const [lojaId, setLojaId] = useState(usuario.papel === 'LOJISTA' ? String(usuario.lojaId) : '')
+  // Lojista trabalha numa loja só: o dashboard fica fixo nela, sem seletor (a API também só devolve a loja dele)
+  const lojaFixa = usuario.papel === 'LOJISTA' && usuario.lojaId ? String(usuario.lojaId) : null
+  const [lojaId, setLojaId] = useState(lojaFixa ?? '')
   const state = useAsync(() => dashboardService.obterResumo({ lojaId }), [lojaId])
   const nomeLoja = lojas.find((l) => String(l.id) === lojaId)?.nome
 
@@ -37,14 +38,16 @@ export function DashboardPage() {
         title={`${saudacao()}, ${usuario.nome.split(' ')[0]}`}
         description={nomeLoja ? `Operação da loja ${nomeLoja} hoje.` : 'Resumo consolidado de todas as lojas da rede.'}
         actions={
-          <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Filtrar por loja">
-            <option value="">Todas as lojas</option>
-            {lojas.map((loja) => (
-              <option key={loja.id} value={loja.id}>
-                {loja.nome}
-              </option>
-            ))}
-          </select>
+          lojaFixa ? undefined : (
+            <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Filtrar por loja">
+              <option value="">Todas as lojas</option>
+              {lojas.map((loja) => (
+                <option key={loja.id} value={loja.id}>
+                  {loja.nome}
+                </option>
+              ))}
+            </select>
+          )
         }
       />
 
