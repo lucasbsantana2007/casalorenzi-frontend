@@ -34,13 +34,13 @@ As variáveis são lidas somente em `src/config/env.js`.
    - **`/lojas`:** lojas no mapa do Brasil.
    - **`/lorenzi`:** parte da história da marca (texto de demonstração, fictício).
    - **Menu:** Masculino, Feminino, Lojas e Lorenzi. À direita, o ícone de pessoa (abre o login; com sessão, leva ao perfil do cliente ou ao painel da equipe) e o carrinho da sacola.
-2. **Conta do cliente criada no checkout.** Não há compra sem conta: no checkout o cliente se cadastra (nome, CPF, e-mail, celular e senha) ou entra na conta que já tem. O id do cliente é o CPF.
+2. **Conta do cliente.** Pode ser criada no login (`/login/criar-conta`) ou no checkout, com nome, CPF, e-mail, celular e senha. Não há compra sem conta. O id do cliente é o CPF.
 3. **Login único em `/login`** (Iniciar sessão), para clientes e equipe. Depois de entrar, o cliente vai para o perfil (`/cliente`) e a equipe para a gestão (`/dashboard`), com os módulos do seu cargo. Quem tentou abrir uma página protegida volta para ela depois de entrar. O endereço antigo `/login/equipe` redireciona para `/login`.
 4. **"Sair"** encerra a sessão e volta para a página inicial.
 
 Com `VITE_USE_MOCKS=true`, `/login` oferece acesso rápido de demonstração para uma cliente, Administrador, Lojista e Operador. Contas da equipe e clientes de demonstração entram com a senha `lorenzi2026`.
 
-`/meus-pedidos` (e-mail + PIN) ainda existe para compras antigas, feitas antes do cadastro com senha.
+Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, que não existe mais) levam para os pedidos da conta (`/cliente/pedidos`).
 
 | Perfil        | Módulos                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
@@ -50,7 +50,7 @@ Com `VITE_USE_MOCKS=true`, `/login` oferece acesso rápido de demonstração par
 
 Lojista e Operador veem os pedidos que a própria loja expede. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/meus-pedidos`, `/meus-pedidos/novo-pin`, `/login`, `/login/esqueci-senha` e `/login/nova-senha`.
+**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
 **Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`.
 
@@ -89,7 +89,7 @@ export const estoqueService = USE_MOCKS ? mock : {
 
 Para conectar o backend, defina `VITE_USE_MOCKS=false`. As páginas não mudam. Para ligar um domínio de cada vez, troque o ternário só no serviço correspondente.
 
-Os mocks guardam as alterações (pedidos, PINs, movimentações, transferências, mensagens, produtos) no `localStorage`, então elas continuam depois de recarregar a página.
+Os mocks guardam as alterações (contas, pedidos, movimentações, transferências, mensagens, produtos) no `localStorage`, então elas continuam depois de recarregar a página.
 
 ## Contrato esperado da API
 

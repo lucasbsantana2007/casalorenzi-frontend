@@ -1,40 +1,10 @@
-import { PIN_DEMO } from '../../context/perfisDemo'
 import { calcularFrete, somenteDigitos, ufDoCep } from '../../utils/frete'
 import { ApiError } from '../api'
-import { anexoView, aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, respond, salvar, usuarioResumo, variacaoView } from './db'
+import { aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, respond, salvar, usuarioResumo, variacaoView } from './db'
 
-const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const PARCELAS_MAX = 6
 
 db.emails = db.emails ?? []
-
-// ---------- PIN de "Meus pedidos" ----------
-// Legado: antes do cadastro com senha, e-mail + PIN de 4 dígitos davam acesso aos pedidos.
-// Compras novas não criam PIN (o cliente tem conta); a página Meus pedidos ainda vai mudar.
-// Na API real o PIN fica com hash (bcrypt) e as tentativas são limitadas no servidor.
-const PIN_VALIDO = /^\d{4}$/
-const TENTATIVAS_MAX = 5
-const BLOQUEIO_MS = 15 * 60 * 1000
-const normalizarEmail = (email) => String(email ?? '').trim().toLowerCase()
-
-// email → { pin, erros, bloqueadoAte }; clientes de demonstração já têm PIN
-db.pins =
-  db.pins ??
-  Object.fromEntries(db.clientes.map((u) => [u.email.toLowerCase(), { pin: PIN_DEMO, erros: 0, bloqueadoAte: 0 }]))
-
-const emailDoPedido = (p) => normalizarEmail(p.contato?.email ?? clientePorId(p.clienteId)?.email)
-
-function verificarPin(email, pin) {
-  const registro = db.pins[normalizarEmail(email)]
-  if (registro?.bloqueadoAte > Date.now()) {
-    throw new ApiError('Muitas tentativas incorretas. Tente de novo em 15 minutos.', { status: 429 })
-  }
-  if (!registro || registro.pin !== String(pin ?? '')) {
-    if (registro && ++registro.erros >= TENTATIVAS_MAX) Object.assign(registro, { erros: 0, bloqueadoAte: Date.now() + BLOQUEIO_MS })
-    throw new ApiError('E-mail ou PIN incorretos.', { status: 401 })
-  }
-  registro.erros = 0
-}
 
 function proximoNumero() {
   const maior = db.pedidos.reduce((max, p) => Math.max(max, Number(p.numero.replace(/\D/g, ''))), 104820)
@@ -208,20 +178,6 @@ export function finalizarCompra(dados) {
   return respond(pedidoPublicoView(pedido))
 }
 
-// "Meus pedidos": todos os pedidos do e-mail, liberados pelo PIN
-export function listarMeusPedidos({ email, pin }) {
-  try {
-    verificarPin(email, pin)
-  } catch (error) {
-    return fail(error.message, error.status)
-  }
-  const lista = db.pedidos
-    .filter((p) => emailDoPedido(p) === normalizarEmail(email))
-    .sort((a, b) => b.criadoEm - a.criadoEm)
-    .map(pedidoPublicoView)
-  return respond(lista)
-}
-
 // ---------- Painel: gestão de pedidos ----------
 
 export function listar({ status, lojaId, canal, busca } = {}) {
@@ -289,7 +245,7 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
   return respond(pedidoAdminView(pedido))
 }
 
-// ---------- Loja: pós-venda em "Meus pedidos" ----------
+// ---------- Fotos dos chamados (área do cliente) ----------
 
 // Foto opcional do chamado: mesmas regras da API (tipo, 2 MB decodificado, conteúdo de imagem de verdade)
 const TIPOS_ANEXO = ['image/jpeg', 'image/png', 'image/webp']
@@ -335,170 +291,4 @@ export function guardarAnexo(anexo) {
     throw new ApiError('Não há espaço no navegador para guardar mais fotos nesta demonstração. Envie a solicitação sem a foto.', { status: 507 })
   }
   return id
-}
-
-// { numero, email, pin, tipoSolicitacaoId, descricao, anexo? } — troca, devolução, reclamação etc. sem conta
-// anexo: { nome, tipo, conteudoBase64 } — fica junto da primeira mensagem do cliente
-export function abrirSolicitacao({ numero, email, pin, tipoSolicitacaoId, descricao, anexo = null }) {
-  try {
-    verificarPin(email, pin)
-  } catch (error) {
-    return fail(error.message, error.status)
-  }
-  const pedido = db.pedidos.find((p) => p.numero === numero && emailDoPedido(p) === normalizarEmail(email))
-  if (!pedido) return fail('Pedido não encontrado.', 404)
-  const contato = pedido.contato ?? clientePorId(pedido.clienteId)
-  const tipo = byId(db.tiposSolicitacao, tipoSolicitacaoId)
-  if (!tipo) return fail('Selecione o tipo de solicitação.', 422)
-  if (!descricao?.trim() || descricao.trim().length < 10) return fail('Descreva sua solicitação com pelo menos 10 caracteres.', 422)
-
-  let anexoId = null
-  try {
-    anexoId = guardarAnexo(anexo)
-  } catch (error) {
-    return fail(error.message, error.status)
-  }
-
-  const id = nextId(db.atendimentos)
-  const agora = Date.now()
-  const atendimento = {
-    id,
-    protocolo: `ATD-${String(26000 + id * 37).padStart(6, '0')}`,
-    solicitanteId: pedido.clienteId ?? null,
-    contato: { nome: contato.nome, email: contato.email, telefone: contato.telefone ?? '' },
-    responsavelId: null,
-    tipoSolicitacaoId: tipo.id,
-    status: 'ABERTO',
-    pedidoId: pedido.id,
-    lojaId: pedido.lojaId,
-    criadoEm: agora,
-    atualizadoEm: agora,
-  }
-  db.atendimentos.push(atendimento)
-  db.mensagens.push({
-    id: nextId(db.mensagens),
-    atendimentoId: id,
-    autorId: pedido.clienteId ?? null,
-    autorTipo: 'CLIENTE',
-    conteudo: descricao.trim(),
-    anexoId,
-    enviadoEm: agora,
-  })
-  db.emails.push({
-    para: contato.email,
-    assunto: `Casa Lorenzi · Solicitação ${atendimento.protocolo} recebida`,
-    corpo: `Recebemos sua solicitação sobre o pedido ${pedido.numero}. Protocolo: ${atendimento.protocolo}.`,
-    pedidoId: pedido.id,
-    enviadoEm: agora,
-  })
-  return respond({ id: atendimento.id, protocolo: atendimento.protocolo, tipo: tipo.titulo })
-}
-
-// ---------- Loja: esqueci o PIN ----------
-
-const VALIDADE_LINK_MS = 30 * 60 * 1000
-db.resetsPin = db.resetsPin ?? {} // token → { email, expiraEm }
-
-// Envia o e-mail com o link de confirmação. A resposta é sempre a mesma,
-// exista ou não o e-mail, para não revelar quem já comprou na loja.
-export function solicitarNovoPin({ email }) {
-  const alvo = normalizarEmail(email)
-  if (!EMAIL_VALIDO.test(alvo)) return fail('Informe um e-mail válido.', 422)
-  const temPedidos = Boolean(db.pins[alvo]) || db.pedidos.some((p) => emailDoPedido(p) === alvo)
-  let linkDemo = null
-  if (temPedidos) {
-    const token = crypto.randomUUID()
-    db.resetsPin[token] = { email: alvo, expiraEm: Date.now() + VALIDADE_LINK_MS }
-    linkDemo = `/meus-pedidos/novo-pin?token=${token}`
-    db.emails.push({
-      para: alvo,
-      assunto: 'Casa Lorenzi · Crie um novo PIN',
-      corpo: `Recebemos um pedido para trocar o PIN de Meus pedidos. Para criar um novo, acesse: ${linkDemo}. O link vale por 30 minutos. Se não foi você, ignore este e-mail.`,
-      enviadoEm: Date.now(),
-    })
-  }
-  // linkDemo só existe na demonstração (simula abrir o e-mail); a API real não devolve o link
-  return respond({ enviado: true, linkDemo })
-}
-
-// { token, pin, pinConfirmacao } → define o novo PIN e invalida o link
-export function redefinirPin({ token, pin, pinConfirmacao }) {
-  const pedido = db.resetsPin[token]
-  if (!pedido || pedido.expiraEm < Date.now()) {
-    delete db.resetsPin[token]
-    return fail('Este link expirou ou já foi usado. Peça um novo em Meus pedidos.', 410)
-  }
-  if (!PIN_VALIDO.test(String(pin ?? ''))) return fail('O PIN deve ter 4 números.', 422)
-  if (pin !== pinConfirmacao) return fail('Os PINs não conferem.', 422)
-  db.pins[pedido.email] = { pin, erros: 0, bloqueadoAte: 0 }
-  delete db.resetsPin[token]
-  return respond({ email: pedido.email })
-}
-
-// ---------- Loja: minhas solicitações ----------
-
-const doEmail = (atendimento, email) =>
-  normalizarEmail(atendimento.contato?.email ?? clientePorId(atendimento.solicitanteId)?.email) === email
-
-// Visão do cliente: sem dados internos (responsável, loja); da equipe aparece só o primeiro nome
-function solicitacaoPublicaView(a) {
-  return {
-    id: a.id,
-    protocolo: a.protocolo,
-    status: a.status,
-    tipo: byId(db.tiposSolicitacao, a.tipoSolicitacaoId)?.titulo,
-    pedidoNumero: byId(db.pedidos, a.pedidoId)?.numero ?? null,
-    criadoEm: a.criadoEm,
-    atualizadoEm: a.atualizadoEm,
-    mensagens: db.mensagens
-      .filter((m) => m.atendimentoId === a.id)
-      .map((m) => ({
-        id: m.id,
-        autorTipo: m.autorTipo,
-        conteudo: m.conteudo,
-        anexo: anexoView(m.anexoId),
-        enviadoEm: m.enviadoEm,
-        autor: m.autorTipo === 'ATENDENTE' ? { nome: usuarioResumo(m.autorId)?.nome.split(' ')[0] ?? 'Equipe' } : null,
-      })),
-  }
-}
-
-// { email, pin } → chamados abertos com este e-mail (mais recentes primeiro)
-export function listarMinhasSolicitacoes({ email, pin }) {
-  try {
-    verificarPin(email, pin)
-  } catch (error) {
-    return fail(error.message, error.status)
-  }
-  const alvo = normalizarEmail(email)
-  return respond(
-    db.atendimentos
-      .filter((a) => doEmail(a, alvo))
-      .sort((a, b) => b.atualizadoEm - a.atualizadoEm)
-      .map(solicitacaoPublicaView),
-  )
-}
-
-// { email, pin, id, conteudo } → cliente responde no chamado; se a equipe aguardava retorno, o caso volta para "em andamento"
-export function responderSolicitacao({ email, pin, id, conteudo }) {
-  try {
-    verificarPin(email, pin)
-  } catch (error) {
-    return fail(error.message, error.status)
-  }
-  const atendimento = byId(db.atendimentos, id)
-  if (!atendimento || !doEmail(atendimento, normalizarEmail(email))) return fail('Solicitação não encontrada.', 404)
-  if (atendimento.status === 'CONCLUIDO') return fail('Esta solicitação foi encerrada. Abra um novo chamado se precisar.', 409)
-  if (!conteudo?.trim()) return fail('A mensagem não pode ficar vazia.', 422)
-  db.mensagens.push({
-    id: nextId(db.mensagens),
-    atendimentoId: atendimento.id,
-    autorId: atendimento.solicitanteId,
-    autorTipo: 'CLIENTE',
-    conteudo: conteudo.trim(),
-    enviadoEm: Date.now(),
-  })
-  if (atendimento.status === 'AGUARDANDO_CLIENTE') atendimento.status = 'EM_ANDAMENTO'
-  atendimento.atualizadoEm = Date.now()
-  return respond(solicitacaoPublicaView(atendimento))
 }
