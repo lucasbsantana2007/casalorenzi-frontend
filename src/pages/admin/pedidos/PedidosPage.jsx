@@ -74,7 +74,8 @@ export function PedidosPage() {
   const lojas = useLojas()
   // Lojista e operador veem só os pedidos que a própria loja expede
   const lojaFixa = usuario.papel === 'ADMINISTRADOR' ? null : String(usuario.lojaId)
-  const [aba, setAba] = useState('PROCESSANDO')
+  // A tela abre em Todos, a primeira aba
+  const [aba, setAba] = useState('TODOS')
   const [busca, setBusca] = useState('')
   const [lojaId, setLojaId] = useState(lojaFixa ?? '')
   const [canal, setCanal] = useState('')
@@ -83,7 +84,7 @@ export function PedidosPage() {
 
   const todos = state.data ?? []
   const pertence = (p, valor) => valor === 'TODOS' || p.status === valor
-  const tabs = [...statusOptions('pedido'), { value: 'TODOS', label: 'Todos' }].map((tab) => ({
+  const tabs = [{ value: 'TODOS', label: 'Todos' }, ...statusOptions('pedido')].map((tab) => ({
     ...tab,
     count: todos.filter((p) => pertence(p, tab.value)).length,
   }))
