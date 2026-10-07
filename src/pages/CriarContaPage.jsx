@@ -46,8 +46,7 @@ export function CriarContaPage() {
   }
 
   return (
-    <LayoutAcesso titulo="Criar conta">
-      <p className="login__intro">Com a sua conta você acompanha pedidos, trocas e solicitações.</p>
+    <LayoutAcesso titulo="Criar conta" subtitulo="Com a sua conta você acompanha pedidos, trocas e solicitações.">
       <form className="login__form" onSubmit={criar} noValidate>
         <AuthField label="Nome completo" value={conta.nome} onChange={atualizar('nome')} autoComplete="name" autoFocus required />
         <div className="login__grid">
@@ -93,14 +92,12 @@ export function CriarContaPage() {
           {enviando ? 'Criando conta…' : 'Criar conta'}
         </button>
       </form>
-      <div className="login__footer">
-        <p>
-          Já tem uma conta?{' '}
-          <Link to="/login" state={location.state}>
-            Entrar
-          </Link>
-        </p>
-      </div>
+      <p className="acesso__alternativa">
+        Já tem uma conta?{' '}
+        <Link to="/login" state={location.state}>
+          Entrar
+        </Link>
+      </p>
     </LayoutAcesso>
   )
 }

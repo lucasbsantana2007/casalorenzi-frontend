@@ -1,11 +1,8 @@
-import { ArrowLeft } from 'lucide-react'
-import { MotionConfig } from 'motion/react'
 import { useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { AuthField } from '../components/auth/AuthField'
 import { CheckboxLine } from '../components/auth/CheckboxLine'
-import { LoginShowcase } from '../components/auth/LoginShowcase'
-import { BrandMark } from '../components/BrandMark'
+import { LayoutAcesso } from '../components/auth/LayoutAcesso'
 import { FormError } from '../components/ui/FormError'
 import { MODO_DEMO } from '../config/env'
 import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
@@ -47,84 +44,61 @@ export function LoginPage() {
   }
 
   return (
-    <MotionConfig reducedMotion="user">
-      <main className="login">
-        <section className="login__panel">
-          <div className="login__form-wrap">
-            <Link to="/" className="back-link">
-              <ArrowLeft size={14} /> Página inicial
-            </Link>
-            <h1 className="login__brand">
-              <BrandMark />
-              <span className="login__brand-area">Iniciar sessão</span>
-            </h1>
+    <LayoutAcesso titulo="Entrar" subtitulo="Acompanhe seus pedidos, trocas e solicitações." voltar={{ to: '/', label: 'Página inicial' }}>
+      {senhaNova && (
+        <p className="login__sucesso" role="status">
+          Senha alterada. Entre com a sua nova senha.
+        </p>
+      )}
 
-            {senhaNova && (
-              <p className="login__sucesso" role="status">
-                Senha alterada. Entre com a sua nova senha.
-              </p>
-            )}
+      <form
+        className="login__form"
+        onSubmit={(event) => {
+          event.preventDefault()
+          entrar({ email, senha })
+        }}
+      >
+        <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="username" required />
+        <AuthField label="Senha" type="password" value={senha} onChange={setSenha} placeholder="Digite sua senha" autoComplete="current-password" required />
 
-            {MODO_DEMO && !senhaNova && (
-              <>
-                <div className="login__quick">
-                  <span className="login__quick-label">Acesso rápido de demonstração</span>
-                  <div className="login__quick-grid login__quick-grid--4">
-                    {CONTAS_DEMO.map((conta) => (
-                      <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
-                        <strong>{conta.rotulo}</strong>
-                        <span>{conta.nome}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="login__divider">ou entre com seu e-mail</div>
-              </>
-            )}
+        <Link to="/login/esqueci-senha" className="login__esqueci">
+          Esqueceu a senha?
+        </Link>
 
-            <form
-              className="login__form"
-              onSubmit={(event) => {
-                event.preventDefault()
-                entrar({ email, senha })
-              }}
-            >
-              <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="username" required />
-              <AuthField label="Senha" type="password" value={senha} onChange={setSenha} placeholder="Digite sua senha" autoComplete="current-password" required />
+        <CheckboxLine checked={manterConectado} onChange={setManterConectado}>
+          Manter conectado neste dispositivo
+        </CheckboxLine>
 
-              <Link to="/login/esqueci-senha" className="login__esqueci">
-                Esqueceu a senha?
-              </Link>
+        <FormError error={error} />
 
-              <CheckboxLine checked={manterConectado} onChange={setManterConectado}>
-                Manter conectado neste dispositivo
-              </CheckboxLine>
+        <button type="submit" className="login__submit" disabled={entrando}>
+          {entrando ? 'Entrando…' : 'Entrar'}
+        </button>
+      </form>
 
-              <FormError error={error} />
+      <p className="acesso__alternativa">
+        Ainda não tem conta?{' '}
+        <Link to="/login/criar-conta" state={location.state}>
+          Criar conta
+        </Link>
+      </p>
 
-              <button type="submit" className="login__submit" disabled={entrando}>
-                {entrando ? 'Entrando…' : 'Entrar'}
+      {MODO_DEMO && (
+        <details className="login__demo">
+          <summary>Acesso de demonstração</summary>
+          <div className="login__quick-grid login__quick-grid--4">
+            {CONTAS_DEMO.map((conta) => (
+              <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
+                <strong>{conta.rotulo}</strong>
+                <span>{conta.nome}</span>
               </button>
-            </form>
-
-            <div className="login__footer">
-              <p>
-                Ainda não tem conta?{' '}
-                <Link to="/login/criar-conta" state={location.state}>
-                  Criar conta
-                </Link>
-              </p>
-              {MODO_DEMO && (
-                <p>
-                  Demonstração: use o acesso rápido ou a senha <code>{SENHA_DEMO}</code>.
-                </p>
-              )}
-            </div>
+            ))}
           </div>
-        </section>
-
-        <LoginShowcase />
-      </main>
-    </MotionConfig>
+          <p>
+            Ou entre com qualquer conta de demonstração e a senha <code>{SENHA_DEMO}</code>.
+          </p>
+        </details>
+      )}
+    </LayoutAcesso>
   )
 }
