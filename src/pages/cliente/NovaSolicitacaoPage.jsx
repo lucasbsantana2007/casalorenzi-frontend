@@ -1,6 +1,9 @@
 import { ArrowLeft } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { SeletorAssunto } from '../../components/atendimento/SeletorAssunto'
+import { AnexoFoto } from '../../components/loja/AnexoFoto'
+import { SeletorPedido } from '../../components/loja/SeletorPedido'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { Field } from '../../components/ui/Field'
 import { FormError } from '../../components/ui/FormError'
@@ -8,7 +11,6 @@ import { useAsync } from '../../hooks/useAsync'
 import { useSession } from '../../hooks/useSession'
 import { cadastrosService } from '../../services/cadastrosService'
 import { clienteService } from '../../services/clienteService'
-import { formatCurrency, formatDate } from '../../utils/format'
 
 export function NovaSolicitacaoPage() {
   const tipos = useAsync(() => cadastrosService.listarTiposSolicitacao(), [])
@@ -34,8 +36,14 @@ function Formulario({ tipos }) {
   const pedidos = useAsync(() => clienteService.listarPedidos(clienteId), [clienteId]).data ?? []
   // ?tipo=<id> pré-seleciona o assunto (links de atendimento da página inicial)
   const [tipoId, setTipoId] = useState(() => tipos.find((t) => t.id === Number(params.get('tipo')))?.id ?? null)
-  const [pedidoId, setPedidoId] = useState(params.get('pedido') ?? '')
+  // ?pedido=<id> pré-seleciona o pedido; o seletor trabalha com o número do pedido
+  const [numeroEscolhido, setNumeroEscolhido] = useState('')
+  const pedidoInicial = pedidos.find((p) => p.id === Number(params.get('pedido')))?.numero ?? ''
+  const numero = numeroEscolhido || pedidoInicial
+  const pedidoId = pedidos.find((p) => p.numero === numero)?.id ?? null
   const [descricao, setDescricao] = useState('')
+  const [foto, setFoto] = useState(null) // já reduzida no navegador: { nome, tipo, conteudoBase64, url, tamanho }
+  const [preparandoFoto, setPreparandoFoto] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const tipo = tipos.find((t) => t.id === tipoId)
@@ -48,8 +56,9 @@ function Formulario({ tipos }) {
       const criada = await clienteService.abrirSolicitacao({
         clienteId,
         tipoSolicitacaoId: tipoId,
-        pedidoId: tipo?.exigeVenda && pedidoId ? Number(pedidoId) : null,
+        pedidoId: tipo?.exigeVenda ? pedidoId : null,
         descricao,
+        anexo: foto && { nome: foto.nome, tipo: foto.tipo, conteudoBase64: foto.conteudoBase64 },
       })
       navigate(`/cliente/solicitacoes/${criada.id}`, { state: { criada: true } })
     } catch (err) {
@@ -64,16 +73,7 @@ function Formulario({ tipos }) {
         <legend>
           <span className="step-number">1</span> Qual é o assunto?
         </legend>
-        <div className="option-grid">
-          {tipos.map((t) => (
-            <label key={t.id} className={`option-card ${tipoId === t.id ? 'is-selected' : ''}`}>
-              <input type="radio" name="tipo" value={t.id} checked={tipoId === t.id} onChange={() => setTipoId(t.id)} className="sr-only" required />
-              <span className="option-card__category">{t.categoria}</span>
-              <strong>{t.titulo}</strong>
-              <span>{t.descricao}</span>
-            </label>
-          ))}
-        </div>
+        <SeletorAssunto tipos={tipos} value={tipoId} onChange={setTipoId} />
       </fieldset>
 
       {tipo?.exigeVenda && (
@@ -81,16 +81,11 @@ function Formulario({ tipos }) {
           <legend>
             <span className="step-number">2</span> Sobre qual pedido?
           </legend>
-          <Field label="Pedido" hint="Este tipo de solicitação precisa estar vinculado a uma compra.">
-            <select className="select" value={pedidoId} onChange={(e) => setPedidoId(e.target.value)} required>
-              <option value="">Selecione o pedido…</option>
-              {pedidos.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.numero} · {formatDate(p.criadoEm)} · {p.itens.map((i) => i.variacao.produto.nome).join(', ')} · {formatCurrency(p.total)}
-                </option>
-              ))}
-            </select>
-          </Field>
+          {pedidos.length ? (
+            <SeletorPedido pedidos={pedidos} value={numero} onChange={setNumeroEscolhido} />
+          ) : (
+            <p className="muted">Você ainda não tem pedidos. Este assunto precisa estar ligado a uma compra.</p>
+          )}
         </fieldset>
       )}
 
@@ -101,6 +96,7 @@ function Formulario({ tipos }) {
         <Field label="Descrição" hint="Inclua tamanho, cor ou qualquer detalhe que ajude nossa equipe.">
           <textarea className="textarea" rows={5} value={descricao} onChange={(e) => setDescricao(e.target.value)} minLength={10} required placeholder="Ex.: Gostaria de trocar a camisa pelo tamanho P…" />
         </Field>
+        <AnexoFoto value={foto} onChange={setFoto} onProcessando={setPreparandoFoto} />
       </fieldset>
 
       <FormError error={error} />
@@ -109,7 +105,7 @@ function Formulario({ tipos }) {
         <Link to="/cliente/solicitacoes" className="btn btn-secondary">
           Cancelar
         </Link>
-        <button type="submit" className="btn btn-primary" disabled={saving || !tipo}>
+        <button type="submit" className="btn btn-primary" disabled={saving || preparandoFoto || !tipo || (tipo.exigeVenda && !pedidoId)}>
           {saving ? 'Enviando…' : 'Enviar solicitação'}
         </button>
       </div>
