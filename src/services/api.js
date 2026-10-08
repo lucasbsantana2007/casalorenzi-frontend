@@ -1,5 +1,5 @@
 import { API_URL } from '../config/env'
-import { getToken } from './authStorage'
+import { getToken, limparSessao } from './authStorage'
 
 // Cliente HTTP central. Nenhum componente deve chamar fetch diretamente:
 // os serviços de domínio (src/services/*Service.js) usam este módulo.
@@ -46,6 +46,14 @@ async function request(path, { method = 'GET', params, body } = {}) {
     })
   } catch {
     throw new ApiError(`Não foi possível conectar à API (${API_URL}).`)
+  }
+
+  // Token vencido (o login vale 2 horas): encerra a sessão e volta ao login, que avisa e depois
+  // devolve a pessoa para a página em que estava
+  if (response.status === 401 && token && !path.startsWith('/auth/login')) {
+    limparSessao()
+    const volta = encodeURIComponent(window.location.pathname + window.location.search)
+    window.location.assign(`/login?sessao=expirada&volta=${volta}`)
   }
 
   if (response.status === 204) return null
