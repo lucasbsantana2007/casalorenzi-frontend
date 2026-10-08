@@ -51,13 +51,14 @@ export function DashboardPage() {
       />
 
       <AsyncContent state={state} isEmpty={() => false} loadingLabel="Carregando indicadores…">
-        {(resumo) => <DashboardContent resumo={resumo} pode={pode} />}
+        {(resumo) => <DashboardContent resumo={resumo} pode={pode} visaoDaRede={usuario.papel === 'ADMINISTRADOR'} />}
       </AsyncContent>
     </>
   )
 }
 
-function DashboardContent({ resumo, pode }) {
+// visaoDaRede: só o Administrador vê o Resumo por loja; para lojista e operador ele repetiria os indicadores de cima
+function DashboardContent({ resumo, pode, visaoDaRede }) {
   const { indicadores: ind, resumoPorLoja, alertas, movimentacoesRecentes } = resumo
   const totalPecas = resumoPorLoja.reduce((sum, l) => sum + l.pecas, 0) || 1
   const mostrarValor = pode('financeiro')
@@ -93,7 +94,7 @@ function DashboardContent({ resumo, pode }) {
       </section>
 
       {/* Alertas primeiro (à esquerda; no celular, em cima), depois o resumo por loja */}
-      <section className="dashboard-grid dashboard-grid--alertas-primeiro">
+      <section className={`dashboard-grid ${visaoDaRede ? 'dashboard-grid--alertas-primeiro' : 'dashboard-grid--inteira'}`}>
         <div className="card">
           <div className="card__header">
             <div>
@@ -124,54 +125,56 @@ function DashboardContent({ resumo, pode }) {
           )}
         </div>
 
-        <div className="card">
-          <div className="card__header">
-            <div>
-              <h2 className="card__title">Resumo por loja</h2>
-              <p className="card__subtitle">Distribuição do estoque e pendências de cada unidade</p>
+        {visaoDaRede && (
+          <div className="card">
+            <div className="card__header">
+              <div>
+                <h2 className="card__title">Resumo por loja</h2>
+                <p className="card__subtitle">Distribuição do estoque e pendências de cada unidade</p>
+              </div>
             </div>
-          </div>
-          <div className="table-wrap">
-            <div className="table-scroll">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th scope="col">Loja</th>
-                    <th scope="col">Peças</th>
-                    <th scope="col" className="align-right">Itens em alerta</th>
-                    <th scope="col" className="align-right">Atendimentos</th>
-                    {mostrarValor && <th scope="col" className="align-right">Valor em estoque</th>}
-                  </tr>
-                </thead>
-                <tbody>
-                  {resumoPorLoja.map((linha) => (
-                    <tr key={linha.loja.id}>
-                      <td>
-                        <span className="cell-main">{linha.loja.nome}</span>
-                        <span className="cell-sub">
-                          {linha.loja.cidade} · {linha.loja.uf}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="share">
-                          <span className="qty">{formatNumber(linha.pecas)}</span>
-                          <span className="share__bar" aria-hidden="true">
-                            <span style={{ width: `${(linha.pecas / totalPecas) * 100}%` }} />
-                          </span>
-                        </div>
-                      </td>
-                      <td className="align-right">
-                        <span className={linha.itensBaixos ? 'text-warning qty' : 'qty'}>{linha.itensBaixos}</span>
-                      </td>
-                      <td className="align-right">{linha.atendimentosAbertos}</td>
-                      {mostrarValor && <td className="align-right">{formatCurrency(linha.valorEstoque)}</td>}
+            <div className="table-wrap">
+              <div className="table-scroll">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Loja</th>
+                      <th scope="col">Peças</th>
+                      <th scope="col" className="align-right">Itens em alerta</th>
+                      <th scope="col" className="align-right">Atendimentos</th>
+                      {mostrarValor && <th scope="col" className="align-right">Valor em estoque</th>}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {resumoPorLoja.map((linha) => (
+                      <tr key={linha.loja.id}>
+                        <td>
+                          <span className="cell-main">{linha.loja.nome}</span>
+                          <span className="cell-sub">
+                            {linha.loja.cidade} · {linha.loja.uf}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="share">
+                            <span className="qty">{formatNumber(linha.pecas)}</span>
+                            <span className="share__bar" aria-hidden="true">
+                              <span style={{ width: `${(linha.pecas / totalPecas) * 100}%` }} />
+                            </span>
+                          </div>
+                        </td>
+                        <td className="align-right">
+                          <span className={linha.itensBaixos ? 'text-warning qty' : 'qty'}>{linha.itensBaixos}</span>
+                        </td>
+                        <td className="align-right">{linha.atendimentosAbertos}</td>
+                        {mostrarValor && <td className="align-right">{formatCurrency(linha.valorEstoque)}</td>}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </section>
 
       <section className="dashboard-grid dashboard-grid--inteira">
