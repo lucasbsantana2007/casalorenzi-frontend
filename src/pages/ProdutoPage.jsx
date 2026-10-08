@@ -46,7 +46,9 @@ function Produto({ produto }) {
 
   const daCor = produto.variacoes.filter((v) => v.cor === cor)
   const variacao = daCor.find((v) => v.tamanho === tamanho)
-  const esgotado = daCor.every((v) => v.estoqueTotal <= 0)
+  // disponivel desconta as peças reservadas por pedidos ainda não enviados (mocks: só estoqueTotal)
+  const livre = (v) => v.disponivel ?? v.estoqueTotal
+  const esgotado = daCor.every((v) => livre(v) <= 0)
 
   const escolherCor = (novaCor) => {
     setCor(novaCor)
@@ -120,9 +122,9 @@ function Produto({ produto }) {
             >
               <option value="">Selecione o tamanho</option>
               {daCor.map((v) => (
-                <option key={v.id} value={v.tamanho} disabled={v.estoqueTotal <= 0}>
+                <option key={v.id} value={v.tamanho} disabled={livre(v) <= 0}>
                   {v.tamanho}
-                  {v.estoqueTotal <= 0 ? ' · esgotado' : ''}
+                  {livre(v) <= 0 ? ' · esgotado' : ''}
                 </option>
               ))}
             </select>
