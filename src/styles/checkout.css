@@ -1219,3 +1219,14 @@ a.drawer__btn:hover {
 .order-actions__cancel {
   color: var(--danger);
 }
+
+/* Link para a busca de CEP dos Correios, ao lado do campo CEP */
+.co-cep-link {
+  align-self: end;
+  padding-bottom: 12px;
+  font-size: 13px;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  justify-self: start;
+}
