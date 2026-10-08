@@ -1,5 +1,5 @@
 import { Lock } from 'lucide-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { FormError } from '../components/ui/FormError'
 import { imagemDoProduto } from '../data/imagensProdutos'
@@ -7,6 +7,7 @@ import { useCondicoesFrete } from '../hooks/useCadastros'
 import { useSacola } from '../hooks/useSacola'
 import { useSession } from '../hooks/useSession'
 import { pedidosService } from '../services/pedidosService'
+import { buscarEnderecoPorCep } from '../utils/cep'
 import { cpfValido, formatarCpf, somenteDigitosCpf } from '../utils/cpf'
 import { calcularFrete, formatarCep } from '../utils/frete'
 import { formatCurrency } from '../utils/format'
@@ -49,11 +50,42 @@ export function CheckoutPage() {
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
   const condicoesFrete = useCondicoesFrete()
+  // CEP completo preenche rua, bairro, cidade e estado (ViaCEP); null | 'buscando' | 'nao-encontrado' | 'falhou'
+  const [consultaCep, setConsultaCep] = useState(null)
+  const ultimoCep = useRef('')
+  const campoNumero = useRef(null)
 
   // Depois de finalizar, a sacola esvazia; não volta para cá
   if (!itens.length && !enviando) return <Navigate to="/" replace />
 
   const set = (campo) => (e) => setDados((d) => ({ ...d, [campo]: e.target.value }))
+
+  const mudarCep = (e) => {
+    const cep = formatarCep(e.target.value)
+    setDados((d) => ({ ...d, cep }))
+    const digitos = cep.replace(/\D/g, '')
+    if (digitos.length !== 8 || digitos === ultimoCep.current) {
+      if (digitos.length !== 8) setConsultaCep(null)
+      return
+    }
+    ultimoCep.current = digitos
+    setConsultaCep('buscando')
+    buscarEnderecoPorCep(digitos)
+      .then((endereco) => {
+        if (ultimoCep.current !== digitos) return // a pessoa já digitou outro CEP
+        if (!endereco) {
+          setConsultaCep('nao-encontrado')
+          return
+        }
+        // Número e complemento ficam com a pessoa; o resto vem do CEP (rua e bairro vazios em CEP de cidade)
+        setDados((d) => ({ ...d, rua: endereco.rua, bairro: endereco.bairro, cidade: endereco.cidade, uf: endereco.uf }))
+        setConsultaCep(null)
+        if (endereco.rua) campoNumero.current?.focus()
+      })
+      .catch(() => {
+        if (ultimoCep.current === digitos) setConsultaCep('falhou')
+      })
+  }
   const opcoesFrete = calcularFrete(dados.cep, subtotal, condicoesFrete)
   const frete = opcoesFrete.find((f) => f.tipo === freteTipo) ?? opcoesFrete[0]
   const total = subtotal + (frete?.valor ?? 0)
@@ -204,17 +236,23 @@ export function CheckoutPage() {
                 inputMode="numeric"
                 autoComplete="postal-code"
                 value={dados.cep}
-                onChange={(e) => setDados((d) => ({ ...d, cep: formatarCep(e.target.value) }))}
+                onChange={mudarCep}
                 placeholder="00000-000"
                 required
+                aria-invalid={consultaCep === 'nao-encontrado'}
               />
+              {consultaCep === 'buscando' && <small className="co-field__hint">Buscando o endereço…</small>}
+              {consultaCep === 'nao-encontrado' && <small className="co-error">CEP não encontrado. Confira o número.</small>}
+              {consultaCep === 'falhou' && <small className="co-field__hint">Não foi possível buscar o endereço agora. Preencha os campos abaixo.</small>}
             </Campo>
-            <span />
+            <a className="co-cep-link" href="https://buscacepinter.correios.com.br/app/endereco/index.php" target="_blank" rel="noreferrer">
+              Não sei meu CEP
+            </a>
             <Campo label="Rua" wide>
               <input autoComplete="address-line1" value={dados.rua} onChange={set('rua')} required />
             </Campo>
             <Campo label="Número">
-              <input value={dados.numero} onChange={set('numero')} required />
+              <input ref={campoNumero} value={dados.numero} onChange={set('numero')} required />
             </Campo>
             <Campo label="Complemento">
               <input autoComplete="address-line2" value={dados.complemento} onChange={set('complemento')} placeholder="Opcional" />
