@@ -16,6 +16,11 @@
   align-items: start;
 }
 
+/* Dashboard: o quadro estreito (Alertas) vem primeiro, à esquerda */
+.dashboard-grid--alertas-primeiro {
+  grid-template-columns: minmax(300px, 1fr) minmax(0, 1.75fr);
+}
+
 .detail-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
