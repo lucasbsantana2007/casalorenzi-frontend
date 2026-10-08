@@ -93,7 +93,38 @@ function DashboardContent({ resumo, pode }) {
         <StatCard label="Peças vendidas · 7 dias" value={formatNumber(ind.vendas7d)} hint="Vendas registradas no PDV" icon={ShoppingBag} />
       </section>
 
-      <section className="dashboard-grid">
+      {/* Alertas primeiro (à esquerda; no celular, em cima), depois o resumo por loja */}
+      <section className="dashboard-grid dashboard-grid--alertas-primeiro">
+        <div className="card">
+          <div className="card__header">
+            <div>
+              <h2 className="card__title">Alertas</h2>
+              <p className="card__subtitle">O que precisa de ação agora</p>
+            </div>
+            <span className="tabs__count">{alertas.length}</span>
+          </div>
+          {alertas.length === 0 ? (
+            <EmptyState title="Nenhum alerta" description="A operação está em dia." />
+          ) : (
+            <ul className="alert-list">
+              {alertas.slice(0, 7).map((alerta) => {
+                const Icon = ALERTA_ICONE[alerta.nivel]
+                return (
+                  <li key={`${alerta.link}-${alerta.titulo}`}>
+                    <Link to={alerta.link} className={`alert-item alert-item--${alerta.nivel}`}>
+                      <Icon size={16} aria-hidden="true" />
+                      <span>
+                        <strong>{alerta.titulo}</strong>
+                        <span>{alerta.descricao}</span>
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+        </div>
+
         <div className="card">
           <div className="card__header">
             <div>
@@ -141,36 +172,6 @@ function DashboardContent({ resumo, pode }) {
               </table>
             </div>
           </div>
-        </div>
-
-        <div className="card">
-          <div className="card__header">
-            <div>
-              <h2 className="card__title">Alertas</h2>
-              <p className="card__subtitle">O que precisa de ação agora</p>
-            </div>
-            <span className="tabs__count">{alertas.length}</span>
-          </div>
-          {alertas.length === 0 ? (
-            <EmptyState title="Nenhum alerta" description="A operação está em dia." />
-          ) : (
-            <ul className="alert-list">
-              {alertas.slice(0, 7).map((alerta) => {
-                const Icon = ALERTA_ICONE[alerta.nivel]
-                return (
-                  <li key={`${alerta.link}-${alerta.titulo}`}>
-                    <Link to={alerta.link} className={`alert-item alert-item--${alerta.nivel}`}>
-                      <Icon size={16} aria-hidden="true" />
-                      <span>
-                        <strong>{alerta.titulo}</strong>
-                        <span>{alerta.descricao}</span>
-                      </span>
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
         </div>
       </section>
 
