@@ -23,13 +23,19 @@ export function LoginPage() {
   }, [contaExcluida, usuario, logout])
   // Voltando de "Esqueceu a senha?": e-mail já preenchido e aviso de sucesso
   const senhaNova = location.state?.senhaNova
+  // Sessão vencida (src/services/api.js): aviso e, depois de entrar, volta à página em que estava
+  const consulta = new URLSearchParams(location.search)
+  const sessaoExpirada = consulta.get('sessao') === 'expirada'
+  const volta = consulta.get('volta')
+  // Só caminhos do próprio site ("/..."), nunca outro endereço ("//site.com")
+  const voltarPara = location.state?.from ?? (volta?.startsWith('/') && !volta.startsWith('//') ? volta : undefined)
   const [email, setEmail] = useState(location.state?.email ?? '')
   const [senha, setSenha] = useState('')
   const [manterConectado, setManterConectado] = useState(true)
   const [entrando, setEntrando] = useState(false)
   const [error, setError] = useState(null)
 
-  if (usuario && !contaExcluida) return <Navigate to={destinoPara(usuario, location.state?.from)} replace />
+  if (usuario && !contaExcluida) return <Navigate to={destinoPara(usuario, voltarPara)} replace />
 
   async function entrar(credenciais) {
     setError(null)
@@ -53,6 +59,11 @@ export function LoginPage() {
       {contaExcluida && (
         <p className="login__sucesso" role="status">
           Sua conta foi excluída e seus dados pessoais foram apagados.
+        </p>
+      )}
+      {sessaoExpirada && !senhaNova && (
+        <p className="login__sucesso" role="status">
+          Sua sessão expirou. Entre novamente para continuar.
         </p>
       )}
       {senhaNova && (
