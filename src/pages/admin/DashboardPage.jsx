@@ -6,12 +6,11 @@ import { AsyncContent } from '../../components/ui/AsyncContent'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { StatCard } from '../../components/ui/StatCard'
-import { StatusBadge } from '../../components/ui/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
 import { useLojas } from '../../hooks/useCadastros'
 import { useSession } from '../../hooks/useSession'
 import { dashboardService } from '../../services/dashboardService'
-import { formatCurrency, formatNumber, formatRelative } from '../../utils/format'
+import { formatCurrency, formatNumber } from '../../utils/format'
 
 function saudacao() {
   const hora = new Date().getHours()
@@ -59,7 +58,7 @@ export function DashboardPage() {
 }
 
 function DashboardContent({ resumo, pode }) {
-  const { indicadores: ind, resumoPorLoja, alertas, movimentacoesRecentes, atendimentosRecentes } = resumo
+  const { indicadores: ind, resumoPorLoja, alertas, movimentacoesRecentes } = resumo
   const totalPecas = resumoPorLoja.reduce((sum, l) => sum + l.pecas, 0) || 1
   const mostrarValor = pode('financeiro')
 
@@ -175,7 +174,7 @@ function DashboardContent({ resumo, pode }) {
         </div>
       </section>
 
-      <section className="dashboard-grid">
+      <section className="dashboard-grid dashboard-grid--inteira">
         <div className="card">
           <div className="card__header">
             <div>
@@ -187,51 +186,6 @@ function DashboardContent({ resumo, pode }) {
           <Link to="/estoque/movimentacoes" className="card__footer-link">
             Ver todas as movimentações <ArrowRight size={14} />
           </Link>
-        </div>
-
-        <div className="card">
-          <div className="card__header">
-            <div>
-              <h2 className="card__title">Atendimentos em aberto</h2>
-              <p className="card__subtitle">Mais recentes primeiro</p>
-            </div>
-          </div>
-          {atendimentosRecentes.length === 0 ? (
-            <EmptyState title="Sem atendimentos abertos" />
-          ) : (
-            <ul className="ticket-list">
-              {atendimentosRecentes.map((a) => {
-                const conteudo = (
-                  <>
-                    <div className="ticket-list__top">
-                      <span className="mono">{a.protocolo}</span>
-                      <StatusBadge type="atendimentoPainel" value={a.status} />
-                    </div>
-                    <strong>{a.cliente.nome}</strong>
-                    <span className="subtle">
-                      {a.tipoSolicitacao.titulo} · {formatRelative(a.atualizadoEm)}
-                    </span>
-                  </>
-                )
-                return (
-                  <li key={a.id}>
-                    {pode('atendimento') ? (
-                      <Link to={`/atendimento/${a.id}`} className="ticket-list__item">
-                        {conteudo}
-                      </Link>
-                    ) : (
-                      <div className="ticket-list__item">{conteudo}</div>
-                    )}
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-          {pode('atendimento') && (
-            <Link to="/atendimento" className="card__footer-link">
-              Abrir central de atendimento <ArrowRight size={14} />
-            </Link>
-          )}
         </div>
       </section>
     </>
