@@ -853,6 +853,93 @@ button.seletor__gatilho:disabled {
   color: var(--navy-900);
 }
 
+/* Slider: trilho fino, faixa em azul-marinho e polegares redondos; a dica com o valor aparece acima
+   do polegar enquanto ele é arrastado ou quando recebe foco pelo teclado */
+.slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  touch-action: none;
+  user-select: none;
+}
+
+.slider[data-disabled] {
+  opacity: 0.5;
+}
+
+.slider__trilho {
+  position: relative;
+  flex-grow: 1;
+  height: 2px;
+  background: var(--border-strong);
+}
+
+.slider__faixa {
+  position: absolute;
+  height: 100%;
+  background: var(--navy-950);
+}
+
+.slider__polegar {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--navy-950);
+  border-radius: 50%;
+  background: var(--surface);
+  cursor: grab;
+  transition: box-shadow 0.15s;
+}
+
+.slider__polegar:hover,
+.slider__polegar:focus-visible {
+  outline: none;
+  box-shadow: var(--focus);
+}
+
+.slider[data-arrastando] .slider__polegar {
+  cursor: grabbing;
+}
+
+.slider[data-disabled] .slider__polegar {
+  cursor: not-allowed;
+}
+
+.slider__dica {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: var(--navy-950);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+  pointer-events: none;
+}
+
+.slider__polegar:focus-visible .slider__dica,
+.slider[data-arrastando] .slider__polegar:focus .slider__dica {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .slider__dica {
+    transition: none;
+  }
+}
+
 @media (max-width: 640px) {
   .form-grid {
     grid-template-columns: 1fr;
