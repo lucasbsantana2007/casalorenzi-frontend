@@ -79,7 +79,7 @@ export function LoginPage() {
           entrar({ email, senha })
         }}
       >
-        <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="username" required />
+        <AuthField label="E-mail ou CPF" type="text" value={email} onChange={setEmail} placeholder="seu@email.com ou 000.000.000-00" autoComplete="username" required />
         <AuthField label="Senha" type="password" value={senha} onChange={setSenha} placeholder="Digite sua senha" autoComplete="current-password" required />
 
         <Link to="/login/esqueci-senha" className="login__esqueci">

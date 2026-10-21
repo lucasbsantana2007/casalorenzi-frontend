@@ -7,6 +7,8 @@ import { FormError } from '../components/ui/FormError'
 import { authService } from '../services/authService'
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+// O cliente também pode informar o CPF (11 dígitos, com ou sem máscara): o link vai para o e-mail da conta
+const LOGIN_VALIDO = (valor) => EMAIL_VALIDO.test(valor) || valor.replace(/\D/g, '').length === 11
 const SENHA_MINIMA = 8
 
 // Passo 1: pede o e-mail e envia o link para criar a senha nova
@@ -35,7 +37,7 @@ export function EsqueciSenhaPage() {
         <div className="login__aviso" role="status">
           <MailCheck size={22} strokeWidth={1.5} aria-hidden="true" />
           <p>
-            Se houver uma conta com <strong>{email.trim()}</strong>, enviamos um link para criar uma nova senha. Ele vale por 30 minutos.
+            Se houver uma conta com <strong>{email.trim()}</strong>, enviamos para o e-mail dela um link para criar uma nova senha. Ele vale por 30 minutos.
           </p>
         </div>
         {enviado.linkDemo && (
@@ -50,7 +52,7 @@ export function EsqueciSenhaPage() {
           <p>
             Não recebeu?{' '}
             <button type="button" className="login__text-btn" onClick={() => setEnviado(null)}>
-              Tentar outro e-mail
+              Tentar de novo
             </button>
           </p>
         </div>
@@ -59,11 +61,11 @@ export function EsqueciSenhaPage() {
   }
 
   return (
-    <LayoutAcesso titulo="Esqueceu a senha?" subtitulo="Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.">
+    <LayoutAcesso titulo="Esqueceu a senha?" subtitulo="Informe o e-mail ou o CPF da sua conta. Vamos enviar um link para o e-mail dela, para você criar uma nova senha.">
       <form className="login__form" onSubmit={enviar}>
-        <AuthField label="E-mail" type="email" value={email} onChange={setEmail} placeholder="seu@email.com" autoComplete="email" autoFocus required />
+        <AuthField label="E-mail ou CPF" type="text" value={email} onChange={setEmail} placeholder="seu@email.com ou 000.000.000-00" autoComplete="username" autoFocus required />
         <FormError error={erro} />
-        <button type="submit" className="login__submit" disabled={enviando || !EMAIL_VALIDO.test(email.trim())}>
+        <button type="submit" className="login__submit" disabled={enviando || !LOGIN_VALIDO(email.trim())}>
           {enviando ? 'Enviando…' : 'Enviar link'}
         </button>
       </form>
