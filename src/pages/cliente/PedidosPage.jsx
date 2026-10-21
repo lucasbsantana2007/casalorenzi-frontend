@@ -1,15 +1,15 @@
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { PedidoCard } from '../../components/atendimento/PedidoCard'
 import { PedidoResumo } from '../../components/atendimento/PedidoResumo'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { FormError } from '../../components/ui/FormError'
-import { StatusBadge } from '../../components/ui/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
 import { useSession } from '../../hooks/useSession'
 import { clienteService } from '../../services/clienteService'
-import { formatCurrency, formatDate } from '../../utils/format'
+import { formatDate } from '../../utils/format'
 
 const ETAPAS = [
   { status: 'PROCESSANDO', label: 'Em separação' },
@@ -98,34 +98,18 @@ export function PedidosPage() {
         </div>
         <AsyncContent state={pedidos} empty={<EmptyState title="Nenhum pedido encontrado" />}>
           {(lista) => (
-            <div className="request-list">
+            <div className="client-card-grid">
               {lista.map((p) => (
-                <button
+                <PedidoCard
                   key={p.id}
-                  type="button"
-                  className={`request-card ${selecionado?.id === p.id ? 'is-selected' : ''}`}
+                  pedido={p}
+                  selecionado={selecionado?.id === p.id}
                   onClick={() => {
                     setError(null)
                     setSelecionado(p)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
-                >
-                  <div className="request-card__main">
-                    <div className="row">
-                      <span className="mono subtle">{p.numero}</span>
-                      <StatusBadge type="pedido" value={p.status} />
-                    </div>
-                    <strong>{p.itens.map((i) => i.variacao.produto.nome).join(' · ')}</strong>
-                    <span className="subtle">
-                      {p.canal}
-                      {p.canal === 'Loja física' ? ` · ${p.loja.nome}` : ''}
-                    </span>
-                  </div>
-                  <div className="request-card__side">
-                    <strong>{formatCurrency(p.total)}</strong>
-                    <span className="subtle">{formatDate(p.criadoEm)}</span>
-                  </div>
-                </button>
+                />
               ))}
             </div>
           )}

@@ -8,6 +8,7 @@ export const clienteService = USE_MOCKS
   ? mock
   : {
       obterPerfil: (clienteId) => api.get(`/clientes/${clienteId}`),
+      // Cada solicitação traz `foto`: a primeira imagem que o cliente anexou (ou null)
       listarSolicitacoes: (clienteId) => api.get(`/clientes/${clienteId}/atendimentos`),
       obterSolicitacao: (clienteId, id) => api.get(`/clientes/${clienteId}/atendimentos/${id}`),
       // { clienteId, tipoSolicitacaoId, pedidoId?, descricao, anexo? }

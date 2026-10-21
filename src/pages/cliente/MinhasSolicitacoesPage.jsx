@@ -13,6 +13,8 @@ import { ATENDIMENTO_ABERTO } from '../../utils/status'
 export function MinhasSolicitacoesPage() {
   const { clienteId } = useSession()
   const state = useAsync(() => clienteService.listarSolicitacoes(clienteId), [clienteId])
+  // Pedidos do cliente: as peças viram a capa das solicitações sem foto
+  const pedidos = useAsync(() => clienteService.listarPedidos(clienteId), [clienteId]).data ?? []
   const [aba, setAba] = useState('ABERTAS')
   const todas = state.data ?? []
   const abertas = todas.filter((s) => ATENDIMENTO_ABERTO.includes(s.status))
@@ -54,9 +56,9 @@ export function MinhasSolicitacoesPage() {
         }
       >
         {(lista) => (
-          <div className="request-list">
+          <div className="client-card-grid">
             {lista.map((s) => (
-              <SolicitacaoCard key={s.id} solicitacao={s} />
+              <SolicitacaoCard key={s.id} solicitacao={s} pedido={pedidos.find((p) => p.id === s.pedidoId)} />
             ))}
           </div>
         )}

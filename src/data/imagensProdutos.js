@@ -32,6 +32,12 @@ const POR_PRODUTO = {
 
 export const imagemDoProduto = (produto) => produto.imagemUrl ?? POR_PRODUTO[produto.id] ?? arara
 
+// Uma foto por peça do pedido (a mesma peça em dois tamanhos aparece uma vez só)
+export function imagensDoPedido(pedido) {
+  const produtos = new Map(pedido.itens.map((i) => [i.variacao.produto.id, i.variacao.produto]))
+  return [...produtos.values()].map(imagemDoProduto)
+}
+
 // Ordem das peças na vitrine (ids dos produtos). Quem não está na lista vem depois, na ordem da API.
 const ORDEM_VITRINE = [
   // Masculino
