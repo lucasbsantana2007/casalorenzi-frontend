@@ -504,9 +504,12 @@ button.pdp__cta:hover:not(:disabled) {
   color: var(--navy-800);
 }
 
+/* Reserva a altura das seções todas abertas (medida na página): abrir ou fechar uma seção não muda a
+   altura da coluna, e a foto sticky ao lado, presa ao fim dela, fica parada */
 .pdp__sections {
   margin-top: 36px;
   border-top: 1px solid var(--border);
+  min-height: var(--pdp-secoes-abertas, 0);
 }
 
 .pdp-section {
@@ -1041,6 +1044,10 @@ button.pdp__cta:hover:not(:disabled) {
   .pdp__info {
     max-width: none;
     padding: 32px var(--store-gutter) 64px;
+  }
+  /* Uma coluna: a foto fica em cima e não se mexe; sem reserva, sem espaço vazio no fim */
+  .pdp__sections {
+    min-height: 0;
   }
   .pdp__title {
     font-size: 26px;
