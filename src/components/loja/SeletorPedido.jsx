@@ -1,8 +1,10 @@
 import { Check, ChevronDown } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { imagemDoProduto } from '../../data/imagensProdutos'
 import { formatCurrency, formatDate } from '../../utils/format'
 import { StatusBadge } from '../ui/StatusBadge'
+import { animacaoDaOpcao, animacaoDoMenu } from '../ui/animacaoMenu'
 
 function ResumoPedido({ pedido }) {
   const [primeiro, ...outros] = pedido.itens
@@ -29,6 +31,7 @@ function ResumoPedido({ pedido }) {
 // Seletor suspenso de pedido: mostra o escolhido; a seta abre a lista com foto, peças, data, total e status
 export function SeletorPedido({ pedidos, value, onChange }) {
   const [aberto, setAberto] = useState(false)
+  const reduzir = useReducedMotion()
   const ref = useRef(null)
   const listaId = useId()
   const rotuloId = useId()
@@ -65,31 +68,40 @@ export function SeletorPedido({ pedidos, value, onChange }) {
         <ChevronDown size={16} className="order-pick__arrow" aria-hidden="true" />
       </button>
 
-      {aberto && (
-        <ul className="order-pick__menu" id={listaId} role="listbox" aria-labelledby={rotuloId}>
-          {pedidos.map((p) => {
-            const marcado = p.numero === value
-            return (
-              <li key={p.numero} role="option" aria-selected={marcado}>
-                <button
-                  type="button"
-                  className={`order-pick__option ${marcado ? 'is-selected' : ''}`}
-                  onClick={() => {
-                    onChange(p.numero)
-                    setAberto(false)
-                  }}
-                >
-                  <ResumoPedido pedido={p} />
-                  <StatusBadge type="pedido" value={p.status} />
-                  <span className="order-pick__check" aria-hidden="true">
-                    {marcado && <Check size={14} strokeWidth={2.5} />}
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      )}
+      <AnimatePresence>
+        {aberto && (
+          <motion.ul
+            key="menu"
+            className="order-pick__menu"
+            id={listaId}
+            role="listbox"
+            aria-labelledby={rotuloId}
+            {...animacaoDoMenu(reduzir)}
+          >
+            {pedidos.map((p, i) => {
+              const marcado = p.numero === value
+              return (
+                <motion.li key={p.numero} role="option" aria-selected={marcado} {...animacaoDaOpcao(reduzir, i)}>
+                  <button
+                    type="button"
+                    className={`order-pick__option ${marcado ? 'is-selected' : ''}`}
+                    onClick={() => {
+                      onChange(p.numero)
+                      setAberto(false)
+                    }}
+                  >
+                    <ResumoPedido pedido={p} />
+                    <StatusBadge type="pedido" value={p.status} />
+                    <span className="order-pick__check" aria-hidden="true">
+                      {marcado && <Check size={14} strokeWidth={2.5} />}
+                    </span>
+                  </button>
+                </motion.li>
+              )
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
