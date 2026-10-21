@@ -218,8 +218,13 @@
   padding: 96px var(--store-gutter) 32px;
 }
 
+/* Páginas da loja: título mais perto do cabeçalho */
 .store-section--page {
-  padding-top: 72px;
+  padding-top: 32px;
+}
+
+.store-section--page .store-section__head {
+  margin-bottom: 32px;
 }
 
 .store-section__head {
@@ -240,7 +245,7 @@
 }
 
 .store-heading--lg {
-  font-size: 46px;
+  font-size: 32px;
 }
 
 .store-heading--lg span {
@@ -1253,10 +1258,10 @@ button.pdp__cta:hover:not(:disabled) {
     padding-top: 64px;
   }
   .store-section--page {
-    padding-top: 40px;
+    padding-top: 24px;
   }
   .store-heading--lg {
-    font-size: 24px;
+    font-size: 22px;
   }
   .store-section__head {
     flex-wrap: wrap;

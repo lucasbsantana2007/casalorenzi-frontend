@@ -365,7 +365,7 @@ a.drawer__btn:hover {
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 48px var(--store-gutter) 96px;
+  padding: 32px var(--store-gutter) 96px;
 }
 
 .checkout__form {
