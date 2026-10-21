@@ -1,5 +1,5 @@
 import { Minus, Plus } from 'lucide-react'
-import { useState } from 'react'
+import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { imagemDoProduto } from '../data/imagensProdutos'
@@ -13,15 +13,66 @@ const unicos = (lista) => [...new Set(lista)]
 
 function Secao({ titulo, children, abertaInicial = false }) {
   const [aberta, setAberta] = useState(abertaInicial)
+  const corpoId = useId()
   return (
     <div className="pdp-section">
-      <button type="button" className="pdp-section__toggle" aria-expanded={aberta} onClick={() => setAberta((v) => !v)}>
+      <button
+        type="button"
+        className="pdp-section__toggle"
+        aria-expanded={aberta}
+        aria-controls={corpoId}
+        onClick={() => setAberta((v) => !v)}
+      >
         {titulo}
         {aberta ? <Minus size={14} aria-hidden="true" /> : <Plus size={14} aria-hidden="true" />}
       </button>
-      {aberta && <div className="pdp-section__body">{children}</div>}
+      {/* Fechada continua na página (hidden): useReservarSecoesAbertas mede a altura de todas abertas */}
+      <div id={corpoId} className="pdp-section__body" hidden={!aberta}>
+        {children}
+      </div>
     </div>
   )
+}
+
+// A foto ao lado é sticky e, perto do fim da página, acompanha o fim da coluna de informações: se abrir
+// uma seção mudasse a altura da coluna, a foto pularia junto. Por isso as seções reservam a altura de
+// todas abertas (--pdp-secoes-abertas, usada no layout de duas colunas). A altura é medida numa cópia
+// invisível, com a mesma largura, e refeita quando a largura muda ou as fontes terminam de carregar.
+function useReservarSecoesAbertas(ref, conteudo) {
+  useLayoutEffect(() => {
+    const secoes = ref.current
+    if (!secoes) return undefined
+    const medir = () => {
+      if (!secoes.isConnected) return // as fontes podem terminar de carregar depois de sair da página
+      const copia = secoes.cloneNode(true)
+      copia.removeAttribute('style')
+      copia.setAttribute('aria-hidden', 'true')
+      copia.querySelectorAll('[hidden]').forEach((corpo) => corpo.removeAttribute('hidden'))
+      copia.querySelectorAll('[id]').forEach((elemento) => elemento.removeAttribute('id'))
+      Object.assign(copia.style, {
+        position: 'absolute',
+        visibility: 'hidden',
+        pointerEvents: 'none',
+        width: `${secoes.offsetWidth}px`,
+        minHeight: '0',
+      })
+      secoes.parentNode.appendChild(copia)
+      // Para cima: a altura tem frações de pixel, e arredondar para baixo deixaria a coluna crescer 1 px
+      secoes.style.setProperty('--pdp-secoes-abertas', `${Math.ceil(copia.getBoundingClientRect().height)}px`)
+      copia.remove()
+    }
+    medir()
+    let largura = secoes.offsetWidth
+    const observador = new ResizeObserver(() => {
+      if (secoes.offsetWidth !== largura) {
+        largura = secoes.offsetWidth
+        medir()
+      }
+    })
+    observador.observe(secoes)
+    document.fonts?.ready.then(medir)
+    return () => observador.disconnect()
+  }, [ref, conteudo])
 }
 
 export function ProdutoPage() {
@@ -43,6 +94,8 @@ function Produto({ produto }) {
   const [cor, setCor] = useState(cores[0])
   const [tamanho, setTamanho] = useState('')
   const [copiado, setCopiado] = useState(false)
+  const secoesRef = useRef(null)
+  useReservarSecoesAbertas(secoesRef, produto)
 
   const daCor = produto.variacoes.filter((v) => v.cor === cor)
   const variacao = daCor.find((v) => v.tamanho === tamanho)
@@ -151,7 +204,7 @@ function Produto({ produto }) {
           Trocas em até 30 dias
         </p>
 
-        <div className="pdp__sections">
+        <div className="pdp__sections" ref={secoesRef}>
 
           <Secao titulo="Detalhes" abertaInicial>
             <dl className="pdp-details">
