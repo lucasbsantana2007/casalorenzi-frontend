@@ -8,6 +8,7 @@ import { TransferenciaModal } from '../../../components/estoque/TransferenciaMod
 import { AsyncContent } from '../../../components/ui/AsyncContent'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { Select } from '../../../components/ui/Select'
 import { StatCard } from '../../../components/ui/StatCard'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
@@ -122,14 +123,14 @@ function Historico({ estoqueId }) {
       <div className="card__body stack-sm">
         <div className="toolbar">
           <PeriodoFilter de={periodo.de} ate={periodo.ate} onChange={setPeriodo} />
-          <select className="select" value={tipo} onChange={(e) => setTipo(e.target.value)} aria-label="Tipo de movimentação">
+          <Select className="select" value={tipo} onChange={(e) => setTipo(e.target.value)} aria-label="Tipo de movimentação">
             <option value="">Todos os tipos</option>
             {Object.entries(TIPOS_MOVIMENTACAO).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
         {state.data && (
           <dl className="period-summary">

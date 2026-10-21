@@ -11,6 +11,7 @@ import { FormError } from '../../../components/ui/FormError'
 import { Modal } from '../../../components/ui/Modal'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
 import { imagemDoProduto } from '../../../data/imagensProdutos'
@@ -125,17 +126,17 @@ export function ProdutosPage() {
 
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por nome, categoria ou SKU" />
-        <select className="select" value={categoria} onChange={(e) => setCategoria(e.target.value)} aria-label="Categoria">
+        <Select className="select" value={categoria} onChange={(e) => setCategoria(e.target.value)} aria-label="Categoria">
           <option value="">Todas as categorias</option>
           {categorias.map((c) => (
             <option key={c}>{c}</option>
           ))}
-        </select>
-        <select className="select" value={ativo} onChange={(e) => setAtivo(e.target.value)} aria-label="Status">
+        </Select>
+        <Select className="select" value={ativo} onChange={(e) => setAtivo(e.target.value)} aria-label="Status">
           <option value="true">Ativos</option>
           <option value="false">Inativos</option>
           <option value="">Todos</option>
-        </select>
+        </Select>
         {state.data && <span className="toolbar__summary">{state.data.length} produtos</span>}
       </div>
 

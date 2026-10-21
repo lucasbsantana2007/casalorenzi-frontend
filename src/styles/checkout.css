@@ -432,6 +432,7 @@ a.drawer__btn:hover {
 
 .co-field input,
 .co-field select,
+.co-field .seletor__gatilho,
 .co-field textarea {
   width: 100%;
   min-height: 46px;
@@ -451,6 +452,7 @@ a.drawer__btn:hover {
 
 .co-field input:focus,
 .co-field select:focus,
+.co-field .seletor__gatilho:focus,
 .co-field textarea:focus {
   outline: none;
   border-color: var(--navy-950);

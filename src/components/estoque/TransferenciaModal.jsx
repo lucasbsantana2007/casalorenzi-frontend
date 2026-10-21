@@ -8,6 +8,7 @@ import { transferenciasService } from '../../services/transferenciasService'
 import { Field } from '../ui/Field'
 import { FormError } from '../ui/FormError'
 import { Modal } from '../ui/Modal'
+import { Select } from '../ui/Select'
 
 // initial (opcional): { produtoId, variacaoId, lojaOrigemId } — usado ao transferir a partir do estoque
 export function TransferenciaModal({ open, onClose, onSaved, initial }) {
@@ -62,7 +63,7 @@ function TransferenciaForm({ initial = {}, onClose, onSaved }) {
     <form className="stack-sm" onSubmit={handleSubmit}>
       <div className="form-grid">
         <Field label="Produto" className="span-2">
-          <select
+          <Select
             className="select"
             value={produtoId}
             onChange={(e) => {
@@ -77,20 +78,20 @@ function TransferenciaForm({ initial = {}, onClose, onSaved }) {
                 {p.nome}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Variação (SKU)" className="span-2">
-          <select className="select" value={variacaoId} onChange={(e) => setVariacaoId(e.target.value)} required disabled={!produtoId}>
+          <Select className="select" value={variacaoId} onChange={(e) => setVariacaoId(e.target.value)} required disabled={!produtoId}>
             <option value="">Selecione…</option>
             {variacoes.map((v) => (
               <option key={v.id} value={v.id}>
                 {v.sku} · {v.cor} · {v.tamanho}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Loja de origem">
-          <select className="select" value={lojaOrigemId} onChange={(e) => setLojaOrigemId(e.target.value)} required>
+          <Select className="select" value={lojaOrigemId} onChange={(e) => setLojaOrigemId(e.target.value)} required>
             <option value="">Selecione…</option>
             {lojas.map((l) => (
               <option key={l.id} value={l.id}>
@@ -98,10 +99,10 @@ function TransferenciaForm({ initial = {}, onClose, onSaved }) {
                 {variacaoId ? ` — ${saldoPorLoja[l.id] ?? 0} un.` : ''}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Loja de destino">
-          <select className="select" value={lojaDestinoId} onChange={(e) => setLojaDestinoId(e.target.value)} required>
+          <Select className="select" value={lojaDestinoId} onChange={(e) => setLojaDestinoId(e.target.value)} required>
             <option value="">Selecione…</option>
             {lojas
               .filter((l) => String(l.id) !== lojaOrigemId)
@@ -110,7 +111,7 @@ function TransferenciaForm({ initial = {}, onClose, onSaved }) {
                   {l.nome}
                 </option>
               ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Quantidade" hint={lojaOrigemId && variacaoId ? `${disponivel} disponível(is) na origem` : undefined}>
           <input className="input" type="number" min="1" max={disponivel || undefined} step="1" value={quantidade} onChange={(e) => setQuantidade(e.target.value)} required />

@@ -4,6 +4,7 @@ import { AsyncContent } from '../../../components/ui/AsyncContent'
 import { Avatar } from '../../../components/ui/Avatar'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { useAsync } from '../../../hooks/useAsync'
 import { useEquipe } from '../../../hooks/useCadastros'
 import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
@@ -25,22 +26,22 @@ export function LogPage() {
     <>
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Buscar no log" />
-        <select className="select" value={area} onChange={(e) => setArea(e.target.value)} aria-label="Área">
+        <Select className="select" value={area} onChange={(e) => setArea(e.target.value)} aria-label="Área">
           <option value="">Todas as áreas</option>
           {Object.entries(AREAS_LOG).map(([valor, rotulo]) => (
             <option key={valor} value={valor}>
               {rotulo}
             </option>
           ))}
-        </select>
-        <select className="select" value={usuarioId} onChange={(e) => setUsuarioId(e.target.value)} aria-label="Quem fez">
+        </Select>
+        <Select className="select" value={usuarioId} onChange={(e) => setUsuarioId(e.target.value)} aria-label="Quem fez">
           <option value="">Toda a equipe</option>
           {equipe.map((u) => (
             <option key={u.id} value={u.id}>
               {u.nome}
             </option>
           ))}
-        </select>
+        </Select>
         {state.data && <span className="toolbar__summary">{state.data.length} registros</span>}
       </div>
 

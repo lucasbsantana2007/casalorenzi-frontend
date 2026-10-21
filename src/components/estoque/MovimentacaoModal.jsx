@@ -5,6 +5,7 @@ import { formatNumber } from '../../utils/format'
 import { Field } from '../ui/Field'
 import { FormError } from '../ui/FormError'
 import { Modal } from '../ui/Modal'
+import { Select } from '../ui/Select'
 
 // Tipos que podem ser registrados manualmente. Transferências são geradas pelo fluxo próprio.
 const TIPOS = {
@@ -64,13 +65,13 @@ function MovimentacaoForm({ item, onClose, onSaved }) {
     <form className="stack-sm" onSubmit={handleSubmit}>
       <div className="form-grid">
         <Field label="Tipo de movimentação">
-          <select className="select" value={tipo} onChange={(e) => setTipo(e.target.value)}>
+          <Select className="select" value={tipo} onChange={(e) => setTipo(e.target.value)}>
             {Object.entries(TIPOS).map(([value, { label }]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label={tipo === 'AJUSTE' ? 'Contagem física' : 'Quantidade'}>
           <input className="input" type="number" min="0" step="1" inputMode="numeric" value={valor} onChange={(e) => setValor(e.target.value)} required />

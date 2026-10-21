@@ -410,6 +410,97 @@
   outline: none;
 }
 
+/* Seletor (ui/Select.jsx): o botão leva a classe do <select> que substitui (.select, .pdp__select...)
+   e troca a seta desenhada no fundo por uma que gira ao abrir */
+button.seletor__gatilho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-right: 12px;
+  background-image: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.seletor__gatilho:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.seletor__valor {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seletor__seta {
+  display: inline-flex;
+  flex: none;
+  color: var(--text-muted);
+}
+
+/* Campo invisível que leva o required para a validação do formulário */
+.seletor__validacao {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.seletor__menu {
+  position: fixed;
+  z-index: 1000;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--surface-muted);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  color: var(--text);
+}
+
+.seletor__opcao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  line-height: 1.4;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.seletor__opcao:last-child {
+  border-bottom: 0;
+}
+
+.seletor__opcao[data-ativo='true'] {
+  background: var(--navy-50);
+}
+
+.seletor__opcao[aria-selected='true'] {
+  color: var(--navy-950);
+  font-weight: 500;
+}
+
+.seletor__opcao[aria-disabled='true'] {
+  color: var(--text-subtle);
+  cursor: not-allowed;
+}
+
+.seletor__opcao svg {
+  flex: none;
+  color: var(--navy-700);
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

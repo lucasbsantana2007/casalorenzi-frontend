@@ -7,6 +7,7 @@ import { DataTable } from '../../../components/ui/DataTable'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { StatCard } from '../../../components/ui/StatCard'
 import { useAsync } from '../../../hooks/useAsync'
 import { useLojas } from '../../../hooks/useCadastros'
@@ -87,14 +88,14 @@ export function PosicaoEmDataPage() {
               </button>
             ))}
           </div>
-          <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
+          <Select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
             <option value="">Todas as lojas</option>
             {lojas.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.nome}
               </option>
             ))}
-          </select>
+          </Select>
           <SearchInput value={busca} onChange={setBusca} placeholder="Filtrar produto ou SKU" />
         </div>
       </div>

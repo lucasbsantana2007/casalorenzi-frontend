@@ -1,5 +1,7 @@
 import { Check, ChevronDown } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useId, useRef, useState } from 'react'
+import { animacaoDaOpcao, animacaoDoMenu } from '../ui/animacaoMenu'
 
 function ResumoAssunto({ tipo, comDescricao = false }) {
   return (
@@ -16,6 +18,7 @@ function ResumoAssunto({ tipo, comDescricao = false }) {
 // Seletor do assunto da solicitação, no mesmo formato do seletor de pedido (ocupa uma linha só)
 export function SeletorAssunto({ tipos, value, onChange }) {
   const [aberto, setAberto] = useState(false)
+  const reduzir = useReducedMotion()
   const ref = useRef(null)
   const listaId = useId()
   const rotuloId = useId()
@@ -52,30 +55,39 @@ export function SeletorAssunto({ tipos, value, onChange }) {
         <ChevronDown size={16} className="order-pick__arrow" aria-hidden="true" />
       </button>
 
-      {aberto && (
-        <ul className="order-pick__menu" id={listaId} role="listbox" aria-labelledby={rotuloId}>
-          {tipos.map((t) => {
-            const marcado = t.id === value
-            return (
-              <li key={t.id} role="option" aria-selected={marcado}>
-                <button
-                  type="button"
-                  className={`order-pick__option ${marcado ? 'is-selected' : ''}`}
-                  onClick={() => {
-                    onChange(t.id)
-                    setAberto(false)
-                  }}
-                >
-                  <ResumoAssunto tipo={t} comDescricao />
-                  <span className="order-pick__check" aria-hidden="true">
-                    {marcado && <Check size={14} strokeWidth={2.5} />}
-                  </span>
-                </button>
-              </li>
-            )
-          })}
-        </ul>
-      )}
+      <AnimatePresence>
+        {aberto && (
+          <motion.ul
+            key="menu"
+            className="order-pick__menu"
+            id={listaId}
+            role="listbox"
+            aria-labelledby={rotuloId}
+            {...animacaoDoMenu(reduzir)}
+          >
+            {tipos.map((t, i) => {
+              const marcado = t.id === value
+              return (
+                <motion.li key={t.id} role="option" aria-selected={marcado} {...animacaoDaOpcao(reduzir, i)}>
+                  <button
+                    type="button"
+                    className={`order-pick__option ${marcado ? 'is-selected' : ''}`}
+                    onClick={() => {
+                      onChange(t.id)
+                      setAberto(false)
+                    }}
+                  >
+                    <ResumoAssunto tipo={t} comDescricao />
+                    <span className="order-pick__check" aria-hidden="true">
+                      {marcado && <Check size={14} strokeWidth={2.5} />}
+                    </span>
+                  </button>
+                </motion.li>
+              )
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { AsyncContent } from '../../../components/ui/AsyncContent'
 import { Field } from '../../../components/ui/Field'
 import { FormError } from '../../../components/ui/FormError'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
 import { useEquipe } from '../../../hooks/useCadastros'
@@ -106,7 +107,7 @@ function Detalhe({ atendimento, onUpdate }) {
             </div>
             <div className="card__body stack-sm">
               <Field label="Status">
-                <select
+                <Select
                   className="select"
                   value={etapaDoAtendimento(atendimento.status)}
                   disabled={saving}
@@ -117,10 +118,10 @@ function Detalhe({ atendimento, onUpdate }) {
                       {o.label}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
               <Field label="Responsável">
-                <select
+                <Select
                   className="select"
                   value={atendimento.responsavelId ?? ''}
                   disabled={saving}
@@ -132,7 +133,7 @@ function Detalhe({ atendimento, onUpdate }) {
                       {u.nome}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
               <FormError error={error} />
             </div>

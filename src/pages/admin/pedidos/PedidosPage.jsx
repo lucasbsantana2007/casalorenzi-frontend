@@ -6,6 +6,7 @@ import { DataTable } from '../../../components/ui/DataTable'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { Tabs } from '../../../components/ui/Tabs'
 import { useAsync } from '../../../hooks/useAsync'
@@ -101,19 +102,19 @@ export function PedidosPage() {
 
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Código, cliente ou e-mail" />
-        <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} disabled={Boolean(lojaFixa)} aria-label="Loja de expedição">
+        <Select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} disabled={Boolean(lojaFixa)} aria-label="Loja de expedição">
           <option value="">Todas as lojas</option>
           {lojas.map((l) => (
             <option key={l.id} value={l.id}>
               {l.nome}
             </option>
           ))}
-        </select>
-        <select className="select" value={canal} onChange={(e) => setCanal(e.target.value)} aria-label="Canal">
+        </Select>
+        <Select className="select" value={canal} onChange={(e) => setCanal(e.target.value)} aria-label="Canal">
           <option value="">Todos os canais</option>
           <option value="E-commerce">E-commerce</option>
           <option value="Loja física">Loja física</option>
-        </select>
+        </Select>
       </div>
 
       <AsyncContent

@@ -2,6 +2,7 @@ import { Lock } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { FormError } from '../components/ui/FormError'
+import { Select } from '../components/ui/Select'
 import { imagemDoProduto } from '../data/imagensProdutos'
 import { useCondicoesFrete } from '../hooks/useCadastros'
 import { useSacola } from '../hooks/useSacola'
@@ -264,14 +265,14 @@ export function CheckoutPage() {
               <input autoComplete="address-level2" value={dados.cidade} onChange={set('cidade')} required />
             </Campo>
             <Campo label="Estado">
-              <select value={dados.uf} onChange={set('uf')} required>
+              <Select value={dados.uf} onChange={set('uf')} required>
                 <option value="">Selecione</option>
                 {UFS.map((uf) => (
                   <option key={uf} value={uf}>
                     {uf}
                   </option>
                 ))}
-              </select>
+              </Select>
             </Campo>
           </div>
 
@@ -316,13 +317,13 @@ export function CheckoutPage() {
                 <small>Até 6x sem juros</small>
               </span>
               {metodo === 'CARTAO' && (
-                <select className="co-option__select" value={parcelas} onChange={(e) => setParcelas(Number(e.target.value))} aria-label="Parcelas">
+                <Select className="co-option__select" value={parcelas} onChange={(e) => setParcelas(Number(e.target.value))} aria-label="Parcelas">
                   {PARCELAS.map((n) => (
                     <option key={n} value={n}>
                       {n}x de {formatCurrency(total / n)}
                     </option>
                   ))}
-                </select>
+                </Select>
               )}
             </label>
           </div>

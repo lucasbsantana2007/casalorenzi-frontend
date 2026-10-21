@@ -8,6 +8,7 @@ import { EmptyState } from '../../components/ui/EmptyState'
 import { FormError } from '../../components/ui/FormError'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { SearchInput } from '../../components/ui/SearchInput'
+import { Select } from '../../components/ui/Select'
 import { StatCard } from '../../components/ui/StatCard'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { Tabs } from '../../components/ui/Tabs'
@@ -152,14 +153,14 @@ export function TransferenciasPage() {
 
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Código, produto ou SKU" />
-        <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
+        <Select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
           <option value="">Todas as lojas</option>
           {lojas.map((l) => (
             <option key={l.id} value={l.id}>
               {l.nome}
             </option>
           ))}
-        </select>
+        </Select>
         <span className="toolbar__spacer" />
         <Link to="/estoque/movimentacoes" className="link">
           Ver movimentações de estoque

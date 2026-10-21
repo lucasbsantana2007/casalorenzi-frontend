@@ -1031,6 +1031,11 @@ a.ticket-list__item:hover {
 .multi__trigger svg {
   flex-shrink: 0;
   color: var(--text-muted);
+  transition: transform 0.2s;
+}
+
+.multi__trigger[aria-expanded='true'] svg {
+  transform: rotate(180deg);
 }
 
 .multi__trigger--active {
