@@ -1,52 +1,73 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ProductGrid } from '../components/home/ProductGrid'
+import { FiltrosColecao } from '../components/loja/FiltrosColecao'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { EmptyState } from '../components/ui/EmptyState'
-import { useAsync } from '../hooks/useAsync'
 import { ordenarVitrine } from '../data/imagensProdutos'
+import { useAsync } from '../hooks/useAsync'
 import { produtosService } from '../services/produtosService'
 import { NotFoundPage } from './NotFoundPage'
 
 const GENEROS = { masculino: 'Masculino', feminino: 'Feminino' }
-const ESTACOES = ['Todas', 'Inverno', 'Verão']
+const SEM_FILTROS = { categoria: null, tamanhos: [], faixa: null }
 
-// Peças atemporais aparecem em qualquer estação
-const daEstacao = (produto, estacao) => estacao === 'Todas' || produto.estacao === estacao || produto.estacao === 'Atemporal'
+// disponivel desconta as peças reservadas por pedidos ainda não enviados (mocks: só estoqueTotal)
+const livre = (v) => v.disponivel ?? v.estoqueTotal
+
+// A peça entra se tiver algum dos tamanhos escolhidos disponível
+function filtrar(produtos, { categoria, tamanhos, faixa }) {
+  return produtos.filter(
+    (p) =>
+      (!categoria || p.categoria === categoria) &&
+      (tamanhos.length === 0 || p.variacoes.some((v) => tamanhos.includes(v.tamanho) && livre(v) > 0)) &&
+      (!faixa || (p.precoBase >= faixa[0] && p.precoBase <= faixa[1])),
+  )
+}
 
 export function ColecaoPage() {
   const { genero } = useParams()
   const nome = GENEROS[genero]
-  const [estacao, setEstacao] = useState('Todas')
-  const [filtrosAbertos, setFiltrosAbertos] = useState(false)
   const state = useAsync(() => produtosService.listar({ ativo: true }), [])
 
   if (!nome) return <NotFoundPage homePath="/" />
 
-  const produtos = ordenarVitrine((state.data ?? []).filter((p) => p.genero === nome && daEstacao(p, estacao)))
+  // key: os filtros recomeçam ao trocar de Masculino para Feminino
+  return <Colecao key={genero} nome={nome} state={state} />
+}
+
+function Colecao({ nome, state }) {
+  const [filtros, setFiltros] = useState(SEM_FILTROS)
+
+  const doGenero = (state.data ?? []).filter((p) => p.genero === nome)
+  const produtos = ordenarVitrine(filtrar(doGenero, filtros))
+  const filtrando = Boolean(filtros.categoria || filtros.tamanhos.length || filtros.faixa)
+  const limpar = () => setFiltros(SEM_FILTROS)
 
   return (
     <main className="store-section store-section--page">
       <div className="store-section__head">
         <h1 className="store-heading store-heading--lg">
-          {nome} <span aria-hidden="true">&gt;</span> {estacao === 'Todas' ? 'Coleção' : estacao}
+          {nome} <span aria-hidden="true">&gt;</span> {filtros.categoria ?? 'Coleção'}
         </h1>
-        <button type="button" className="store-filter-btn" onClick={() => setFiltrosAbertos((v) => !v)} aria-expanded={filtrosAbertos}>
-          Filtros
-        </button>
+        <FiltrosColecao produtos={doGenero} filtros={filtros} onChange={setFiltros} onLimpar={limpar} total={produtos.length} />
       </div>
 
-      {filtrosAbertos && (
-        <div className="store-filters" role="group" aria-label="Estação">
-          {ESTACOES.map((opcao) => (
-            <button key={opcao} type="button" className={estacao === opcao ? 'is-active' : ''} aria-pressed={estacao === opcao} onClick={() => setEstacao(opcao)}>
-              {opcao}
-            </button>
-          ))}
-        </div>
-      )}
-
-      <AsyncContent state={{ ...state, data: state.data && produtos }} empty={<EmptyState title="Nenhuma peça nesta seleção" />}>
+      <AsyncContent
+        state={{ ...state, data: state.data && produtos }}
+        empty={
+          <EmptyState
+            title="Nenhuma peça nesta seleção"
+            action={
+              filtrando && (
+                <button type="button" className="store-filter-btn" onClick={limpar}>
+                  Limpar filtros
+                </button>
+              )
+            }
+          />
+        }
+      >
         {(lista) => <ProductGrid produtos={lista} colunas={3} />}
       </AsyncContent>
     </main>

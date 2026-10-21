@@ -273,28 +273,171 @@
   letter-spacing: 0.1em;
 }
 
-.store-filters {
-  display: flex;
-  justify-content: flex-end;
-  gap: 24px;
-  margin: -24px 0 40px;
+/* Filtros da coleção: menu que abre do botão, com a mesma animação dos seletores */
+.colecao-filtros {
+  position: relative;
+  flex: none;
 }
 
-.store-filters button {
+.colecao-filtros__gatilho {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.colecao-filtros__seta {
+  display: inline-flex;
+}
+
+.colecao-filtros__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 24px;
+  width: 340px;
+  padding: 20px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
+  color: var(--navy-950);
+  font-family: var(--store-font);
+}
+
+.colecao-filtros__grupo {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.colecao-filtros__grupo legend {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+/* Categorias como as opções dos seletores: linhas, com a escolhida marcada */
+.colecao-filtros__categorias {
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border);
+  list-style: none;
+}
+
+.colecao-filtros__categorias li + li {
+  border-top: 1px solid var(--border);
+}
+
+.colecao-filtros__categoria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: background-color 0.15s;
+}
+
+.colecao-filtros__categoria:hover {
+  background: var(--navy-50);
+}
+
+.colecao-filtros__categoria[aria-pressed='true'] {
+  color: var(--navy-950);
+}
+
+.colecao-filtros__categoria svg {
+  flex: none;
+  color: var(--navy-700);
+}
+
+.colecao-filtros__tamanhos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.colecao-filtros__tamanhos button {
+  min-width: 44px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--navy-950);
+  font-family: inherit;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.colecao-filtros__tamanhos button:hover {
+  border-color: var(--navy-950);
+}
+
+.colecao-filtros__tamanhos button[aria-pressed='true'] {
+  border-color: var(--navy-950);
+  background: var(--navy-950);
+  color: #fff;
+}
+
+.colecao-filtros__categoria:focus-visible,
+.colecao-filtros__tamanhos button:focus-visible {
+  outline: 2px solid var(--navy-700);
+  outline-offset: -2px;
+}
+
+/* Espaço para a dica do slider não cobrir o texto da faixa */
+.colecao-filtros__faixa {
+  margin: 0 0 28px;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Recuo para a dica dos polegares nas pontas não sair do menu */
+.colecao-filtros .slider {
+  width: calc(100% - 24px);
+  margin: 0 12px;
+}
+
+.colecao-filtros__rodape {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+}
+
+.colecao-filtros__rodape button {
   padding: 0;
   border: 0;
   background: none;
-  font-family: var(--store-font);
-  font-size: 14px;
-  font-weight: 400;
-  text-transform: uppercase;
-  color: var(--text-subtle);
-  letter-spacing: 0.08em;
-}
-
-.store-filters button:hover,
-.store-filters button.is-active {
   color: var(--navy-950);
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
   text-decoration: underline;
   text-underline-offset: 5px;
 }
@@ -1111,6 +1254,11 @@ button.pdp__cta:hover:not(:disabled) {
   .store-section__head {
     flex-wrap: wrap;
     margin-bottom: 32px;
+  }
+  .colecao-filtros__menu {
+    right: auto;
+    left: 0;
+    width: min(340px, calc(100vw - 2 * var(--store-gutter)));
   }
   .store-list__toggle {
     flex-direction: column;
