@@ -223,6 +223,16 @@ button.sidebar__link {
 }
 
 /* ---------- Área do cliente (dentro do layout da loja) ---------- */
+/* Fundo um pouco mais escuro que o da loja, para os cards e formulários brancos se destacarem;
+   o cabeçalho continua branco como no resto do site (.store.: o store.css vem depois e pinta de branco) */
+.store.store--cliente {
+  background: var(--bg);
+}
+
+.store--cliente .store-header {
+  background: var(--surface);
+}
+
 .client-bar {
   display: flex;
   flex-wrap: wrap;

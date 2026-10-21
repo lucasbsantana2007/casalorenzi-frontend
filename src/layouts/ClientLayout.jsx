@@ -24,7 +24,7 @@ export function ClientLayout() {
   if (!isCliente) return <Navigate to="/login" replace state={redirectState} />
 
   return (
-    <div className="store">
+    <div className="store store--cliente">
       <StoreHeader />
 
       <div className="client-bar">
