@@ -6,6 +6,7 @@ import { AsyncContent } from '../../../components/ui/AsyncContent'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { useAsync } from '../../../hooks/useAsync'
 import { useLojas } from '../../../hooks/useCadastros'
 import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
@@ -37,22 +38,22 @@ export function MovimentacoesPage() {
         </div>
         <div className="toolbar">
           <SearchInput value={busca} onChange={setBusca} placeholder="Produto, SKU ou referência" />
-          <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
+          <Select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
             <option value="">Todas as lojas</option>
             {lojas.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.nome}
               </option>
             ))}
-          </select>
-          <select className="select" value={tipo} onChange={(e) => setTipo(e.target.value)} aria-label="Tipo">
+          </Select>
+          <Select className="select" value={tipo} onChange={(e) => setTipo(e.target.value)} aria-label="Tipo">
             <option value="">Todos os tipos</option>
             {Object.entries(TIPOS_MOVIMENTACAO).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
           {state.data && (
             <span className="toolbar__summary">
               {movs.length} registros · entradas {formatNumber(movs.filter((m) => m.quantidade > 0).reduce((s, m) => s + m.quantidade, 0))} · saídas{' '}

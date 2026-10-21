@@ -7,6 +7,7 @@ import { Field } from '../../../components/ui/Field'
 import { FormError } from '../../../components/ui/FormError'
 import { Modal } from '../../../components/ui/Modal'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
 import { useLojas } from '../../../hooks/useCadastros'
@@ -104,27 +105,27 @@ export function FuncionariosPage() {
     <>
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Buscar por nome ou e-mail" />
-        <select className="select" value={papel} onChange={(e) => setPapel(e.target.value)} aria-label="Cargo">
+        <Select className="select" value={papel} onChange={(e) => setPapel(e.target.value)} aria-label="Cargo">
           <option value="">Todos os cargos</option>
           {Object.entries(PAPEIS).map(([valor, rotulo]) => (
             <option key={valor} value={valor}>
               {rotulo}
             </option>
           ))}
-        </select>
-        <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
+        </Select>
+        <Select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Loja">
           <option value="">Todas as lojas</option>
           {lojas.map((l) => (
             <option key={l.id} value={l.id}>
               {l.nome}
             </option>
           ))}
-        </select>
-        <select className="select" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status">
+        </Select>
+        <Select className="select" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Status">
           <option value="ATIVO">Ativos</option>
           <option value="INATIVO">Desativados</option>
           <option value="">Todos</option>
-        </select>
+        </Select>
         {state.data && <span className="toolbar__summary">{state.data.length} funcionários</span>}
         <span className="toolbar__spacer" />
         <button type="button" className="btn btn-primary" onClick={() => setForm({ open: true, funcionario: null })}>
@@ -210,16 +211,16 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
           <input className="input" type="email" value={form.email} onChange={set('email')} placeholder="nome@casalorenzi.com.br" autoComplete="off" required />
         </Field>
         <Field label="Cargo" hint={administrador ? 'Acesso a toda a rede, inclusive esta central.' : undefined}>
-          <select className="select" value={form.papel} onChange={set('papel')} required>
+          <Select className="select" value={form.papel} onChange={set('papel')} required>
             {Object.entries(PAPEIS).map(([valor, rotulo]) => (
               <option key={valor} value={valor}>
                 {rotulo}
               </option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Loja">
-          <select className="select" value={administrador ? '' : form.lojaId} onChange={set('lojaId')} disabled={administrador} required={!administrador}>
+          <Select className="select" value={administrador ? '' : form.lojaId} onChange={set('lojaId')} disabled={administrador} required={!administrador}>
             <option value="">{administrador ? 'Toda a rede' : 'Selecione…'}</option>
             {lojas
               .filter((l) => l.ativa !== false || l.id === funcionario?.lojaId)
@@ -228,7 +229,7 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
                   {l.nome}
                 </option>
               ))}
-          </select>
+          </Select>
         </Field>
       </div>
       <FormError error={error} />

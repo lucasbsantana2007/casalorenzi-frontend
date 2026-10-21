@@ -9,6 +9,7 @@ import { DataTable } from '../../../components/ui/DataTable'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
 import { useCategorias, useLojas } from '../../../hooks/useCadastros'
@@ -114,27 +115,27 @@ export function EstoquePage() {
 
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Buscar produto, SKU ou cor" />
-        <select className="select" value={filtros.lojaId} onChange={(e) => setFiltro('lojaId', e.target.value)} aria-label="Loja">
+        <Select className="select" value={filtros.lojaId} onChange={(e) => setFiltro('lojaId', e.target.value)} aria-label="Loja">
           <option value="">Todas as lojas</option>
           {lojas.map((l) => (
             <option key={l.id} value={l.id}>
               {l.nome}
             </option>
           ))}
-        </select>
-        <select className="select" value={filtros.categoria} onChange={(e) => setFiltro('categoria', e.target.value)} aria-label="Categoria">
+        </Select>
+        <Select className="select" value={filtros.categoria} onChange={(e) => setFiltro('categoria', e.target.value)} aria-label="Categoria">
           <option value="">Todas as categorias</option>
           {categorias.map((c) => (
             <option key={c}>{c}</option>
           ))}
-        </select>
-        <select className="select" value={filtros.status} onChange={(e) => setFiltro('status', e.target.value)} aria-label="Status">
+        </Select>
+        <Select className="select" value={filtros.status} onChange={(e) => setFiltro('status', e.target.value)} aria-label="Status">
           {STATUS_FILTRO.map((s) => (
             <option key={s.value} value={s.value}>
               {s.label}
             </option>
           ))}
-        </select>
+        </Select>
         {state.data && (
           <span className="toolbar__summary">
             {state.data.length} itens · {formatNumber(state.data.reduce((sum, e) => sum + e.quantidade, 0))} peças

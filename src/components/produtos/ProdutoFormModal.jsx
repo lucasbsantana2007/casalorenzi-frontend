@@ -6,6 +6,7 @@ import { faixaDeMargem } from '../../utils/margem'
 import { Field } from '../ui/Field'
 import { FormError } from '../ui/FormError'
 import { Modal } from '../ui/Modal'
+import { Select } from '../ui/Select'
 import { FotoProdutoCampo } from './FotoProdutoCampo'
 
 const semAcento = (texto) =>
@@ -120,30 +121,30 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
           <input className="input" value={form.nome} onChange={set('nome')} placeholder="Ex.: Camisa de Linho Toscana" required />
         </Field>
         <Field label="Categoria">
-          <select className="select" value={form.categoria} onChange={set('categoria')} required>
+          <Select className="select" value={form.categoria} onChange={set('categoria')} required>
             <option value="">Selecione…</option>
             {categorias.map((c) => (
               <option key={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Preço de venda (R$)" hint={margemTexto(form.precoBase, variacoes)}>
           <input className="input" type="number" min="0" step="0.01" value={form.precoBase} onChange={set('precoBase')} required />
         </Field>
         <Field label="Coleção" hint="Em qual página da loja o produto aparece.">
-          <select className="select" value={form.genero} onChange={set('genero')} required>
+          <Select className="select" value={form.genero} onChange={set('genero')} required>
             <option value="">Selecione…</option>
             {GENEROS.map((g) => (
               <option key={g}>{g}</option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Estação" hint="Atemporal aparece em todos os filtros de estação.">
-          <select className="select" value={form.estacao} onChange={set('estacao')}>
+          <Select className="select" value={form.estacao} onChange={set('estacao')}>
             {ESTACOES.map((e) => (
               <option key={e}>{e}</option>
             ))}
-          </select>
+          </Select>
         </Field>
         <label className="checkbox span-2">
           <input type="checkbox" checked={form.ativo} onChange={set('ativo')} />

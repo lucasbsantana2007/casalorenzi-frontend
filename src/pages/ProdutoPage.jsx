@@ -2,6 +2,7 @@ import { Minus, Plus } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AsyncContent } from '../components/ui/AsyncContent'
+import { Select } from '../components/ui/Select'
 import { imagemDoProduto } from '../data/imagensProdutos'
 import { useAsync } from '../hooks/useAsync'
 import { useSacola } from '../hooks/useSacola'
@@ -103,19 +104,19 @@ function Produto({ produto }) {
           {cores.length > 1 && (
             <label className="pdp__field">
               <span className="sr-only">Cor</span>
-              <select className="pdp__select" value={cor} onChange={(e) => escolherCor(e.target.value)}>
+              <Select className="pdp__select" value={cor} onChange={(e) => escolherCor(e.target.value)}>
                 {cores.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           )}
 
           <label className="pdp__field">
             <span className="sr-only">Tamanho</span>
-            <select
+            <Select
               className="pdp__select"
               value={tamanho}
               onChange={(e) => setTamanho(e.target.value)}
@@ -127,7 +128,7 @@ function Produto({ produto }) {
                   {livre(v) <= 0 ? ' · esgotado' : ''}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
         </div>
 

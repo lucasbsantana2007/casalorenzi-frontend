@@ -5,6 +5,7 @@ import { MovimentacoesTable } from '../../components/estoque/MovimentacoesTable'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { PageHeader } from '../../components/ui/PageHeader'
+import { Select } from '../../components/ui/Select'
 import { StatCard } from '../../components/ui/StatCard'
 import { useAsync } from '../../hooks/useAsync'
 import { useLojas } from '../../hooks/useCadastros'
@@ -38,14 +39,14 @@ export function DashboardPage() {
         description={nomeLoja ? `Operação da loja ${nomeLoja} hoje.` : 'Resumo consolidado de todas as lojas da rede.'}
         actions={
           lojaFixa ? undefined : (
-            <select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Filtrar por loja">
+            <Select className="select" value={lojaId} onChange={(e) => setLojaId(e.target.value)} aria-label="Filtrar por loja">
               <option value="">Todas as lojas</option>
               {lojas.map((loja) => (
                 <option key={loja.id} value={loja.id}>
                   {loja.nome}
                 </option>
               ))}
-            </select>
+            </Select>
           )
         }
       />

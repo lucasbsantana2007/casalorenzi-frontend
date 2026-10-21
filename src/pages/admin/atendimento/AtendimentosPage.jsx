@@ -6,6 +6,7 @@ import { DataTable } from '../../../components/ui/DataTable'
 import { EmptyState } from '../../../components/ui/EmptyState'
 import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { Tabs } from '../../../components/ui/Tabs'
 import { useAsync } from '../../../hooks/useAsync'
@@ -104,15 +105,15 @@ export function AtendimentosPage() {
 
       <div className="toolbar">
         <SearchInput value={busca} onChange={setBusca} placeholder="Protocolo, cliente ou tipo" />
-        <select className="select" value={tipoId} onChange={(e) => setTipoId(e.target.value)} aria-label="Tipo de solicitação">
+        <Select className="select" value={tipoId} onChange={(e) => setTipoId(e.target.value)} aria-label="Tipo de solicitação">
           <option value="">Todos os tipos</option>
           {tipos.map((t) => (
             <option key={t.id} value={t.id}>
               {t.titulo}
             </option>
           ))}
-        </select>
-        <select className="select" value={responsavelId} onChange={(e) => setResponsavelId(e.target.value)} aria-label="Responsável">
+        </Select>
+        <Select className="select" value={responsavelId} onChange={(e) => setResponsavelId(e.target.value)} aria-label="Responsável">
           <option value="">Qualquer responsável</option>
           <option value={usuario.id}>Atribuídos a mim</option>
           <option value="nenhum">Sem responsável</option>
@@ -123,7 +124,7 @@ export function AtendimentosPage() {
                 {u.nome}
               </option>
             ))}
-        </select>
+        </Select>
       </div>
 
       <AsyncContent

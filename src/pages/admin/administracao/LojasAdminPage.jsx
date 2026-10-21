@@ -6,6 +6,7 @@ import { EmptyState } from '../../../components/ui/EmptyState'
 import { Field } from '../../../components/ui/Field'
 import { FormError } from '../../../components/ui/FormError'
 import { Modal } from '../../../components/ui/Modal'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
 import { administracaoService } from '../../../services/administracaoService'
@@ -117,12 +118,12 @@ function LojaForm({ loja, onClose, onSaved }) {
           <input className="input" value={form.cidade} onChange={set('cidade')} required />
         </Field>
         <Field label="Estado">
-          <select className="select" value={form.uf} onChange={set('uf')} required>
+          <Select className="select" value={form.uf} onChange={set('uf')} required>
             <option value="">Selecione…</option>
             {UFS.map((uf) => (
               <option key={uf}>{uf}</option>
             ))}
-          </select>
+          </Select>
         </Field>
         <Field label="Endereço" className="span-2">
           <input className="input" value={form.endereco} onChange={set('endereco')} placeholder="Rua, número, bairro, cidade - UF" />

@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { AsyncContent } from '../../../components/ui/AsyncContent'
 import { FormError } from '../../../components/ui/FormError'
 import { PageHeader } from '../../../components/ui/PageHeader'
+import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
 import { useLojas } from '../../../hooks/useCadastros'
@@ -188,7 +189,7 @@ function PedidoDetalhe({ pedido, onChange }) {
                 <>
                   <label className="field">
                     <span className="field__label">Loja de expedição</span>
-                    <select
+                    <Select
                       className="select"
                       value={pedido.lojaId}
                       onChange={(ev) => atualizar({ lojaId: Number(ev.target.value) })}
@@ -199,7 +200,7 @@ function PedidoDetalhe({ pedido, onChange }) {
                           {l.nome}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                     {!isAdmin && <span className="field__hint">Só o administrador troca a loja.</span>}
                   </label>
 

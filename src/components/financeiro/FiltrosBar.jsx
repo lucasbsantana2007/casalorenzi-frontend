@@ -10,6 +10,7 @@ import {
   resolverPeriodo,
 } from '../../utils/filtrosFinanceiro'
 import { MultiSelect } from '../ui/MultiSelect'
+import { Select } from '../ui/Select'
 
 export function FiltrosBar({ filtros, onChange }) {
   const lojas = useLojas()
@@ -38,13 +39,13 @@ export function FiltrosBar({ filtros, onChange }) {
       <div className="fin-filtros__grid">
         <label className="fin-filtros__field">
           <span className="field__label">Período</span>
-          <select className="select" value={filtros.periodo} onChange={(e) => escolherPeriodo(e.target.value)}>
+          <Select className="select" value={filtros.periodo} onChange={(e) => escolherPeriodo(e.target.value)}>
             {PERIODOS.map((p) => (
               <option key={p.value} value={p.value}>
                 {p.label}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
 
         {filtros.periodo === 'custom' && (
@@ -62,13 +63,13 @@ export function FiltrosBar({ filtros, onChange }) {
 
         <label className="fin-filtros__field">
           <span className="field__label">Comparar com</span>
-          <select className="select" value={filtros.comparar} onChange={(e) => set({ comparar: e.target.value })}>
+          <Select className="select" value={filtros.comparar} onChange={(e) => set({ comparar: e.target.value })}>
             {COMPARACOES.map((c) => (
               <option key={c.value} value={c.value}>
                 {c.label}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
 
         <div className="fin-filtros__field">
