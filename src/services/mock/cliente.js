@@ -1,5 +1,5 @@
 import { atendimentoView, pedidoView } from './atendimento'
-import { byId, clientePorId, db, fail, nextId, normalize, respond } from './db'
+import { anexoView, byId, clientePorId, db, fail, nextId, normalize, respond } from './db'
 import { guardarAnexo } from './pedidos'
 
 export function obterPerfil(clienteId) {
@@ -11,9 +11,15 @@ export function listarSolicitacoes(clienteId) {
   return respond(
     db.atendimentos
       .filter((a) => a.solicitanteId === String(clienteId))
-      .map((a) => atendimentoView(a))
+      .map((a) => ({ ...atendimentoView(a), foto: primeiraFotoDoCliente(a.id) }))
       .sort((a, b) => b.criadoEm - a.criadoEm),
   )
+}
+
+// Capa do card na lista: a primeira imagem que o cliente anexou (mesma regra da API)
+function primeiraFotoDoCliente(atendimentoId) {
+  const mensagem = db.mensagens.find((m) => m.atendimentoId === atendimentoId && m.autorTipo === 'CLIENTE' && m.anexoId)
+  return anexoView(mensagem?.anexoId)
 }
 
 export function obterSolicitacao(clienteId, id) {

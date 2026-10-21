@@ -17,6 +17,8 @@ export function ClienteHomePage() {
   const { clienteId } = useSession()
   const perfil = useAsync(() => clienteService.obterPerfil(clienteId), [clienteId]).data
   const solicitacoes = useAsync(() => clienteService.listarSolicitacoes(clienteId), [clienteId])
+  // Pedidos do cliente: as peças viram a capa das solicitações sem foto
+  const pedidos = useAsync(() => clienteService.listarPedidos(clienteId), [clienteId]).data ?? []
 
   return (
     <>
@@ -46,9 +48,9 @@ export function ClienteHomePage() {
         </div>
         <AsyncContent state={solicitacoes} empty={<EmptyState title="Você ainda não abriu solicitações" />}>
           {(lista) => (
-            <div className="request-list">
-              {lista.slice(0, 3).map((s) => (
-                <SolicitacaoCard key={s.id} solicitacao={s} />
+            <div className="client-card-grid">
+              {lista.slice(0, 2).map((s) => (
+                <SolicitacaoCard key={s.id} solicitacao={s} pedido={pedidos.find((p) => p.id === s.pedidoId)} />
               ))}
             </div>
           )}
