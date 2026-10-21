@@ -289,7 +289,7 @@ button.sidebar__link {
   width: 100%;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 56px var(--store-gutter) 0;
+  padding: 32px var(--store-gutter) 0;
 }
 
 @media (max-width: 640px) {
@@ -297,7 +297,7 @@ button.sidebar__link {
     display: none;
   }
   .client-content {
-    padding-top: 32px;
+    padding-top: 24px;
   }
 }
 
