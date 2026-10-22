@@ -1,8 +1,9 @@
 import { createRandom, daysAgo } from './random'
 
 // Vulto nos dados de demonstração: as lojas, o CD e uma seleção do catálogo 2026 migrado
-// (copy.vulto-legado-back, produtos_padronizados), com o código do modelo da Vulto. Sem fotos:
-// a vitrine mostra o card tipográfico (data/cardsVulto.js). O estoque entra como o saldo migrado.
+// (copy.vulto-legado-back, produtos_padronizados), com o código do modelo da Vulto. As fotos (frente e
+// costas, em assets/vulto) são ligadas pelo código do modelo, e a cor de cada peça é a da foto.
+// O estoque entra como o saldo migrado.
 
 export const LOJAS_VULTO = [
   {
@@ -51,24 +52,24 @@ const NUMEROS = ['38', '40', '42', '44']
 
 // [id, código do modelo, nome, categoria, preço, cores, tamanhos, estação]
 const CATALOGO = [
-  [101, 'CAL-005', 'Calça Jogger Ripstop', 'Calças', 359.9, ['Preto'], NUMEROS, 'Verão'],
-  [102, 'CAL-021', 'Calça Jeans Reta Parachute', 'Calças', 309.9, ['Preto'], NUMEROS, 'Verão'],
-  [103, 'CAL-023', 'Calça Alfaiataria Parachute', 'Calças', 269.9, ['Lilás'], NUMEROS, 'Verão'],
-  [104, 'CAM-016', 'Camiseta Oversized Urbana', 'Camisetas', 149.9, ['Bege', 'Preto'], LETRAS, 'Verão'],
-  [105, 'CAM-020', 'Camiseta Estampada Vintage', 'Camisetas', 89.9, ['Amarelo', 'Lilás'], LETRAS, 'Verão'],
-  [106, 'CMS-010', 'Camisa Cuban Bolso', 'Camisas', 279.9, ['Marrom'], LETRAS, 'Verão'],
-  [107, 'CMS-011', 'Camisa Jeans Estonada', 'Camisas', 249.9, ['Jeans Claro', 'Jeans Escuro'], LETRAS, 'Verão'],
-  [108, 'MOL-004', 'Hoodie Oversized Bordado', 'Moletons', 299.9, ['Branco'], LETRAS, 'Inverno'],
-  [109, 'MOL-013', 'Moletom Careca Fleece', 'Moletons', 219.9, ['Marrom'], LETRAS, 'Inverno'],
-  [110, 'JAQ-007', 'Corta-Vento Utilitária', 'Jaquetas', 489.9, ['Off White'], LETRAS, 'Inverno'],
-  [111, 'TOP-012', 'Top Alcinha Canelado', 'Tops e Croppeds', 149.9, ['Verde Oliva', 'Preto'], ['P', 'M', 'G'], 'Verão'],
-  [112, 'SAI-008', 'Saia Cargo Cetim', 'Saias', 219.9, ['Vinho'], ['P', 'M', 'G'], 'Verão'],
-  [113, 'VES-010', 'Vestido Midi Cetim', 'Vestidos', 249.9, ['Off White', 'Marrom'], ['P', 'M', 'G'], 'Verão'],
-  [114, 'BER-007', 'Bermuda Moletom Ampla', 'Bermudas e Shorts', 189.9, ['Azul Marinho'], NUMEROS, 'Verão'],
-  [115, 'TRI-012', 'Cardigan Listrado', 'Tricô', 299.9, ['Cinza Mescla'], LETRAS, 'Inverno'],
-  [116, 'ACE-013', 'Bucket Hat Listrado', 'Acessórios', 149.9, ['Verde Oliva'], ['U'], 'Inverno'],
-  [117, 'CAL-028', 'Calça Wide Leg Pregas', 'Calças', 289.9, ['Azul Marinho'], NUMEROS, 'Inverno'],
-  [118, 'ACE-012', 'Boné Logo', 'Acessórios', 49.9, ['Azul Marinho'], ['U'], 'Inverno'],
+  [101, 'CAL-005', 'Calça Jogger Ripstop', 'Calças', 359.9, ['Verde Oliva'], NUMEROS, 'Verão'],
+  [102, 'CAL-021', 'Calça Jeans Reta Parachute', 'Calças', 309.9, ['Jeans Médio'], NUMEROS, 'Verão'],
+  [103, 'CAL-023', 'Calça Alfaiataria Parachute', 'Calças', 269.9, ['Grafite'], NUMEROS, 'Verão'],
+  [104, 'CAM-016', 'Camiseta Oversized Urbana', 'Camisetas', 149.9, ['Off White'], LETRAS, 'Verão'],
+  [105, 'CAM-020', 'Camiseta Estampada Vintage', 'Camisetas', 89.9, ['Preto'], LETRAS, 'Verão'],
+  [106, 'CMS-010', 'Camisa Cuban Bolso', 'Camisas', 279.9, ['Off White'], LETRAS, 'Verão'],
+  [107, 'CMS-011', 'Camisa Jeans Estonada', 'Camisas', 249.9, ['Jeans Claro'], LETRAS, 'Verão'],
+  [108, 'MOL-004', 'Hoodie Oversized Bordado', 'Moletons', 299.9, ['Marrom'], LETRAS, 'Inverno'],
+  [109, 'MOL-013', 'Moletom Careca Fleece', 'Moletons', 219.9, ['Cinza Mescla'], LETRAS, 'Inverno'],
+  [110, 'JAQ-007', 'Corta-Vento Utilitária', 'Jaquetas', 489.9, ['Grafite'], LETRAS, 'Inverno'],
+  [111, 'TOP-012', 'Top Alcinha Canelado', 'Tops e Croppeds', 149.9, ['Preto'], ['P', 'M', 'G'], 'Verão'],
+  [112, 'SAI-008', 'Saia Cargo Cetim', 'Saias', 219.9, ['Verde Oliva'], ['P', 'M', 'G'], 'Verão'],
+  [113, 'VES-010', 'Vestido Midi Cetim', 'Vestidos', 249.9, ['Azul Marinho'], ['P', 'M', 'G'], 'Verão'],
+  [114, 'BER-007', 'Bermuda Moletom Ampla', 'Bermudas e Shorts', 189.9, ['Preto'], NUMEROS, 'Verão'],
+  [115, 'TRI-012', 'Cardigan Listrado', 'Tricô', 299.9, ['Off White e Marinho'], LETRAS, 'Inverno'],
+  [116, 'ACE-013', 'Bucket Hat Listrado', 'Acessórios', 149.9, ['Off White'], ['U'], 'Inverno'],
+  [117, 'CAL-028', 'Calça Wide Leg Pregas', 'Calças', 289.9, ['Bege'], NUMEROS, 'Inverno'],
+  [118, 'ACE-012', 'Boné Logo', 'Acessórios', 49.9, ['Preto'], ['U'], 'Inverno'],
 ]
 
 export const CATEGORIAS_VULTO = [...new Set(CATALOGO.map((p) => p[3]))]
