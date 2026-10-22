@@ -7,7 +7,7 @@ import { statusEstoque } from '../../utils/estoque'
 // Fica salvo no navegador (localStorage): pedidos, PINs, movimentações etc. sobrevivem a recarregar
 // a página e valem em todas as abas. Mudar VERSAO descarta os dados salvos e recria a partir do seed.
 const CHAVE = 'casalorenzi.demo-db'
-const VERSAO = 7
+const VERSAO = 8
 
 function carregar() {
   try {
@@ -142,7 +142,7 @@ export function anexoView(id) {
 export function variacaoView(variacaoId) {
   const { precoCusto: _precoCusto, ...variacao } = byId(db.variacoes, variacaoId)
   const produto = byId(db.produtos, variacao.produtoId)
-  return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo, imagemUrl: produto.imagemUrl ?? null } }
+  return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo, imagemUrl: produto.imagemUrl ?? null, marca: produto.marca ?? 'LORENZI' } }
 }
 
 // Produto removido do catálogo (some da loja, do painel e do estoque; o histórico continua)

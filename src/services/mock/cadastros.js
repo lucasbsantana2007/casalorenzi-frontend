@@ -1,6 +1,11 @@
-import { db, respond } from './db'
+import { db, respond, usuarioDaSessao } from './db'
 
-export const listarLojas = () => respond(db.lojas)
+// Como a API: a equipe recebe todas (as duas marcas e o CD); o site, só as lojas físicas da marca pedida
+// (sem marca, as da Casa Lorenzi)
+export function listarLojas({ marca } = {}) {
+  if (usuarioDaSessao()) return respond(db.lojas.filter((l) => !marca || (l.marca ?? 'LORENZI') === marca))
+  return respond(db.lojas.filter((l) => (l.marca ?? 'LORENZI') === (marca || 'LORENZI') && (l.tipo ?? 'LOJA') === 'LOJA'))
+}
 
 export const listarCategorias = () => respond(db.categorias)
 
