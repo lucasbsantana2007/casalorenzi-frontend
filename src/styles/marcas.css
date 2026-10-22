@@ -147,21 +147,76 @@
   background: #0e0f11;
 }
 
-/* Página da peça: o card tipográfico aparece inteiro (as fotos da Lorenzi continuam cortadas em cover) */
+/* Página da peça: a foto quadrada (ou o card) aparece inteira, num fundo da mesma cor do estúdio das
+   fotos, sem moldura (as fotos da Lorenzi continuam cortadas em cover) */
 .store--vulto .pdp__media {
   display: grid;
   place-items: center;
-  padding: 48px;
-  background: var(--vulto-papel);
+  background: #f2f0ed;
 }
 
-.store--vulto .pdp__media img {
+.store--vulto .pdp__media > img {
   width: auto;
   max-width: 100%;
   height: auto;
   max-height: 100%;
-  aspect-ratio: 4 / 5;
   object-fit: contain;
+}
+
+/* Grade: peça com foto de costas troca para ela com o mouse em cima */
+.product-card--duas-fotos .product-card__image {
+  position: relative;
+}
+
+.product-card__image .product-card__costas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition:
+    opacity 0.35s ease,
+    transform 0.8s ease;
+}
+
+a.product-card--duas-fotos:hover .product-card__costas {
+  opacity: 1;
+}
+
+/* Página da peça: miniaturas de frente e costas sobre a foto (a .pdp__media já é sticky/relative) */
+.pdp__vistas {
+  position: absolute;
+  top: 24px;
+  left: var(--store-gutter);
+  display: flex;
+  gap: 8px;
+}
+
+.pdp__vistas button {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 2px solid transparent;
+  background: #fff;
+  cursor: pointer;
+  opacity: 0.7;
+  transition:
+    opacity 0.2s,
+    border-color 0.2s;
+}
+
+.pdp__vistas button:hover,
+.pdp__vistas button.is-ativa {
+  opacity: 1;
+}
+
+.pdp__vistas button.is-ativa {
+  border-color: var(--navy-950);
+}
+
+.pdp__vistas img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Início da Vulto */
@@ -371,10 +426,6 @@
 @media (max-width: 900px) {
   .barra-marcas {
     gap: 22px;
-  }
-
-  .store--vulto .pdp__media {
-    padding: 24px;
   }
 
   .store-header__logo {

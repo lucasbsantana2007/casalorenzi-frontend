@@ -31,14 +31,30 @@ const POR_PRODUTO = {
   12: ruaItaliana,
 }
 
-// Peça da Vulto sem foto: card tipográfico na cor da peça (cor: a escolhida; senão a primeira variação).
-// Aceita o produto da API ou o item da sacola ({ produtoId, nome, cor, marca, imagemUrl }).
+// Fotos do catálogo da Vulto (frente e costas), pelo código do modelo (CAL-005, MOL-004...): valem para
+// os dados de demonstração e para a API real, onde os ids das peças são outros
+const FOTOS_VULTO = import.meta.glob('../assets/vulto/*.webp', { eager: true, import: 'default' })
+const fotoDaVulto = (codigo, vista) => (codigo ? FOTOS_VULTO[`../assets/vulto/${codigo}-${vista}.webp`] : undefined)
+
+// Foto principal da peça. Aceita o produto da API ou o item da sacola ({ produtoId, nome, cor, marca,
+// codigoModelo, imagemUrl }). A foto enviada no cadastro vem primeiro; peça da Vulto sem foto nenhuma
+// mostra o card tipográfico na cor da peça (cor: a escolhida; senão a da primeira variação).
 export function imagemDoProduto(produto, cor) {
   if (produto.imagemUrl) return produto.imagemUrl
   if (produto.marca === 'VULTO') {
-    return cardDaVulto({ nome: produto.nome, cor: cor ?? produto.cor ?? produto.variacoes?.[0]?.cor, codigo: produto.codigoModelo })
+    return (
+      fotoDaVulto(produto.codigoModelo, 'frente') ??
+      cardDaVulto({ nome: produto.nome, cor: cor ?? produto.cor ?? produto.variacoes?.[0]?.cor, codigo: produto.codigoModelo })
+    )
   }
   return POR_PRODUTO[produto.id ?? produto.produtoId] ?? arara
+}
+
+// Todas as fotos da peça, na ordem da galeria (frente, costas). Lorenzi: uma só
+export function fotosDoProduto(produto, cor) {
+  const principal = imagemDoProduto(produto, cor)
+  const costas = produto.marca === 'VULTO' ? fotoDaVulto(produto.codigoModelo, 'costas') : undefined
+  return costas ? [principal, costas] : [principal]
 }
 
 // Uma foto por peça do pedido (a mesma peça em dois tamanhos aparece uma vez só)
