@@ -3,8 +3,9 @@ import { freteService } from '../services/freteService'
 import { useAsync } from './useAsync'
 
 // Cadastros de apoio (lojas, categorias, usuários) usados em filtros e formulários.
-export function useLojas() {
-  return useAsync(() => cadastrosService.listarLojas(), []).data ?? []
+// marca: só as lojas físicas dessa marca (página Lojas de cada vitrine); sem ela, o padrão da API
+export function useLojas(marca) {
+  return useAsync(() => cadastrosService.listarLojas(marca ? { marca } : undefined), [marca]).data ?? []
 }
 
 export function useCategorias() {

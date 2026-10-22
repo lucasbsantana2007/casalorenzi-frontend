@@ -28,19 +28,23 @@ function filtrar(produtos, { categoria, tamanhos, faixa }) {
 export function ColecaoPage() {
   const { genero } = useParams()
   const nome = GENEROS[genero]
-  const state = useAsync(() => produtosService.listar({ ativo: true }), [])
+  const state = useAsync(() => produtosService.listar({ ativo: true, marca: 'LORENZI' }), [])
 
   if (!nome) return <NotFoundPage homePath="/" />
 
+  const selecao = state.data && state.data.filter((p) => p.genero === nome)
   // key: os filtros recomeçam ao trocar de Masculino para Feminino
-  return <Colecao key={genero} nome={nome} state={state} />
+  return <Colecao key={genero} nome={nome} state={{ ...state, data: selecao }} />
 }
 
-function Colecao({ nome, state }) {
-  const [filtros, setFiltros] = useState(SEM_FILTROS)
+// Grade com filtros (categoria, tamanho, faixa de preço). state.data: as peças da seleção (gênero na
+// Casa Lorenzi; a loja inteira na Vulto). Também usada pela vitrine da Vulto.
+export function Colecao({ nome, state, categoria = null }) {
+  // categoria: já abre filtrada (links de categoria do início da Vulto)
+  const [filtros, setFiltros] = useState({ ...SEM_FILTROS, categoria })
 
-  const doGenero = (state.data ?? []).filter((p) => p.genero === nome)
-  const produtos = ordenarVitrine(filtrar(doGenero, filtros))
+  const selecao = state.data ?? []
+  const produtos = ordenarVitrine(filtrar(selecao, filtros))
   const filtrando = Boolean(filtros.categoria || filtros.tamanhos.length || filtros.faixa)
   const limpar = () => setFiltros(SEM_FILTROS)
 
@@ -50,7 +54,7 @@ function Colecao({ nome, state }) {
         <h1 className="store-heading store-heading--lg">
           {nome} <span aria-hidden="true">&gt;</span> {filtros.categoria ?? 'Coleção'}
         </h1>
-        <FiltrosColecao produtos={doGenero} filtros={filtros} onChange={setFiltros} onLimpar={limpar} total={produtos.length} />
+        <FiltrosColecao produtos={selecao} filtros={filtros} onChange={setFiltros} onLimpar={limpar} total={produtos.length} />
       </div>
 
       <AsyncContent

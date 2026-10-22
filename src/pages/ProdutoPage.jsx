@@ -1,9 +1,11 @@
 import { Minus, Plus } from 'lucide-react'
 import { useId, useLayoutEffect, useRef, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { Select } from '../components/ui/Select'
 import { imagemDoProduto } from '../data/imagensProdutos'
+import { caminhoDoProduto, inicioDaMarca, marcaDoProduto } from '../data/marcas'
+import { useMarca } from '../hooks/useMarca'
 import { useAsync } from '../hooks/useAsync'
 import { useSacola } from '../hooks/useSacola'
 import { produtosService } from '../services/produtosService'
@@ -79,12 +81,18 @@ function useReservarSecoesAbertas(ref, conteudo) {
 export function ProdutoPage() {
   const { id } = useParams()
   const state = useAsync(() => produtosService.obter(id), [id])
+  const marca = useMarca()
 
-  if (state.error?.status === 404) return <NotFoundPage homePath="/" />
+  if (state.error?.status === 404) return <NotFoundPage homePath={inicioDaMarca(marca)} />
 
   return (
     <AsyncContent state={state} isEmpty={() => false}>
-      {(produto) => (produto.ativo ? <Produto produto={produto} /> : <NotFoundPage homePath="/" />)}
+      {(produto) => {
+        if (!produto.ativo) return <NotFoundPage homePath={inicioDaMarca(marca)} />
+        // A peça abre na vitrine da marca dela (link antigo /produto/:id de uma peça da Vulto → /vulto/produto/:id)
+        if (marcaDoProduto(produto).id !== marca.id) return <Navigate to={caminhoDoProduto(produto)} replace />
+        return <Produto produto={produto} />
+      }}
     </AsyncContent>
   )
 }
@@ -130,8 +138,10 @@ function Produto({ produto }) {
       tamanho: variacao.tamanho,
       sku: variacao.sku,
       preco: produto.precoBase,
-      // Foto enviada no cadastro (sem ela, o carrinho usa a ilustração do produto)
+      // Foto enviada no cadastro (sem ela, o carrinho usa a ilustração do produto ou o card da Vulto)
       imagemUrl: produto.imagemUrl ?? null,
+      marca: produto.marca ?? 'LORENZI',
+      codigoModelo: produto.codigoModelo ?? null,
     })
   }
   const genero = produto.genero?.toLowerCase()
@@ -139,12 +149,12 @@ function Produto({ produto }) {
   return (
     <main className="pdp">
       <div className="pdp__media">
-        <img src={imagemDoProduto(produto)} alt={`${produto.nome}, cor ${cor}`} />
+        <img src={imagemDoProduto(produto, cor)} alt={`${produto.nome}, cor ${cor}`} />
       </div>
 
       <div className="pdp__info">
         <nav className="pdp__crumbs" aria-label="Você está em">
-          {genero && <Link to={`/colecao/${genero}`}>{produto.genero}</Link>}
+          {produto.marca === 'VULTO' ? <Link to="/vulto/loja">Loja</Link> : genero && <Link to={`/colecao/${genero}`}>{produto.genero}</Link>}
           <span aria-hidden="true">/</span>
           <span>{produto.categoria}</span>
         </nav>
@@ -223,8 +233,12 @@ function Produto({ produto }) {
               )}
               <dt>Categoria</dt>
               <dd>{produto.categoria}</dd>
-              <dt>Estação</dt>
-              <dd>{produto.estacao}</dd>
+              {produto.estacao && (
+                <>
+                  <dt>Estação</dt>
+                  <dd>{produto.estacao}</dd>
+                </>
+              )}
             </dl>
           </Secao>
 
