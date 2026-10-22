@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { inicioDaMarca, loginDaMarca } from '../../data/marcas'
 import { useMarca } from '../../hooks/useMarca'
 import { BrandMark } from '../BrandMark'
+import { VideoLoop } from '../ui/VideoLoop'
 import agua1000 from '../../assets/login/agua-1000.jpg'
 import agua1800 from '../../assets/login/agua-1800.jpg'
 
@@ -25,6 +26,7 @@ function useTelaGrande() {
 function PainelVulto() {
   return (
     <div className="acesso__vulto">
+      <VideoLoop nome="garagem" />
       <p className="acesso__vulto-selo">Vulto+ · site · app · lojas</p>
       <p className="acesso__vulto-titulo">
         Uma conta.

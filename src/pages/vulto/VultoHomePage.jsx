@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ProductGrid } from '../../components/home/ProductGrid'
+import { VideoLoop } from '../../components/ui/VideoLoop'
 import { useAsync } from '../../hooks/useAsync'
 import { useLojas } from '../../hooks/useCadastros'
 import { produtosService } from '../../services/produtosService'
@@ -19,6 +20,7 @@ export function VultoHomePage() {
   return (
     <main className="vulto-inicio">
       <section className="vulto-hero" aria-labelledby="vulto-hero-titulo">
+        <VideoLoop nome="oficina" />
         <p className="vulto-hero__selo">Drop Inverno 26</p>
         <h1 id="vulto-hero-titulo" className="vulto-hero__titulo">
           Da rua
@@ -44,7 +46,8 @@ export function VultoHomePage() {
       )}
 
       {categorias.length > 0 && (
-        <section className="store-section vulto-categorias" aria-labelledby="vulto-categorias-titulo">
+        <section className="vulto-categorias vulto-faixa-video" aria-labelledby="vulto-categorias-titulo">
+          <VideoLoop nome="prancha" />
           <h2 id="vulto-categorias-titulo" className="store-heading">
             Categorias
           </h2>
@@ -58,7 +61,8 @@ export function VultoHomePage() {
         </section>
       )}
 
-      <section className="vulto-mais" aria-labelledby="vulto-mais-titulo">
+      <section className="vulto-mais vulto-faixa-video" aria-labelledby="vulto-mais-titulo">
+        <VideoLoop nome="garagem" />
         <div>
           <h2 id="vulto-mais-titulo">Vulto+</h2>
           <p>
@@ -72,7 +76,8 @@ export function VultoHomePage() {
       </section>
 
       {lojas.length > 0 && (
-        <section className="store-section vulto-onde" aria-labelledby="vulto-onde-titulo">
+        <section className="store-section vulto-onde vulto-faixa-video" aria-labelledby="vulto-onde-titulo">
+          <VideoLoop nome="pintura" />
           <div className="store-section__head">
             <h2 id="vulto-onde-titulo" className="store-heading">
               Onde estamos

@@ -556,3 +556,114 @@ a.product-card--duas-fotos:hover .product-card__costas {
     font-size: 40px;
   }
 }
+
+/* ---------- Vídeos em loop (estética de oficina, inspirada na Deus Ex Machina) ----------
+   O vídeo preenche a seção por trás do conteúdo, escurecido para o texto branco ficar legível. */
+.video-loop {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--vulto-preto, #17191c);
+}
+
+.video-loop video,
+.video-loop img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-loop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(14, 15, 17, 0.35) 0%, rgba(14, 15, 17, 0.55) 55%, rgba(14, 15, 17, 0.85) 100%);
+}
+
+.vulto-hero,
+.vulto-faixa-video,
+.acesso__vulto {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Hero: o vídeo substitui o traço laranja */
+.vulto-hero {
+  min-height: min(88vh, 820px);
+  background: none;
+}
+
+.vulto-faixa-video {
+  color: #fff;
+}
+
+/* Categorias sobre a prancha */
+.vulto-categorias.vulto-faixa-video {
+  display: grid;
+  gap: 24px;
+  margin-top: 96px;
+  padding: 120px var(--store-gutter) 56px;
+}
+
+.vulto-faixa-video .store-heading {
+  color: #fff;
+}
+
+.vulto-faixa-video.vulto-categorias ul {
+  margin-top: 0;
+}
+
+.vulto-faixa-video.vulto-categorias a {
+  border-color: rgba(255, 255, 255, 0.85);
+  color: #fff;
+  backdrop-filter: blur(2px);
+}
+
+.vulto-faixa-video.vulto-categorias a:hover {
+  background: #fff;
+  color: var(--vulto-preto);
+}
+
+/* Vulto+ sobre a garagem: escuro, com o laranja só no título */
+.vulto-mais.vulto-faixa-video {
+  min-height: 360px;
+  margin: 0;
+  padding: 56px var(--store-gutter);
+  background: none;
+}
+
+.vulto-mais.vulto-faixa-video h2 {
+  color: var(--vulto-sinal);
+  font-size: 64px;
+}
+
+/* Onde estamos sobre a oficina de pranchas */
+.vulto-onde.vulto-faixa-video {
+  max-width: none;
+  margin-top: 0;
+  padding-top: 96px;
+  padding-bottom: 64px;
+}
+
+.vulto-faixa-video .store-heading-link {
+  color: #fff;
+}
+
+.vulto-faixa-video .vulto-onde__lista {
+  border-top-color: #fff;
+}
+
+.vulto-faixa-video .vulto-onde__lista span {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Login: a garagem no painel preto */
+.acesso--vulto .acesso__cor {
+  background: var(--vulto-preto);
+}
+
+/* O rodapé da Vulto encosta na última faixa de vídeo */
+.store--vulto:has(.vulto-inicio) .store-footer {
+  margin-top: 0;
+}
