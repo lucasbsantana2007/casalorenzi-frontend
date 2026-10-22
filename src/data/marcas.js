@@ -40,6 +40,21 @@ export const MARCAS = {
 
 export const LISTA_MARCAS = [MARCAS.LORENZI, MARCAS.VULTO]
 
+// Marca de cada funcionário e de cada loja no painel (GRUPO: Administrador que vê as duas)
+export const NOMES_MARCAS = { LORENZI: 'Casa Lorenzi', VULTO: 'Vulto', GRUPO: 'Grupo' }
+
+// As duas juntas: área do cliente (uma conta só nas duas marcas). Cabeçalho e rodapé com as duas logos
+export const GRUPO = {
+  id: 'GRUPO',
+  nome: 'Casa Lorenzi e Vulto',
+  base: '',
+  nav: [
+    { to: '/', label: 'Casa Lorenzi' },
+    { to: '/vulto', label: 'Vulto' },
+  ],
+  rodape: 'Uma conta, duas marcas, os mesmos pontos Vulto+',
+}
+
 const ehVulto = (caminho) => caminho === '/vulto' || caminho.startsWith('/vulto/')
 
 export const marcaDoCaminho = (caminho) => (ehVulto(caminho) ? MARCAS.VULTO : MARCAS.LORENZI)
