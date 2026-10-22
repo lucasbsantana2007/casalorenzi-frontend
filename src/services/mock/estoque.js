@@ -1,10 +1,11 @@
 import { ApiError } from '../api'
-import { aplicarMovimentacao, byId, db, estoqueView, fail, inPeriod, matches, movimentacaoView, produtoRemovido, registrarLog, respond } from './db'
+import { aplicarMovimentacao, byId, db, estoqueView, fail, inPeriod, lojaNaMarca, matches, movimentacaoView, produtoRemovido, registrarLog, respond } from './db'
 
 // incluirRemovidos: só para reconstruir o passado (posição em data)
 function filtrarEstoques({ busca, lojaId, categoria, status, variacaoId, incluirRemovidos = false } = {}) {
   return db.estoques
     .filter((e) => incluirRemovidos || !produtoRemovido(e.variacaoId))
+    .filter((e) => lojaNaMarca(e.lojaId))
     .map(estoqueView)
     .filter((e) => !lojaId || e.lojaId === Number(lojaId))
     .filter((e) => !variacaoId || e.variacaoId === Number(variacaoId))
@@ -25,7 +26,7 @@ export function listar(filtros) {
 
 export function obter(id) {
   const estoque = byId(db.estoques, id)
-  return estoque ? respond(estoqueView(estoque)) : fail('Item de estoque não encontrado.', 404)
+  return estoque && lojaNaMarca(estoque.lojaId) ? respond(estoqueView(estoque)) : fail('Item de estoque não encontrado.', 404)
 }
 
 export function listarMovimentacoes({ estoqueId, lojaId, tipo, de, ate, busca } = {}) {
@@ -34,6 +35,7 @@ export function listarMovimentacoes({ estoqueId, lojaId, tipo, de, ate, busca } 
     .filter((m) => !tipo || m.tipo === tipo)
     .filter((m) => inPeriod(m.criadoEm, de, ate))
     .map(movimentacaoView)
+    .filter((m) => lojaNaMarca(m.loja.id))
     .filter((m) => !lojaId || m.loja.id === Number(lojaId))
     .filter((m) => matches(busca, m.produto.nome, m.variacao.sku, m.origem))
     .sort((a, b) => b.criadoEm - a.criadoEm)
@@ -56,7 +58,7 @@ export function posicaoEmData({ data, lojaId, busca } = {}) {
 
 export function registrarMovimentacao({ estoqueId, tipo, quantidade, origem, usuarioId }) {
   const estoque = byId(db.estoques, estoqueId)
-  if (!estoque) return fail('Item de estoque não encontrado.', 404)
+  if (!estoque || !lojaNaMarca(estoque.lojaId)) return fail('Item de estoque não encontrado.', 404)
   if (produtoRemovido(estoque.variacaoId)) return fail('Este produto foi removido do catálogo.', 409)
   if (!Number.isInteger(quantidade) || quantidade === 0) return fail('Informe uma quantidade válida.', 422)
   try {

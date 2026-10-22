@@ -1,7 +1,7 @@
 import { calcularFrete, somenteDigitos, ufDoCep } from '../../utils/frete'
 import { ApiError } from '../api'
 import * as fidelidade from './fidelidade'
-import { aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, registrarLog, respond, salvar, usuarioDaSessao, usuarioResumo, variacaoView } from './db'
+import { aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, lojaNaMarca, matches, nextId, registrarLog, respond, salvar, usuarioDaSessao, usuarioResumo, variacaoView } from './db'
 
 const PARCELAS_MAX = 6
 
@@ -206,6 +206,7 @@ export function finalizarCompra(dados) {
 
 export function listar({ status, lojaId, canal, busca } = {}) {
   const lista = db.pedidos
+    .filter((p) => lojaNaMarca(p.lojaId))
     .map(pedidoAdminView)
     .filter((p) => !status || p.status === status)
     .filter((p) => !lojaId || p.lojaId === Number(lojaId))
@@ -217,13 +218,13 @@ export function listar({ status, lojaId, canal, busca } = {}) {
 
 export function obter(id) {
   const pedido = byId(db.pedidos, id)
-  return pedido ? respond(pedidoAdminView(pedido)) : fail('Pedido não encontrado.', 404)
+  return pedido && lojaNaMarca(pedido.lojaId) ? respond(pedidoAdminView(pedido)) : fail('Pedido não encontrado.', 404)
 }
 
 // { lojaId } troca a loja de expedição | { status: 'ENVIADO', codigoRastreio } | { status: 'ENTREGUE' } | { status: 'CANCELADO' }
 export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
   const pedido = byId(db.pedidos, id)
-  if (!pedido) return fail('Pedido não encontrado.', 404)
+  if (!pedido || !lojaNaMarca(pedido.lojaId) || (lojaId && !lojaNaMarca(lojaId))) return fail('Pedido não encontrado.', 404)
   let descricao = null
 
   try {

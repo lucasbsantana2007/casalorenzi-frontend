@@ -1,4 +1,4 @@
-import { byId, db, respond } from './db'
+import { byId, db, escopoMarca, respond } from './db'
 
 const DIA = 86400000
 // Tipos de solicitação que contam como pós-venda no financeiro
@@ -47,7 +47,12 @@ export function obterResumo(params = {}) {
   const fim = inicioDoDia(params.ate) + DIA
   const comparar = params.comparar || 'anterior'
   const agrupar = params.agrupar || 'dia'
-  const lojas = lista(params.lojas).map(Number)
+  // Só as lojas da marca de quem vê (como na API): sem filtro, todas as da marca; nenhuma da marca, nada
+  const pedidas = lista(params.lojas).map(Number)
+  const escopo = escopoMarca()
+  const daMarca = db.lojas.filter((l) => !escopo || (l.marca ?? 'LORENZI') === escopo).map((l) => l.id)
+  const lojas = escopo ? (pedidas.length ? pedidas.filter((id) => daMarca.includes(id)) : daMarca) : pedidas
+  if (escopo && !lojas.length) lojas.push(0)
   const canais = lista(params.canais)
   const categorias = lista(params.categorias)
   const generos = lista(params.generos)

@@ -1,5 +1,5 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
-import { anexoView, autorResumo, byId, clientePorId, db, fail, matches, nextId, respond, usuarioResumo, variacaoView } from './db'
+import { anexoView, autorResumo, byId, clientePorId, db, fail, matches, nextId, noEscopo, respond, usuarioResumo, variacaoView } from './db'
 
 function pedidoView(pedido) {
   if (!pedido) return null
@@ -63,6 +63,7 @@ export { pedidoView }
 
 export function listar({ busca, tipoSolicitacaoId, responsavelId, lojaId } = {}) {
   const lista = db.atendimentos
+    .filter((a) => noEscopo(a.marca))
     .map((a) => atendimentoView(a))
     .filter((a) => !tipoSolicitacaoId || a.tipoSolicitacaoId === Number(tipoSolicitacaoId))
     .filter((a) => !lojaId || a.lojaId === Number(lojaId))
@@ -78,7 +79,7 @@ export function listar({ busca, tipoSolicitacaoId, responsavelId, lojaId } = {})
 
 export function obter(id) {
   const atendimento = byId(db.atendimentos, id)
-  return atendimento ? respond(atendimentoView(atendimento, { detalhado: true })) : fail('Atendimento não encontrado.', 404)
+  return atendimento && noEscopo(atendimento.marca) ? respond(atendimentoView(atendimento, { detalhado: true })) : fail('Atendimento não encontrado.', 404)
 }
 
 function registrarEventoSistema(atendimento, conteudo) {
@@ -87,7 +88,7 @@ function registrarEventoSistema(atendimento, conteudo) {
 
 export function atualizar(id, { status, responsavelId }) {
   const atendimento = byId(db.atendimentos, id)
-  if (!atendimento) return fail('Atendimento não encontrado.', 404)
+  if (!atendimento || !noEscopo(atendimento.marca)) return fail('Atendimento não encontrado.', 404)
   if (responsavelId !== undefined && responsavelId !== atendimento.responsavelId) {
     atendimento.responsavelId = responsavelId
     const nome = usuarioResumo(responsavelId)?.nome
@@ -103,7 +104,7 @@ export function atualizar(id, { status, responsavelId }) {
 
 export function enviarMensagem(id, { conteudo, autorId, autorTipo }) {
   const atendimento = byId(db.atendimentos, id)
-  if (!atendimento) return fail('Atendimento não encontrado.', 404)
+  if (!atendimento || !noEscopo(atendimento.marca)) return fail('Atendimento não encontrado.', 404)
   if (!conteudo?.trim()) return fail('A mensagem não pode ficar vazia.', 422)
   db.mensagens.push({ id: nextId(db.mensagens), atendimentoId: atendimento.id, autorId, autorTipo, conteudo: conteudo.trim(), enviadoEm: Date.now() })
 

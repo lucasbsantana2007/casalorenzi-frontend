@@ -24,8 +24,8 @@ export async function login({ email, senha }) {
     if (usuario.convitePendente) return fail('Esta conta ainda não tem senha. Use o link do convite enviado por e-mail para criá-la.', 401)
     if (!(await senhaConfere(usuario, senha))) return fail('E-mail ou senha incorretos.', 401)
     if (usuario.ativo === false) return fail('Esta conta está desativada. Fale com o administrador.', 403)
-    const { id, nome, papel, lojaId = null } = usuario
-    return respond({ token: `demo-${id}`, usuario: { id, nome, email: usuario.email, papel, lojaId } })
+    const { id, nome, papel, lojaId = null, marca = 'LORENZI' } = usuario
+    return respond({ token: `demo-${id}`, usuario: { id, nome, email: usuario.email, papel, lojaId, marca } })
   }
   const cliente = clientePorEmail(alvo)
   if (!cliente || !(await senhaConfere(cliente, senha))) return fail('E-mail ou senha incorretos.', 401)
