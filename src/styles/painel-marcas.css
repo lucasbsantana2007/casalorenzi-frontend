@@ -1,0 +1,293 @@
+/* ---------- Identidade do painel por marca ----------
+   Equipe da Casa Lorenzi: o painel azul-marinho de sempre. Equipe da Vulto: o mesmo painel em preto,
+   com a fonte e o laranja dela. Administrador do grupo: as duas logos, a barra lateral cortada na
+   diagonal (marinho da Lorenzi em cima, preto da Vulto embaixo, com o traço laranja no meio) e a cor de
+   destaque da marca escolhida no seletor. Tudo por variáveis: as telas do painel não mudam. */
+
+.admin-shell {
+  --painel-acento: #d9c7a3;
+  --painel-faixa: var(--painel-acento);
+}
+
+/* Vulto (equipe da Vulto e o grupo com a Vulto escolhida) */
+.painel--vulto,
+.painel--grupo-vulto {
+  --navy-950: #17191c;
+  --navy-900: #1f2125;
+  --navy-800: #2c2e33;
+  --navy-700: #3b3e44;
+  --navy-100: #e9e7e3;
+  --navy-50: #f2f0ed;
+  --marrom-600: #b8542e;
+  --marrom-700: #94401f;
+  --terracota-500: #cf6a3f;
+  --focus: 0 0 0 3px rgba(184, 84, 46, 0.25);
+  --font-display: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+  --painel-acento: #e0703f;
+  --painel-faixa: #e0703f;
+}
+
+.painel--vulto .sidebar {
+  background: #111214;
+  color: #c9c7c2;
+}
+
+.painel--vulto .sidebar__link,
+.painel--grupo .sidebar__link {
+  color: #b9b6b0;
+}
+
+.sidebar__marca-vulto {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 18px 0 6px;
+}
+
+.sidebar__marca-vulto img {
+  display: block;
+  width: auto;
+  height: 22px;
+}
+
+.painel--vulto .brand__subtitle,
+.painel--grupo .brand__subtitle {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Destaque do item ativo do menu: na cor da marca */
+.admin-shell .sidebar__link.is-active {
+  box-shadow: inset 2px 0 0 var(--painel-acento);
+}
+
+/* Faixa fina no topo do conteúdo, na cor da marca (no grupo com "Todas", as duas) */
+.admin-shell .topbar {
+  box-shadow: inset 0 3px 0 var(--painel-faixa);
+}
+
+/* ---------- Grupo: as duas marcas ---------- */
+.painel--grupo {
+  --painel-faixa: linear-gradient(90deg, #13203b 0 50%, #b8542e 50% 100%);
+}
+
+.painel--grupo .topbar {
+  box-shadow: none;
+}
+
+.painel--grupo .topbar::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--painel-faixa);
+}
+
+.painel--grupo-lorenzi {
+  --painel-acento: #d9c7a3;
+  --painel-faixa: #13203b;
+}
+
+.painel--grupo-todas {
+  /* Neutro: grafite e bronze, a mistura do marinho com o laranja */
+  --navy-950: #1c1d21;
+  --navy-900: #26282d;
+  --navy-800: #33363c;
+  --marrom-600: #8c5a3c;
+  --marrom-700: #74482f;
+  --painel-acento: #c99a6b;
+}
+
+.painel--grupo .sidebar {
+  background:
+    linear-gradient(162deg, transparent 0 49.4%, rgba(184, 84, 46, 0.85) 49.4% 49.8%, transparent 49.8%),
+    linear-gradient(162deg, #13203b 0 49.6%, #121315 49.6% 100%);
+  color: #c9c7c2;
+}
+
+.sidebar__grupo {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 10px 4px 20px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar__grupo-logos {
+  display: block;
+}
+
+.logos-grupo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logos-grupo img {
+  display: block;
+  width: auto;
+}
+
+.logos-grupo__lorenzi {
+  height: 24px;
+}
+
+.logos-grupo__vulto {
+  height: 15px;
+}
+
+.logos-grupo__traco {
+  width: 1px;
+  height: 26px;
+  background: currentColor;
+  opacity: 0.35;
+  transform: skewX(-18deg);
+}
+
+.logos-grupo--claro {
+  color: #fff;
+}
+
+/* Seletor Todas / Lorenzi / Vulto */
+.seletor-marca {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  padding: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.seletor-marca__opcao {
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.seletor-marca__opcao:hover {
+  color: #fff;
+}
+
+.seletor-marca__opcao[aria-checked='true'] {
+  color: #fff;
+}
+
+.seletor-marca__opcao--todas[aria-checked='true'] {
+  background: linear-gradient(90deg, #26375c, #b8542e);
+}
+
+.seletor-marca__opcao--lorenzi[aria-checked='true'] {
+  background: #26375c;
+  font-family: 'Marcellus', Georgia, serif;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+
+.seletor-marca__opcao--vulto[aria-checked='true'] {
+  background: #b8542e;
+  font-family: 'Archivo', Arial, sans-serif;
+  font-weight: 800;
+}
+
+.seletor-marca__opcao:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+/* ---------- Área do cliente: as duas marcas ---------- */
+.store-header__logos .logos-grupo__lorenzi {
+  height: 30px;
+}
+
+.store-header__logos .logos-grupo__vulto {
+  height: 19px;
+}
+
+/* Faixa cortada na diagonal: o nome de cada marca no lado dela, na fonte dela */
+.cliente-faixa {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  min-height: 132px;
+  padding: 0 var(--store-gutter);
+  overflow: hidden;
+  background:
+    linear-gradient(108deg, transparent 0 49.7%, #b8542e 49.7% 50.1%, transparent 50.1%),
+    linear-gradient(108deg, #13203b 0 49.9%, #17191c 49.9% 100%);
+  color: #fff;
+}
+
+.cliente-faixa__lorenzi {
+  font-family: 'Marcellus', Georgia, serif;
+  font-size: clamp(26px, 3.4vw, 44px);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cliente-faixa__vulto {
+  justify-self: end;
+  font-family: 'Archivo', Arial, sans-serif;
+  font-size: clamp(28px, 3.8vw, 50px);
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.cliente-faixa__texto {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  max-width: 90%;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.store--grupo .store-footer {
+  background: linear-gradient(108deg, #13203b 0 50%, #17191c 50% 100%);
+}
+
+@media (max-width: 700px) {
+  .cliente-faixa {
+    min-height: 110px;
+    padding-bottom: 28px;
+  }
+
+  .cliente-faixa__texto {
+    font-size: 10.5px;
+  }
+}
+
+/* Marca de funcionários e lojas nas tabelas da central */
+.tag-marca--lorenzi {
+  background: #e6eaf1;
+  color: #13203b;
+  font-family: 'Marcellus', Georgia, serif;
+}
+
+.tag-marca--vulto {
+  background: #17191c;
+  color: #fff;
+  font-family: 'Archivo', Arial, sans-serif;
+  font-weight: 700;
+}
+
+.tag-marca--grupo {
+  background: linear-gradient(90deg, #13203b, #b8542e);
+  color: #fff;
+}
