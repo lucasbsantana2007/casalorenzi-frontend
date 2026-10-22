@@ -1,6 +1,5 @@
 import { LogOut } from 'lucide-react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { BrandMark } from '../components/BrandMark'
 import { LogosDoGrupo } from '../components/LogosDoGrupo'
 import { MARCAS } from '../data/marcas'
 import { useMarcaPainel } from '../hooks/useMarcaPainel'
@@ -20,14 +19,10 @@ function MarcaDoPainel({ onNavigate }) {
   if (!grupo) {
     return (
       <Link to="/dashboard" className="sidebar__brand" onClick={onNavigate}>
-        {marca === 'VULTO' ? (
-          <span className="sidebar__marca-vulto">
-            <img src={MARCAS.VULTO.logoBranca} alt="Vulto" />
-            <span className="brand__subtitle">Gestão de lojas</span>
-          </span>
-        ) : (
-          <BrandMark subtitle="Gestão de lojas" inverse />
-        )}
+        <span className={`sidebar__marca sidebar__marca--${marca.toLowerCase()}`}>
+          <img src={MARCAS[marca]?.logoBranca ?? MARCAS.LORENZI.logoBranca} alt={MARCAS[marca]?.nome ?? 'Casa Lorenzi'} />
+          <span className="brand__subtitle">Gestão de lojas</span>
+        </span>
       </Link>
     )
   }

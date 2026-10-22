@@ -191,6 +191,8 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
   })
   // Só o Administrador do grupo escolhe a marca de um Administrador; Lojista e Operador ficam com a da loja
   const { grupo } = useMarcaPainel()
+  // Grupo: filtra as lojas por marca na hora de escolher (Lojista e Operador recebem a marca da loja)
+  const [marcaDaLoja, setMarcaDaLoja] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
@@ -238,11 +240,21 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
             </Select>
           </Field>
         )}
+        {grupo && !administrador && (
+          <Field label="Lojas da marca">
+            <Select className="select" value={marcaDaLoja} onChange={(e) => setMarcaDaLoja(e.target.value)}>
+              <option value="">Todas as marcas</option>
+              <option value="LORENZI">Casa Lorenzi</option>
+              <option value="VULTO">Vulto</option>
+            </Select>
+          </Field>
+        )}
         <Field label="Loja" hint={!administrador ? 'A marca do funcionário é a da loja.' : undefined}>
           <Select className="select" value={administrador ? '' : form.lojaId} onChange={set('lojaId')} disabled={administrador} required={!administrador}>
             <option value="">{administrador ? 'Toda a rede' : 'Selecione…'}</option>
             {lojas
               .filter((l) => l.ativa !== false || l.id === funcionario?.lojaId)
+              .filter((l) => !marcaDaLoja || (l.marca ?? 'LORENZI') === marcaDaLoja || l.id === Number(form.lojaId))
               .map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.nome}

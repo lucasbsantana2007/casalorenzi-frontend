@@ -37,17 +37,22 @@
   color: #b9b6b0;
 }
 
-.sidebar__marca-vulto {
+/* Logo da marca no topo da barra lateral (as mesmas do site, em branco) */
+.sidebar__marca {
   display: grid;
   justify-items: center;
   gap: 12px;
   padding: 18px 0 6px;
 }
 
-.sidebar__marca-vulto img {
+.sidebar__marca img {
   display: block;
   width: auto;
   height: 22px;
+}
+
+.sidebar__marca--lorenzi img {
+  height: 34px;
 }
 
 .painel--vulto .brand__subtitle,
