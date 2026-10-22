@@ -50,11 +50,21 @@ export function imagemDoProduto(produto, cor) {
   return POR_PRODUTO[produto.id ?? produto.produtoId] ?? arara
 }
 
-// Todas as fotos da peça, na ordem da galeria (frente, costas). Lorenzi: uma só
+// Fotos da peça na ordem da galeria: [{ url, vista }] (frente, costas e no corpo, com modelo). Lorenzi: uma só
 export function fotosDoProduto(produto, cor) {
-  const principal = imagemDoProduto(produto, cor)
-  const costas = produto.marca === 'VULTO' ? fotoDaVulto(produto.codigoModelo, 'costas') : undefined
-  return costas ? [principal, costas] : [principal]
+  const fotos = [{ url: imagemDoProduto(produto, cor), vista: 'Frente' }]
+  if (produto.marca !== 'VULTO') return fotos
+  const costas = fotoDaVulto(produto.codigoModelo, 'costas')
+  const modelo = fotoDaVulto(produto.codigoModelo, 'modelo')
+  if (costas) fotos.push({ url: costas, vista: 'Costas' })
+  if (modelo) fotos.push({ url: modelo, vista: 'No corpo' })
+  return fotos
+}
+
+// Foto que aparece na grade com o mouse em cima: a peça vestida; sem ela, as costas
+export function fotoAlternativa(produto) {
+  if (produto.marca !== 'VULTO') return undefined
+  return fotoDaVulto(produto.codigoModelo, 'modelo') ?? fotoDaVulto(produto.codigoModelo, 'costas')
 }
 
 // Uma foto por peça do pedido (a mesma peça em dois tamanhos aparece uma vez só)

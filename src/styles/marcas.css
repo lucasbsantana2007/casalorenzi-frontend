@@ -173,7 +173,16 @@
   object-fit: contain;
 }
 
-/* Grade: peça com foto de costas troca para ela com o mouse em cima */
+/* Foto com modelo: preenche a coluna inteira, como as fotos da Lorenzi */
+.store--vulto .pdp__media > img.pdp__foto-modelo {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+/* Grade: peça da Vulto mostra a foto com modelo (ou as costas) com o mouse em cima */
 .product-card--duas-fotos .product-card__image {
   position: relative;
 }

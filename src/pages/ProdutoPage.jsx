@@ -78,21 +78,20 @@ function useReservarSecoesAbertas(ref, conteudo) {
   }, [ref, conteudo])
 }
 
-const VISTAS = ['Frente', 'Costas']
-
-// Foto da peça; com frente e costas (Vulto), miniaturas para trocar
+// Foto da peça; com mais de uma (Vulto: frente, costas e no corpo), miniaturas para trocar
 function GaleriaDaPeca({ fotos, nome }) {
   const [atual, setAtual] = useState(0)
   const foto = fotos[atual] ?? fotos[0]
+  const vertical = foto.vista === 'No corpo'
   return (
     <div className="pdp__media">
-      <img src={foto} alt={`${nome}, ${VISTAS[atual]?.toLowerCase() ?? 'frente'}`} />
+      <img src={foto.url} alt={`${nome}, ${foto.vista.toLowerCase()}`} className={vertical ? 'pdp__foto-modelo' : undefined} />
       {fotos.length > 1 && (
         <div className="pdp__vistas" role="group" aria-label="Fotos da peça">
-          {fotos.map((url, i) => (
+          {fotos.map(({ url, vista }, i) => (
             <button key={url} type="button" className={i === atual ? 'is-ativa' : undefined} aria-pressed={i === atual} onClick={() => setAtual(i)}>
               <img src={url} alt="" />
-              <span className="sr-only">{VISTAS[i]}</span>
+              <span className="sr-only">{vista}</span>
             </button>
           ))}
         </div>
