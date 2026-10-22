@@ -25,7 +25,8 @@
 }
 
 .barra-marcas-area:hover .barra-marcas,
-.barra-marcas-area:focus-within .barra-marcas {
+/* Teclado: abre com o foco visível (clique do mouse não deixa a faixa presa aberta) */
+.barra-marcas-area:has(:focus-visible) .barra-marcas {
   height: 40px;
 }
 
