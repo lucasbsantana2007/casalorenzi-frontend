@@ -38,8 +38,25 @@ export function VultoHomePage() {
               Ver tudo
             </Link>
           </div>
-          <ProductGrid produtos={drop} colunas={4} />
+          <ProductGrid produtos={drop.slice(0, 4)} colunas={4} />
         </section>
+      )}
+
+      {drop.length > 4 && (
+        <>
+          {/* Faixa fina e larga entre as duas linhas de peças, com o mesmo vídeo do topo */}
+          <section className="vulto-faixa" aria-label="Lojas Vulto">
+            <VideoLoop nome="vulto" />
+            <p className="vulto-rotulo">Pinheiros · Eldorado · Savassi · Batel</p>
+            <p className="vulto-faixa__texto">Nas lojas, no site e no app, com os mesmos pontos Vulto+.</p>
+            <Link to="/vulto/lojas" className="vulto-link">
+              Ver lojas <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
+          </section>
+          <section className="store-section vulto-segunda-linha" aria-label="Mais novidades">
+            <ProductGrid produtos={drop.slice(4)} colunas={4} />
+          </section>
+        </>
       )}
 
       {categorias.length > 0 && (

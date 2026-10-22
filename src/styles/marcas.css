@@ -394,6 +394,47 @@ a.product-card--duas-fotos:hover .product-card__costas {
   color: var(--vulto-preto);
 }
 
+/* Faixa fina e larga entre as linhas de peças: o vídeo do topo, baixo e escurecido */
+.vulto-faixa {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 32px;
+  min-height: 180px;
+  margin: 64px var(--store-gutter) 0;
+  padding: 0 40px;
+  color: #fff;
+}
+
+.vulto-faixa .video-loop video,
+.vulto-faixa .video-loop img {
+  object-position: center 40%;
+}
+
+.vulto-faixa .video-loop::after {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.vulto-faixa .vulto-rotulo {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.vulto-faixa__texto {
+  flex: 1;
+  min-width: 240px;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.vulto-segunda-linha {
+  padding-top: 64px;
+}
+
 /* Link de texto com sublinhado fino */
 .vulto-link {
   display: inline-flex;
@@ -548,6 +589,10 @@ a.product-card--duas-fotos:hover .product-card__costas {
 
   .vulto-mais {
     padding: 64px var(--store-gutter);
+  }
+
+  .vulto-faixa {
+    padding: 28px 24px;
   }
 
   .vulto-onde__lista,
