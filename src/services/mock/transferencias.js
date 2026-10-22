@@ -1,4 +1,4 @@
-import { aplicarMovimentacao, byId, db, estoquePor, fail, matches, nextId, registrarLog, produtoRemovido, respond, usuarioResumo, variacaoView } from './db'
+import { aplicarMovimentacao, byId, db, estoquePor, fail, lojaNaMarca, matches, nextId, produtoRemovido, registrarLog, respond, usuarioResumo, variacaoView } from './db'
 
 function transferenciaView(t) {
   const { produto, ...variacao } = variacaoView(t.variacaoId)
@@ -15,6 +15,7 @@ function transferenciaView(t) {
 
 export function listar({ status, lojaId, busca } = {}) {
   const lista = db.transferencias
+    .filter((t) => lojaNaMarca(t.lojaOrigemId) && lojaNaMarca(t.lojaDestinoId))
     .map(transferenciaView)
     .filter((t) => !status || t.status === status)
     .filter((t) => !lojaId || t.lojaOrigemId === Number(lojaId) || t.lojaDestinoId === Number(lojaId))
@@ -26,6 +27,7 @@ export function listar({ status, lojaId, busca } = {}) {
 export function criar({ variacaoId, lojaOrigemId, lojaDestinoId, quantidade, observacao = '', usuarioId }) {
   if (!variacaoId) return fail('Selecione o item a transferir.', 422)
   if (produtoRemovido(variacaoId)) return fail('Este produto foi removido do catálogo.', 409)
+  if (!lojaNaMarca(lojaOrigemId) || !lojaNaMarca(lojaDestinoId)) return fail('Loja não encontrada.', 404)
   if (Number(lojaOrigemId) === Number(lojaDestinoId)) return fail('A loja de destino deve ser diferente da origem.', 422)
   const origem = estoquePor(lojaOrigemId, variacaoId)
   if (!origem) return fail('Item não encontrado na loja de origem.', 404)
@@ -62,7 +64,7 @@ export function criar({ variacaoId, lojaOrigemId, lojaDestinoId, quantidade, obs
 //        SOLICITADA → CANCELADA
 export function atualizarStatus(id, { status, usuarioId }) {
   const t = byId(db.transferencias, id)
-  if (!t) return fail('Transferência não encontrada.', 404)
+  if (!t || !lojaNaMarca(t.lojaOrigemId)) return fail('Transferência não encontrada.', 404)
   const rota = `${t.codigo} · ${byId(db.lojas, t.lojaOrigemId).nome} → ${byId(db.lojas, t.lojaDestinoId).nome}`
 
   try {

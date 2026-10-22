@@ -8,7 +8,9 @@ import { FormError } from '../../../components/ui/FormError'
 import { Modal } from '../../../components/ui/Modal'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
+import { NOMES_MARCAS } from '../../../data/marcas'
 import { useAsync } from '../../../hooks/useAsync'
+import { useMarcaPainel } from '../../../hooks/useMarcaPainel'
 import { administracaoService } from '../../../services/administracaoService'
 import { formatNumber } from '../../../utils/format'
 
@@ -27,9 +29,15 @@ export function LojasAdminPage() {
           <span className="cell-main">{l.nome}</span>
           <span className="cell-sub">
             {l.cidade}, {l.uf}
+            {l.tipo === 'CD' && ' · centro de distribuição'}
           </span>
         </>
       ),
+    },
+    {
+      key: 'marca',
+      header: 'Marca',
+      render: (l) => <span className={`tag tag-marca tag-marca--${(l.marca ?? 'LORENZI').toLowerCase()}`}>{NOMES_MARCAS[l.marca ?? 'LORENZI']}</span>,
     },
     { key: 'endereco', header: 'Endereço', render: (l) => (l.endereco ? <span className="cell-sub cell-sub--wrap">{l.endereco}</span> : <span className="subtle">—</span>) },
     { key: 'telefone', header: 'Contato', render: (l) => <span className="nowrap">{l.telefone || '—'}</span> },
@@ -87,6 +95,9 @@ function LojaForm({ loja, onClose, onSaved }) {
     horarios: (loja?.horarios ?? []).join('\n'),
     ativa: loja?.ativa ?? true,
   })
+  // Loja nova do grupo: escolhe a marca (começa pela do seletor); a do Administrador da marca é sempre dela
+  const painel = useMarcaPainel()
+  const [marca, setMarca] = useState(painel.marca ?? 'LORENZI')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
@@ -96,7 +107,7 @@ function LojaForm({ loja, onClose, onSaved }) {
     event.preventDefault()
     setError(null)
     setSaving(true)
-    const dados = { ...form, horarios: form.horarios.split('\n') }
+    const dados = { ...form, horarios: form.horarios.split('\n'), ...(loja ? {} : { marca }) }
     try {
       if (loja) await administracaoService.atualizarLoja(loja.id, dados)
       else await administracaoService.criarLoja(dados)
@@ -111,6 +122,14 @@ function LojaForm({ loja, onClose, onSaved }) {
   return (
     <form className="stack" onSubmit={handleSubmit}>
       <div className="form-grid">
+        {painel.grupo && !loja && (
+          <Field label="Marca" hint="A loja recebe as peças e a equipe desta marca. Depois não muda." className="span-2">
+            <Select className="select" value={marca} onChange={(e) => setMarca(e.target.value)}>
+              <option value="LORENZI">Casa Lorenzi</option>
+              <option value="VULTO">Vulto</option>
+            </Select>
+          </Field>
+        )}
         <Field label="Nome da loja" className="span-2">
           <input className="input" value={form.nome} onChange={set('nome')} placeholder="Ex.: Jardins" required />
         </Field>

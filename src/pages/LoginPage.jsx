@@ -5,6 +5,8 @@ import { CheckboxLine } from '../components/auth/CheckboxLine'
 import { LayoutAcesso } from '../components/auth/LayoutAcesso'
 import { FormError } from '../components/ui/FormError'
 import { MODO_DEMO } from '../config/env'
+import { inicioDaMarca, loginDaMarca } from '../data/marcas'
+import { useMarca } from '../hooks/useMarca'
 import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
 import { useSession } from '../hooks/useSession'
 import { destinoPara } from '../utils/destinoLogin'
@@ -12,9 +14,12 @@ import { PAPEIS } from '../utils/permissions'
 
 const CONTAS_DEMO = [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }, ...PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] }))]
 
-// Login único (Iniciar sessão) para clientes e equipe
+// Login único (Iniciar sessão) para clientes e equipe, em /login (Casa Lorenzi) e /vulto/login (Vulto).
+// Os dois entram na mesma conta e levam ao mesmo lugar: cliente → /cliente, equipe → /dashboard.
 export function LoginPage() {
   const { usuario, login, logout } = useSession()
+  const marca = useMarca()
+  const vulto = marca.id === 'VULTO'
   const location = useLocation()
   // Vindo da exclusão da conta: encerra aqui a sessão (a conta já não existe) e mostra o aviso
   const contaExcluida = location.state?.contaExcluida
@@ -55,7 +60,11 @@ export function LoginPage() {
   }
 
   return (
-    <LayoutAcesso titulo="Entrar" subtitulo="Acompanhe seus pedidos, trocas e solicitações." voltar={{ to: '/', label: 'Página inicial' }}>
+    <LayoutAcesso
+      titulo="Entrar"
+      subtitulo={vulto ? 'Seus pedidos, trocas e pontos Vulto+.' : 'Acompanhe seus pedidos, trocas e solicitações.'}
+      voltar={{ to: inicioDaMarca(marca), label: 'Página inicial' }}
+    >
       {contaExcluida && (
         <p className="login__sucesso" role="status">
           Sua conta foi excluída e seus dados pessoais foram apagados.
@@ -82,7 +91,7 @@ export function LoginPage() {
         <AuthField label="E-mail ou CPF" type="text" value={email} onChange={setEmail} placeholder="seu@email.com ou 000.000.000-00" autoComplete="username" required />
         <AuthField label="Senha" type="password" value={senha} onChange={setSenha} placeholder="Digite sua senha" autoComplete="current-password" required />
 
-        <Link to="/login/esqueci-senha" className="login__esqueci">
+        <Link to={loginDaMarca(marca, '/esqueci-senha')} className="login__esqueci">
           Esqueceu a senha?
         </Link>
 
@@ -99,10 +108,12 @@ export function LoginPage() {
 
       <p className="acesso__alternativa">
         Ainda não tem conta?{' '}
-        <Link to="/login/criar-conta" state={location.state}>
+        <Link to={loginDaMarca(marca, '/criar-conta')} state={location.state}>
           Criar conta
         </Link>
       </p>
+
+      {vulto && <p className="acesso__equipe">Equipe da Vulto ou da Casa Lorenzi: entre com o seu e-mail. Você vai para o mesmo painel de gestão das duas marcas.</p>}
 
       {MODO_DEMO && (
         <details className="login__demo">

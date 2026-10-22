@@ -7,6 +7,7 @@ import { useAsync } from '../../../hooks/useAsync'
 import { freteService } from '../../../services/freteService'
 import { formatCurrency } from '../../../utils/format'
 import { formatarCep } from '../../../utils/frete'
+import { useMarcaPainel } from '../../../hooks/useMarcaPainel'
 
 const TIPOS = [
   ['padrao', 'Padrão'],
@@ -25,6 +26,8 @@ export function FretePage() {
 
 // Edita uma cópia; "Salvar" manda tudo de uma vez e o servidor registra no log só o que mudou
 function ConfigFrete({ inicial, onSaved }) {
+  // O frete vale para o site das duas marcas: só o Administrador do grupo altera (os demais consultam)
+  const { grupo } = useMarcaPainel()
   const [config, setConfig] = useState(() => structuredClone(inicial))
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
@@ -58,6 +61,7 @@ function ConfigFrete({ inicial, onSaved }) {
         <div>
           <h2 className="card__title">Tabela de frete</h2>
           <p className="card__subtitle">Por região do CEP: quanto o cliente paga, quanto o envio custa para a loja e o prazo. O cliente nunca vê o custo.</p>
+          {!grupo && <p className="card__subtitle">Somente leitura: o frete vale para o site das duas marcas e só o Administrador do grupo altera.</p>}
         </div>
       </div>
       <div className="card__body stack">
@@ -149,10 +153,10 @@ function ConfigFrete({ inicial, onSaved }) {
               Frete salvo. A alteração está no log.
             </span>
           )}
-          <button type="button" className="btn btn-secondary" onClick={() => setConfig(structuredClone(inicial))} disabled={!alterado || saving}>
+          <button type="button" className="btn btn-secondary" onClick={() => setConfig(structuredClone(inicial))} disabled={!alterado || saving || !grupo}>
             Descartar alterações
           </button>
-          <button type="submit" className="btn btn-primary" disabled={!alterado || saving}>
+          <button type="submit" className="btn btn-primary" disabled={!alterado || saving || !grupo}>
             {saving ? 'Salvando…' : 'Salvar frete'}
           </button>
         </div>

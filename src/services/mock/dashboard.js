@@ -1,6 +1,6 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
 import { atendimentoView } from './atendimento'
-import { clientePorId, db, estoqueView, movimentacaoView, respond, usuarioDaSessao } from './db'
+import { clientePorId, db, estoqueView, lojaNaMarca, movimentacaoView, noEscopo, respond, usuarioDaSessao } from './db'
 
 const DIA = 86400000
 
@@ -9,7 +9,8 @@ export function obterResumo({ lojaId } = {}) {
   // Lojista vê sempre a própria loja, qualquer que seja o filtro (mesma regra da API)
   const sessao = usuarioDaSessao()
   if (sessao?.papel === 'LOJISTA' && sessao.lojaId) lojaId = sessao.lojaId
-  const daLoja = (id) => !lojaId || id === Number(lojaId)
+  // Só as lojas da marca de quem vê (o grupo: as duas ou a do seletor)
+  const daLoja = (id) => (!lojaId || id === Number(lojaId)) && lojaNaMarca(id)
   const estoques = db.estoques.filter((e) => daLoja(e.lojaId)).map(estoqueView)
   const ativos = estoques.filter((e) => e.produto.ativo)
   const atendimentosAbertos = db.atendimentos.filter((a) => ATENDIMENTO_ABERTO.includes(a.status) && daLoja(a.lojaId))
@@ -19,7 +20,7 @@ export function obterResumo({ lojaId } = {}) {
 
   const indicadores = {
     estoqueTotal: ativos.reduce((sum, e) => sum + e.quantidade, 0),
-    produtosAtivos: db.produtos.filter((p) => p.ativo).length,
+    produtosAtivos: db.produtos.filter((p) => p.ativo && noEscopo(p.marca)).length,
     variacoesAtivas: new Set(ativos.map((e) => e.variacaoId)).size,
     itensEstoqueBaixo: ativos.filter((e) => e.status === 'BAIXO').length,
     itensSemEstoque: ativos.filter((e) => e.status === 'SEM_ESTOQUE').length,

@@ -1,7 +1,9 @@
 import { ArrowLeft } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BrandMark } from '../BrandMark'
+import { inicioDaMarca, loginDaMarca } from '../../data/marcas'
+import { useMarca } from '../../hooks/useMarca'
+import { VideoLoop } from '../ui/VideoLoop'
 import agua1000 from '../../assets/login/agua-1000.jpg'
 import agua1800 from '../../assets/login/agua-1800.jpg'
 
@@ -19,24 +21,45 @@ function useTelaGrande() {
   return grande
 }
 
-// Telas de acesso (entrar, criar conta, nova senha): foto de água à esquerda e
-// formulário no branco à direita. No celular só o lado branco.
-export function LayoutAcesso({ titulo, subtitulo, voltar = { to: '/login', label: 'Iniciar sessão' }, children }) {
-  const telaGrande = useTelaGrande()
+// Painel esquerdo do acesso da Vulto: preto, com a manchete e o traço laranja da vitrine
+function PainelVulto() {
   return (
-    <main className="acesso">
+    <div className="acesso__vulto">
+      <VideoLoop nome="vulto" />
+      <p className="acesso__vulto-selo">Vulto+ · site · app · lojas</p>
+      <p className="acesso__vulto-titulo">
+        Uma conta.
+        <br />
+        Duas marcas.
+      </p>
+      <p className="acesso__vulto-texto">A mesma conta vale na Vulto e na Casa Lorenzi, com os mesmos pontos Vulto+.</p>
+    </div>
+  )
+}
+
+// Telas de acesso (entrar, criar conta, nova senha): painel à esquerda e formulário no branco à
+// direita. No celular só o lado branco. Casa Lorenzi (/login): foto de água e o monograma; Vulto
+// (/vulto/login): painel preto e a identidade dela. A conta e o destino depois de entrar são os mesmos.
+export function LayoutAcesso({ titulo, subtitulo, voltar, children }) {
+  const telaGrande = useTelaGrande()
+  const marca = useMarca()
+  const vulto = marca.id === 'VULTO'
+  const destinoVoltar = voltar ?? { to: loginDaMarca(marca), label: 'Iniciar sessão' }
+  return (
+    <main className={`acesso ${vulto ? 'acesso--vulto' : ''}`}>
       <div className="acesso__cor">
-        {telaGrande && (
+        {vulto && telaGrande && <PainelVulto />}
+        {!vulto && telaGrande && (
           <img className="acesso__foto" src={agua1000} srcSet={`${agua1000} 1000w, ${agua1800} 1800w`} sizes="50vw" alt="" decoding="async" />
         )}
       </div>
       <section className="acesso__lado">
-        <Link to={voltar.to} className="acesso__voltar">
-          <ArrowLeft size={14} aria-hidden="true" /> {voltar.label}
+        <Link to={destinoVoltar.to} className="acesso__voltar">
+          <ArrowLeft size={14} aria-hidden="true" /> {destinoVoltar.label}
         </Link>
         <div className="acesso__conteudo">
-          <Link to="/" className="acesso__marca" aria-label="Casa Lorenzi — início">
-            <BrandMark size="sm" />
+          <Link to={inicioDaMarca(marca)} className="acesso__marca" aria-label={`${marca.nome} — início`}>
+            <img src={marca.logo} alt={marca.nome} className={`acesso__logo acesso__logo--${marca.id.toLowerCase()}`} />
           </Link>
           <header className="acesso__cabecalho">
             <h1>{titulo}</h1>

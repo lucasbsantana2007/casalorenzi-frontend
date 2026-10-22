@@ -3,7 +3,7 @@ import { useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { Select } from '../components/ui/Select'
-import { imagemDoProduto } from '../data/imagensProdutos'
+import { fotosDoProduto } from '../data/imagensProdutos'
 import { caminhoDoProduto, inicioDaMarca, marcaDoProduto } from '../data/marcas'
 import { useMarca } from '../hooks/useMarca'
 import { useAsync } from '../hooks/useAsync'
@@ -78,6 +78,28 @@ function useReservarSecoesAbertas(ref, conteudo) {
   }, [ref, conteudo])
 }
 
+// Foto da peça; com mais de uma (Vulto: frente, costas e no corpo), miniaturas para trocar
+function GaleriaDaPeca({ fotos, nome }) {
+  const [atual, setAtual] = useState(0)
+  const foto = fotos[atual] ?? fotos[0]
+  const vertical = foto.vista === 'No corpo'
+  return (
+    <div className="pdp__media">
+      <img src={foto.url} alt={`${nome}, ${foto.vista.toLowerCase()}`} className={vertical ? 'pdp__foto-modelo' : undefined} />
+      {fotos.length > 1 && (
+        <div className="pdp__vistas" role="group" aria-label="Fotos da peça">
+          {fotos.map(({ url, vista }, i) => (
+            <button key={url} type="button" className={i === atual ? 'is-ativa' : undefined} aria-pressed={i === atual} onClick={() => setAtual(i)}>
+              <img src={url} alt="" />
+              <span className="sr-only">{vista}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function ProdutoPage() {
   const { id } = useParams()
   const state = useAsync(() => produtosService.obter(id), [id])
@@ -148,9 +170,7 @@ function Produto({ produto }) {
 
   return (
     <main className="pdp">
-      <div className="pdp__media">
-        <img src={imagemDoProduto(produto, cor)} alt={`${produto.nome}, cor ${cor}`} />
-      </div>
+      <GaleriaDaPeca fotos={fotosDoProduto(produto, cor)} nome={`${produto.nome}, cor ${cor}`} />
 
       <div className="pdp__info">
         <nav className="pdp__crumbs" aria-label="Você está em">

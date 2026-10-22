@@ -1,5 +1,5 @@
 import { formatCurrency } from '../../utils/format'
-import { byId, db, exigirAdmin, fail, matches, mudancas, nextId, registrarLog, respond, salvar, usuarioDaSessao } from './db'
+import { byId, db, escopoMarca, exigirAdmin, fail, matches, mudancas, nextId, noEscopo, registrarLog, respond, salvar, usuarioDaSessao } from './db'
 import { erroDoAnexo } from './pedidos'
 
 // O preço de custo só vai para o Administrador; a vitrine usa a mesma listagem
@@ -16,8 +16,11 @@ function produtoView(produto) {
 }
 
 // marca: a vitrine de cada marca pede a sua; sem ela, o visitante recebe a Casa Lorenzi e a equipe, as duas
+// Vitrine: a marca pedida (sem ela, a Casa Lorenzi). Equipe: só a marca dela (o grupo: as duas ou a do seletor)
 export function listar({ busca, categoria, ativo, marca } = {}) {
-  const daMarca = marca || (usuarioDaSessao() ? null : 'LORENZI')
+  const escopo = usuarioDaSessao() ? escopoMarca() : null
+  if (escopo && marca && marca !== escopo) return respond([])
+  const daMarca = escopo || marca || (usuarioDaSessao() ? null : 'LORENZI')
   const lista = db.produtos
     .filter((p) => !p.removidoEm)
     .filter((p) => !daMarca || (p.marca ?? 'LORENZI') === daMarca)
@@ -31,17 +34,18 @@ export function listar({ busca, categoria, ativo, marca } = {}) {
 
 export function obter(id) {
   const produto = byId(db.produtos, id)
-  return produto && !produto.removidoEm ? respond(produtoView(produto)) : fail('Produto não encontrado.', 404)
+  return produto && !produto.removidoEm && noEscopo(produto.marca) ? respond(produtoView(produto)) : fail('Produto não encontrado.', 404)
 }
 
 // Coleção (página da vitrine) e estação: mesmas regras da API
 export const GENEROS = ['Masculino', 'Feminino']
 export const ESTACOES = ['Inverno', 'Verão', 'Atemporal']
 
-function validar({ nome, categoria, precoBase, genero, estacao, variacoes = [] }, produtoId) {
+function validar({ nome, categoria, precoBase, genero, estacao, variacoes = [] }, produtoId, marca = 'LORENZI') {
   if (!nome?.trim()) return 'Informe o nome do produto.'
   if (!categoria) return 'Selecione a categoria.'
-  if (!produtoId && !genero) return 'Selecione a coleção do produto: Masculino ou Feminino.'
+  // A Vulto não separa a vitrine por coleção (gênero)
+  if (!produtoId && !genero && marca === 'LORENZI') return 'Selecione a coleção do produto: Masculino ou Feminino.'
   if (genero && !GENEROS.includes(genero)) return 'Coleção inválida. Use Masculino ou Feminino.'
   if (estacao && !ESTACOES.includes(estacao)) return 'Estação inválida. Use Inverno, Verão ou Atemporal.'
   if (!(Number(precoBase) > 0)) return 'Informe um preço base válido.'
@@ -120,11 +124,14 @@ function comoAdmin(acao) {
 
 export function criar(dados) {
   return comoAdmin(() => {
-    const erro = validar(dados)
+    // A peça é da marca do Administrador; o do grupo escolhe (padrão Casa Lorenzi)
+    const autor = usuarioDaSessao()?.marca ?? 'LORENZI'
+    const marca = autor === 'GRUPO' ? (dados.marca ?? 'LORENZI') : autor
+    const erro = validar(dados, undefined, marca)
     if (erro) return fail(erro, 422)
     const produto = {
       id: nextId(db.produtos),
-      marca: 'LORENZI',
+      marca,
       nome: dados.nome.trim(),
       categoria: dados.categoria,
       genero: dados.genero,
@@ -148,8 +155,8 @@ export function criar(dados) {
 export function atualizar(id, dados) {
   return comoAdmin(() => {
     const produto = byId(db.produtos, id)
-    if (!produto || produto.removidoEm) return fail('Produto não encontrado.', 404)
-    const erro = validar(dados, produto.id)
+    if (!produto || produto.removidoEm || !noEscopo(produto.marca)) return fail('Produto não encontrado.', 404)
+    const erro = validar(dados, produto.id, produto.marca)
     if (erro) return fail(erro, 422)
     // Coleção e estação nunca ficam vazias: sem elas o produto sairia da vitrine
     const campos = {
@@ -183,7 +190,7 @@ export function atualizar(id, dados) {
 export function remover(id) {
   return comoAdmin(() => {
     const produto = byId(db.produtos, id)
-    if (!produto || produto.removidoEm) return fail('Produto não encontrado.', 404)
+    if (!produto || produto.removidoEm || !noEscopo(produto.marca)) return fail('Produto não encontrado.', 404)
     const variacoes = new Set(db.variacoes.filter((v) => v.produtoId === produto.id).map((v) => v.id))
     const pedidos = db.pedidos.filter((p) => p.status === 'PROCESSANDO' && p.itens.some((i) => variacoes.has(i.variacaoId))).length
     const transferencias = db.transferencias.filter((t) => ['SOLICITADA', 'EM_TRANSITO'].includes(t.status) && variacoes.has(t.variacaoId)).length

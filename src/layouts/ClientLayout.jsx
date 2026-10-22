@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { StoreFooter } from '../components/home/StoreFooter'
 import { StoreHeader } from '../components/home/StoreHeader'
+import { GRUPO } from '../data/marcas'
 import { useSession } from '../hooks/useSession'
 
 const LINKS = [
@@ -13,7 +14,8 @@ const LINKS = [
   { to: '/cliente/conta', label: 'Configurações' },
 ]
 
-// Área do cliente: mesmo cabeçalho e rodapé da loja, com navegação própria abaixo.
+// Área do cliente: a mesma conta nas duas marcas. Visual neutro (grafite e cinza), só com as duas logos
+// no cabeçalho e no rodapé, e a navegação própria abaixo.
 export function ClientLayout() {
   const { usuario, isCliente } = useSession()
   const location = useLocation()
@@ -22,11 +24,15 @@ export function ClientLayout() {
   const from = `${location.pathname}${location.search}`
   const redirectState = useMemo(() => ({ from }), [from])
 
-  if (!isCliente) return <Navigate to="/login" replace state={redirectState} />
+  // Vulto+ é o programa da Vulto: sem sessão, os pontos pedem o login com a identidade dela
+  // (depois de entrar, volta para /cliente/pontos)
+  const login = location.pathname.startsWith('/cliente/pontos') ? '/vulto/login' : '/login'
+  if (!isCliente) return <Navigate to={login} replace state={redirectState} />
 
   return (
-    <div className="store store--cliente">
-      <StoreHeader />
+    <div className="store store--cliente store--grupo">
+      <StoreHeader marca={GRUPO} />
+
 
       <div className="client-bar">
         <nav className="client-bar__nav" aria-label="Área do cliente">
@@ -48,7 +54,7 @@ export function ClientLayout() {
         <Outlet />
       </main>
 
-      <StoreFooter />
+      <StoreFooter marca={GRUPO} />
     </div>
   )
 }

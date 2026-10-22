@@ -4,7 +4,7 @@ import { DETALHES_PRODUTOS } from './detalhesProdutos'
 import { FRETE_INICIAL } from './frete'
 import { buildEstoque, buildVariacoes } from './estoque'
 import { CLIENTES, USUARIOS } from './pessoas'
-import { buildVulto, CATEGORIAS_VULTO, CD_VULTO, LOJAS_VULTO, PRODUTOS_VULTO } from './vulto'
+import { buildOperacaoVulto, buildVulto, CATEGORIAS_VULTO, CD_VULTO, LOJAS_VULTO, PRODUTOS_VULTO } from './vulto'
 
 // Monta o estado inicial completo dos dados de demonstração.
 export function createSeed() {
@@ -15,6 +15,18 @@ export function createSeed() {
   // Vulto: lojas, CD, catálogo e o saldo migrado, com ids depois dos da Casa Lorenzi
   const ultimo = (lista) => lista.reduce((max, item) => Math.max(max, item.id), 0) + 1
   const vulto = buildVulto({ primeiraVariacao: ultimo(variacoes), primeiroEstoque: ultimo(estoques), primeiraMovimentacao: ultimo(movimentacoes) })
+  const operacao = buildOperacaoVulto({
+    variacoes: vulto.variacoes,
+    estoques: vulto.estoques,
+    movimentacoes: vulto.movimentacoes,
+    ids: {
+      pedido: ultimo(pedidos),
+      movimentacao: ultimo([...movimentacoes, ...vulto.movimentacoes]),
+      atendimento: ultimo(atendimentos),
+      mensagem: ultimo(mensagens),
+      transferencia: ultimo(transferencias),
+    },
+  })
 
   return {
     lojas: [
@@ -49,10 +61,10 @@ export function createSeed() {
     clientes: CLIENTES.map((c) => ({ ...c, senhaHash: null })),
     estoques: [...estoques, ...vulto.estoques],
     movimentacoes: [...movimentacoes, ...vulto.movimentacoes],
-    transferencias,
-    pedidos,
+    transferencias: [...transferencias, ...operacao.transferencias],
+    pedidos: [...pedidos, ...operacao.pedidos],
     tiposSolicitacao: TIPOS_SOLICITACAO,
-    atendimentos,
-    mensagens,
+    atendimentos: [...atendimentos, ...operacao.atendimentos],
+    mensagens: [...mensagens, ...operacao.mensagens],
   }
 }

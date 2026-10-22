@@ -3,23 +3,26 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSacola } from '../../hooks/useSacola'
 import { useSession } from '../../hooks/useSession'
-import { inicioDaMarca } from '../../data/marcas'
+import { inicioDaMarca, loginDaMarca } from '../../data/marcas'
 import { useMarca } from '../../hooks/useMarca'
+import { LogosDoGrupo } from '../LogosDoGrupo'
 import { BuscaDaLoja } from './BuscaDaLoja'
 
 // Boneco do cabeçalho: abre o login; com sessão, leva cada um para a sua área
-function itemDaConta({ isCliente, isEquipe }) {
+function itemDaConta({ isCliente, isEquipe }, marca) {
   if (isCliente) return { to: '/cliente', label: 'Minha conta' }
   if (isEquipe) return { to: '/dashboard', label: 'Painel' }
-  return { to: '/login', label: 'Iniciar sessão' }
+  return { to: loginDaMarca(marca), label: 'Iniciar sessão' }
 }
 
 // Cabeçalho da loja: fica no topo da página e sai de vista ao rolar (não acompanha a rolagem).
 // `overlay` (início): por cima das fotos, com texto claro. Logo e menu são os da marca da vitrine aberta.
-export function StoreHeader({ overlay = false }) {
+// marca: força a identidade (área do cliente: GRUPO, com as duas logos)
+export function StoreHeader({ overlay = false, marca: marcaFixa }) {
   const sessao = useSession()
-  const marca = useMarca()
-  const conta = itemDaConta(sessao)
+  const marcaDaRota = useMarca()
+  const marca = marcaFixa ?? marcaDaRota
+  const conta = itemDaConta(sessao, marca)
   const { quantidadeTotal, abrir: abrirSacola } = useSacola()
   const [menuAberto, setMenuAberto] = useState(false)
   const fechar = () => setMenuAberto(false)
@@ -28,7 +31,11 @@ export function StoreHeader({ overlay = false }) {
   return (
     <header className={`store-header ${overlay ? 'store-header--overlay' : ''} ${transparente ? 'is-transparent' : ''} ${menuAberto ? 'is-open' : ''}`}>
       <Link to={inicioDaMarca(marca)} className="store-header__brand" aria-label={`${marca.nome} — início`} onClick={fechar}>
-        <img src={transparente ? marca.logoBranca : marca.logo} alt={marca.nome} className="store-header__logo" />
+        {marca.id === 'GRUPO' ? (
+          <LogosDoGrupo claro={transparente} className="store-header__logos" />
+        ) : (
+          <img src={transparente ? marca.logoBranca : marca.logo} alt={marca.nome} className="store-header__logo" />
+        )}
       </Link>
 
       <nav className="store-header__nav" aria-label="Navegação principal">

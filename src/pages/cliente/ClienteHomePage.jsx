@@ -26,7 +26,7 @@ export function ClienteHomePage() {
   return (
     <>
       <section className="client-hero">
-        <p className="eyebrow">Atendimento Casa Lorenzi</p>
+        <p className="eyebrow">Sua conta · Casa Lorenzi e Vulto</p>
         <h1 className="client-hero__title">{perfil ? `Olá, ${perfil.nome.split(' ')[0]}.` : 'Olá.'}</h1>
         <p className="client-hero__text">Como podemos ajudar hoje? Acompanhe seus pedidos e fale com a nossa equipe em um só lugar.</p>
       </section>

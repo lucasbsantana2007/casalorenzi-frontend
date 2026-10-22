@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 'motion/react'
 import { GRID_BRASIL } from '../../data/mapaBrasil'
-import { COORDENADAS_LOJAS, LOJA_MATRIZ_ID } from '../../data/coordenadasLojas'
+import { coordenadasDaLoja, ehMatriz, nomeCurto } from '../../data/coordenadasLojas'
 
 // Mapa de pontos do Brasil com as lojas. Linhas animadas saem da matriz para cada unidade.
 // Adaptado do componente WorldMap (dotted-map + framer-motion) para o padrão do projeto:
@@ -103,11 +103,11 @@ export function MapaLojas({ lojas, ativa, onAtivar, onSelecionar }) {
   const noMapa = useMemo(
     () =>
       lojas
-        .filter((loja) => COORDENADAS_LOJAS[loja.id])
-        .map((loja) => ({ ...loja, ...COORDENADAS_LOJAS[loja.id], posicao: projetar(COORDENADAS_LOJAS[loja.id]) })),
+        .filter((loja) => coordenadasDaLoja(loja))
+        .map((loja) => ({ ...loja, ...coordenadasDaLoja(loja), posicao: projetar(coordenadasDaLoja(loja)) })),
     [lojas],
   )
-  const matriz = noMapa.find((loja) => loja.id === LOJA_MATRIZ_ID)
+  const matriz = noMapa.find(ehMatriz)
   const arcos = useMemo(
     () => (matriz ? noMapa.filter((loja) => loja !== matriz).map((loja) => curva(matriz.posicao, loja.posicao)) : []),
     [noMapa, matriz],
@@ -122,7 +122,7 @@ export function MapaLojas({ lojas, ativa, onAtivar, onSelecionar }) {
     return () => controle.stop()
   }, [tempo, ciclo, arcos.length, reduzirMovimento])
 
-  const descricao = `Mapa do Brasil com as lojas Casa Lorenzi: ${noMapa.map((l) => `${l.nome} (${l.cidade})`).join(', ')}`
+  const descricao = `Mapa do Brasil com as lojas: ${noMapa.map((l) => `${l.nome} (${l.cidade})`).join(', ')}`
 
   return (
     <div className="mapa-lojas">
@@ -160,7 +160,7 @@ export function MapaLojas({ lojas, ativa, onAtivar, onSelecionar }) {
               <circle className="mapa-lojas__onda" r="0.9" />
               <circle className="mapa-lojas__ponto" r="0.9" />
               <text x={direita ? 1.9 : -1.9} textAnchor={direita ? 'start' : 'end'} dominantBaseline="central">
-                {loja.nome}
+                {nomeCurto(loja)}
               </text>
             </g>
           )

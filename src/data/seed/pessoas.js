@@ -1,4 +1,5 @@
-// USUARIO { id, papel } — complementado com dados de exibição.
+// USUARIO { id, papel, marca } — complementado com dados de exibição. marca: LORENZI, VULTO ou GRUPO
+// (só Administrador: vê as duas marcas). Quem é de uma marca não vê nem altera nada da outra.
 export const USUARIOS = [
   { id: 1, nome: 'Helena Lorenzi', email: 'helena@casalorenzi.com.br', papel: 'ADMINISTRADOR', lojaId: null },
   { id: 2, nome: 'Rafael Monteiro', email: 'rafael.monteiro@casalorenzi.com.br', papel: 'LOJISTA', lojaId: 1 },
@@ -8,7 +9,11 @@ export const USUARIOS = [
   { id: 6, nome: 'Diego Almeida', email: 'diego.almeida@casalorenzi.com.br', papel: 'OPERADOR', lojaId: 1 },
   { id: 7, nome: 'Carla Nunes', email: 'carla.nunes@casalorenzi.com.br', papel: 'OPERADOR', lojaId: 3 },
   { id: 8, nome: 'Marina Duarte', email: 'marina.duarte@casalorenzi.com.br', papel: 'LOJISTA', lojaId: 5 },
-]
+  // Equipe da Vulto (lojas 6 a 9 e o CD Cajamar, id 10)
+  { id: 9, nome: 'Paula Ferraz', email: 'paula.ferraz@vulto.com.br', papel: 'ADMINISTRADOR', lojaId: null, marca: 'VULTO' },
+  { id: 10, nome: 'Lia Okada', email: 'lia.okada@vulto.com.br', papel: 'LOJISTA', lojaId: 6, marca: 'VULTO' },
+  { id: 11, nome: 'Bruno Sales', email: 'bruno.sales@vulto.com.br', papel: 'OPERADOR', lojaId: 10, marca: 'VULTO' },
+].map((u) => ({ ...u, marca: u.marca ?? (u.papel === 'ADMINISTRADOR' ? 'GRUPO' : 'LORENZI') }))
 
 // CLIENTE: o id é o CPF (11 dígitos, sem pontuação)
 export const CLIENTES = [

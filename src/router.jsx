@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, ...publica(() => import('./pages/vulto/VultoHomePage'), 'VultoHomePage') },
           { path: 'loja', ...publica(() => import('./pages/vulto/VultoLojaPage'), 'VultoLojaPage') },
-          { path: 'lojas', ...publica(() => import('./pages/vulto/VultoLojasPage'), 'VultoLojasPage') },
+          { path: 'lojas', ...publica(() => import('./pages/LojasPage'), 'LojasPage') },
           { path: 'produto/:id', ...publica(() => import('./pages/ProdutoPage'), 'ProdutoPage') },
         ],
       },
@@ -66,6 +66,10 @@ export const router = createBrowserRouter([
   { path: '/login/esqueci-senha', ...publica(() => import('./pages/RecuperarSenhaPage'), 'EsqueciSenhaPage') },
   { path: '/login/nova-senha', ...publica(() => import('./pages/RecuperarSenhaPage'), 'NovaSenhaPage') },
   { path: '/login/equipe', element: <Navigate to="/login" replace /> },
+  // Acesso com a identidade da Vulto: mesma conta, mesmas páginas e o mesmo destino depois de entrar
+  { path: '/vulto/login', ...publica(() => import('./pages/LoginPage'), 'LoginPage') },
+  { path: '/vulto/login/criar-conta', ...publica(() => import('./pages/CriarContaPage'), 'CriarContaPage') },
+  { path: '/vulto/login/esqueci-senha', ...publica(() => import('./pages/RecuperarSenhaPage'), 'EsqueciSenhaPage') },
   {
     // Área do cliente: perfil, pedidos e solicitações (exige login de cliente)
     path: '/cliente',

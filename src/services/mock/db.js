@@ -1,13 +1,14 @@
 import { createSeed } from '../../data/seed'
 import { ApiError } from '../api'
 import { getUsuarioSalvo } from '../authStorage'
+import { marcaDoEscopo, naMarca } from '../marcaPainel'
 import { statusEstoque } from '../../utils/estoque'
 
 // Banco de demonstração usado enquanto a API real não está disponível.
 // Fica salvo no navegador (localStorage): pedidos, PINs, movimentações etc. sobrevivem a recarregar
 // a página e valem em todas as abas. Mudar VERSAO descarta os dados salvos e recria a partir do seed.
 const CHAVE = 'casalorenzi.demo-db'
-const VERSAO = 8
+const VERSAO = 11
 
 function carregar() {
   try {
@@ -142,7 +143,7 @@ export function anexoView(id) {
 export function variacaoView(variacaoId) {
   const { precoCusto: _precoCusto, ...variacao } = byId(db.variacoes, variacaoId)
   const produto = byId(db.produtos, variacao.produtoId)
-  return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo, imagemUrl: produto.imagemUrl ?? null, marca: produto.marca ?? 'LORENZI' } }
+  return { ...variacao, produto: { id: produto.id, nome: produto.nome, categoria: produto.categoria, precoBase: produto.precoBase, ativo: produto.ativo, imagemUrl: produto.imagemUrl ?? null, marca: produto.marca ?? 'LORENZI', codigoModelo: produto.codigoModelo ?? null } }
 }
 
 // Produto removido do catálogo (some da loja, do painel e do estoque; o histórico continua)
@@ -199,3 +200,11 @@ export function aplicarMovimentacao({ estoqueId, tipo, quantidade, origem, usuar
 export function estoquePor(lojaId, variacaoId) {
   return db.estoques.find((e) => e.lojaId === Number(lojaId) && e.variacaoId === Number(variacaoId))
 }
+
+// ---------- Marca da equipe (como na API) ----------
+// Quem é de uma marca não vê nem altera nada da outra; o Administrador do grupo vê as duas ou a do
+// seletor do painel (src/services/marcaPainel.js).
+export const escopoMarca = () => marcaDoEscopo(usuarioDaSessao())
+export const marcaDaLoja = (lojaId) => byId(db.lojas, lojaId)?.marca ?? 'LORENZI'
+export const lojaNaMarca = (lojaId) => naMarca(escopoMarca(), marcaDaLoja(lojaId))
+export const noEscopo = (marca) => naMarca(escopoMarca(), marca)

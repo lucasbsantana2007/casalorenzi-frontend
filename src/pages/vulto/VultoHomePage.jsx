@@ -1,14 +1,15 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ProductGrid } from '../../components/home/ProductGrid'
+import { VideoLoop } from '../../components/ui/VideoLoop'
 import { useAsync } from '../../hooks/useAsync'
 import { useLojas } from '../../hooks/useCadastros'
 import { produtosService } from '../../services/produtosService'
 
 const DESTAQUES = 8
 
-// Início da Vulto: a marca jovem do grupo. Manchete grande, o drop mais recente, as categorias,
-// o Vulto+ e as lojas. Mesma estrutura da Casa Lorenzi (sacola, login e checkout são os mesmos).
+// Início da Vulto, no tom da Deus Ex Machina: um vídeo de oficina e estrada no topo, muito espaço,
+// títulos discretos e o produto em primeiro plano. Sacola, login e checkout são os da Casa Lorenzi.
 export function VultoHomePage() {
   const produtos = useAsync(() => produtosService.listar({ ativo: true, marca: 'VULTO' }), []).data ?? []
   const lojas = useLojas('VULTO').filter((loja) => loja.ativa !== false)
@@ -19,33 +20,48 @@ export function VultoHomePage() {
   return (
     <main className="vulto-inicio">
       <section className="vulto-hero" aria-labelledby="vulto-hero-titulo">
-        <p className="vulto-hero__selo">Drop Inverno 26</p>
+        <VideoLoop nome="vulto" />
+        <p className="vulto-rotulo">Inverno 26</p>
         <h1 id="vulto-hero-titulo" className="vulto-hero__titulo">
-          Da rua
-          <br />
-          pro seu feed.
+          Feito na rua, no mar e na oficina.
         </h1>
-        <p className="vulto-hero__texto">Peças urbanas em drops curtos. Compre no site, no app ou nas lojas, com os mesmos pontos Vulto+.</p>
         <Link to="/vulto/loja" className="vulto-cta">
-          Ver a loja <ArrowRight size={18} aria-hidden="true" />
+          Ver a coleção <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
         </Link>
       </section>
 
       {drop.length > 0 && (
         <section className="store-section">
           <div className="store-section__head">
-            <h2 className="store-heading">Acabou de chegar</h2>
+            <h2 className="store-heading">Novidades</h2>
             <Link to="/vulto/loja" className="store-heading-link">
               Ver tudo
             </Link>
           </div>
-          <ProductGrid produtos={drop} colunas={4} />
+          <ProductGrid produtos={drop.slice(0, 4)} colunas={4} />
         </section>
+      )}
+
+      {drop.length > 4 && (
+        <>
+          {/* Faixa fina e larga entre as duas linhas de peças, com o mesmo vídeo do topo */}
+          <section className="vulto-faixa" aria-label="Lojas Vulto">
+            <VideoLoop nome="vulto" />
+            <p className="vulto-rotulo">Pinheiros · Eldorado · Savassi · Batel</p>
+            <p className="vulto-faixa__texto">Nas lojas, no site e no app, com os mesmos pontos Vulto+.</p>
+            <Link to="/vulto/lojas" className="vulto-link">
+              Ver lojas <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
+            </Link>
+          </section>
+          <section className="store-section vulto-segunda-linha" aria-label="Mais novidades">
+            <ProductGrid produtos={drop.slice(4)} colunas={4} />
+          </section>
+        </>
       )}
 
       {categorias.length > 0 && (
         <section className="store-section vulto-categorias" aria-labelledby="vulto-categorias-titulo">
-          <h2 id="vulto-categorias-titulo" className="store-heading">
+          <h2 id="vulto-categorias-titulo" className="vulto-rotulo">
             Categorias
           </h2>
           <ul>
@@ -59,22 +75,18 @@ export function VultoHomePage() {
       )}
 
       <section className="vulto-mais" aria-labelledby="vulto-mais-titulo">
-        <div>
-          <h2 id="vulto-mais-titulo">Vulto+</h2>
-          <p>
-            R$ 1 = 1 ponto nas lojas e 2 no site e no app. A cada 100 pontos, R$ 5 de desconto. Vale nas compras da Vulto e da Casa
-            Lorenzi.
-          </p>
-        </div>
-        <Link to="/cliente/pontos" className="vulto-cta vulto-cta--claro">
-          Meus pontos <ArrowRight size={18} aria-hidden="true" />
+        <p className="vulto-rotulo">Programa de pontos</p>
+        <h2 id="vulto-mais-titulo">Vulto+</h2>
+        <p>R$ 1 vira 1 ponto nas lojas e 2 no site e no app. A cada 100 pontos, R$ 5 de desconto, na Vulto e na Casa Lorenzi.</p>
+        <Link to="/cliente/pontos" className="vulto-link">
+          Meus pontos <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
         </Link>
       </section>
 
       {lojas.length > 0 && (
         <section className="store-section vulto-onde" aria-labelledby="vulto-onde-titulo">
           <div className="store-section__head">
-            <h2 id="vulto-onde-titulo" className="store-heading">
+            <h2 id="vulto-onde-titulo" className="vulto-rotulo">
               Onde estamos
             </h2>
             <Link to="/vulto/lojas" className="store-heading-link">
@@ -84,8 +96,11 @@ export function VultoHomePage() {
           <ul className="vulto-onde__lista">
             {lojas.map((loja) => (
               <li key={loja.id}>
-                <strong>{loja.nome.replace(/^Vulto\s+/, '')}</strong>
-                <span>{loja.cidade}</span>
+                {/* Abre a página Lojas já com esta loja aberta */}
+                <Link to={`/vulto/lojas?loja=${loja.id}`}>
+                  <strong>{loja.nome.replace(/^Vulto\s+/, '')}</strong>
+                  <span>{loja.cidade}</span>
+                </Link>
               </li>
             ))}
           </ul>

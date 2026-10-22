@@ -1,5 +1,6 @@
 import { API_URL } from '../config/env'
 import { getToken, limparSessao } from './authStorage'
+import { marcaEscolhida } from './marcaPainel'
 
 // Cliente HTTP central. Nenhum componente deve chamar fetch diretamente:
 // os serviços de domínio (src/services/*Service.js) usam este módulo.
@@ -35,6 +36,9 @@ async function request(path, { method = 'GET', params, body } = {}) {
   const headers = { Accept: 'application/json' }
   const token = getToken()
   if (token) headers.Authorization = `Bearer ${token}`
+  // Seletor de marca do Administrador do grupo (a API ignora para quem é de uma marca só)
+  const marca = marcaEscolhida()
+  if (token && marca) headers['X-Marca'] = marca
   if (body !== undefined) headers['Content-Type'] = 'application/json'
 
   let response

@@ -16,6 +16,8 @@ export function BarraDeMarcas() {
             to={inicioDaMarca(marca)}
             className={`barra-marcas__marca barra-marcas__marca--${marca.id.toLowerCase()}`}
             aria-current={marca.id === atual.id ? 'page' : undefined}
+            // Solta o foco ao trocar de página: a faixa volta a ficar recolhida até o mouse subir de novo
+            onClick={(e) => e.currentTarget.blur()}
           >
             <img src={marca.logoBranca} alt={marca.nome} />
           </Link>

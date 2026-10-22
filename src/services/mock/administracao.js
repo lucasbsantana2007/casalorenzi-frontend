@@ -1,5 +1,5 @@
 import { criarLinkSenha } from './auth'
-import { byId, clientePorEmail, db, exigirAdmin, fail, matches, mudancas, nextId, registrarLog, respond, usuarioDaSessao } from './db'
+import { byId, clientePorEmail, db, escopoMarca, exigirAdmin, fail, lojaNaMarca, matches, mudancas, nextId, noEscopo, registrarLog, respond, usuarioDaSessao } from './db'
 
 // Central administrativa (só Administrador): funcionários, lojas e log de ações.
 // Toda função começa conferindo o cargo de quem está logado (na API real, pelo token).
@@ -31,6 +31,7 @@ function funcionarioView(u) {
     nome: u.nome,
     email: u.email,
     papel: u.papel,
+    marca: u.marca ?? 'LORENZI',
     lojaId: u.lojaId ?? null,
     loja: loja ? { id: loja.id, nome: loja.nome } : null,
     ativo: u.ativo !== false,
@@ -38,26 +39,44 @@ function funcionarioView(u) {
   }
 }
 
-const adminsAtivos = (excetoId) => db.usuarios.filter((u) => u.papel === 'ADMINISTRADOR' && u.ativo !== false && u.id !== excetoId)
+// A rede nunca fica sem um Administrador do grupo (o que vê as duas marcas) ativo
+const adminsAtivos = (excetoId) => db.usuarios.filter((u) => u.papel === 'ADMINISTRADOR' && u.marca === 'GRUPO' && u.ativo !== false && u.id !== excetoId)
 
-function validarFuncionario({ nome, email, papel, lojaId }, id = null) {
+// Administrador de uma marca só cadastra funcionários dela; o do grupo escolhe (GRUPO só para Administrador).
+// Lojista e Operador ficam com a marca da loja em que trabalham
+function validarFuncionario({ nome, email, papel, lojaId, marca }, id = null) {
   if (!nome?.trim()) throw erro('Informe o nome.')
   const alvo = String(email ?? '').trim().toLowerCase()
   if (!EMAIL_VALIDO.test(alvo)) throw erro('Informe um e-mail válido.')
   if (db.usuarios.some((u) => u.id !== id && u.email.toLowerCase() === alvo) || clientePorEmail(alvo)) throw erro('Este e-mail já está em uso.', 409)
   if (!PAPEIS[papel]) throw erro('Selecione o cargo.')
   // Lojista e Operador trabalham numa loja; o Administrador governa a rede toda
-  if (papel !== 'ADMINISTRADOR' && !byId(db.lojas, lojaId)) throw erro('Selecione a loja deste funcionário.')
-  return { nome: nome.trim(), email: alvo, papel, lojaId: papel === 'ADMINISTRADOR' ? null : Number(lojaId) }
+  const escopo = marcaDoAutor()
+  const loja = byId(db.lojas, lojaId)
+  if (papel !== 'ADMINISTRADOR' && (!loja || !lojaNaMarca(loja.id))) throw erro('Selecione a loja deste funcionário.')
+  const marcaFinal = papel === 'ADMINISTRADOR' ? (escopo ?? marca ?? 'GRUPO') : (loja.marca ?? 'LORENZI')
+  if (!['LORENZI', 'VULTO', 'GRUPO'].includes(marcaFinal)) throw erro('Selecione a marca: Casa Lorenzi, Vulto ou as duas (grupo).')
+  return { nome: nome.trim(), email: alvo, papel, lojaId: papel === 'ADMINISTRADOR' ? null : Number(lojaId), marca: marcaFinal }
 }
 
-const ROTULOS_FUNCIONARIO = { nome: 'Nome', email: 'E-mail', papel: 'Cargo', lojaId: 'Loja' }
-const FORMATOS_FUNCIONARIO = { papel: (v) => PAPEIS[v] ?? '—', lojaId: (v) => (v ? nomeDaLoja(v) : '—') }
+const NOMES_MARCAS = { LORENZI: 'Casa Lorenzi', VULTO: 'Vulto', GRUPO: 'Grupo (as duas marcas)' }
+const ROTULOS_FUNCIONARIO = { nome: 'Nome', email: 'E-mail', papel: 'Cargo', lojaId: 'Loja', marca: 'Marca' }
+const FORMATOS_FUNCIONARIO = { papel: (v) => PAPEIS[v] ?? '—', lojaId: (v) => (v ? nomeDaLoja(v) : '—'), marca: (v) => NOMES_MARCAS[v] ?? '—' }
+
+// Marca do Administrador logado: a dele; null = grupo (cadastra em qualquer marca, mesmo com o seletor)
+const marcaDoAutor = () => {
+  const marca = usuarioDaSessao()?.marca ?? 'LORENZI'
+  return marca === 'GRUPO' ? null : marca
+}
+
+// Funcionário fora da marca do Administrador: como se não existisse
+const funcionarioDaMarca = (u) => u && (!marcaDoAutor() || u.marca === marcaDoAutor()) && noEscopo(u.marca === 'GRUPO' ? null : u.marca)
 
 export function listarFuncionarios({ busca, papel, lojaId, status } = {}) {
   return comoAdmin(() =>
     respond(
       db.usuarios
+        .filter((u) => funcionarioDaMarca(u) && (!escopoMarca() || u.marca === escopoMarca()))
         .map(funcionarioView)
         .filter((f) => !papel || f.papel === papel)
         .filter((f) => !lojaId || f.lojaId === Number(lojaId))
@@ -96,10 +115,11 @@ export function criarFuncionario(dados) {
 export function atualizarFuncionario(id, dados) {
   return comoAdmin(() => {
     const usuario = byId(db.usuarios, id)
-    if (!usuario) throw erro('Funcionário não encontrado.', 404)
+    if (!funcionarioDaMarca(usuario)) throw erro('Funcionário não encontrado.', 404)
     const campos = validarFuncionario(dados, usuario.id)
-    if (usuario.papel === 'ADMINISTRADOR' && campos.papel !== 'ADMINISTRADOR' && usuario.ativo !== false && !adminsAtivos(usuario.id).length) {
-      throw erro('É preciso manter pelo menos um Administrador ativo.')
+    const deixaDeSerGrupo = usuario.marca === 'GRUPO' && (campos.papel !== 'ADMINISTRADOR' || campos.marca !== 'GRUPO')
+    if (deixaDeSerGrupo && usuario.ativo !== false && !adminsAtivos(usuario.id).length) {
+      throw erro('É preciso manter pelo menos um Administrador do grupo ativo.')
     }
     const alteracoes = mudancas(usuario, campos, ROTULOS_FUNCIONARIO, FORMATOS_FUNCIONARIO)
     Object.assign(usuario, campos)
@@ -114,9 +134,9 @@ export function atualizarFuncionario(id, dados) {
 export function alterarStatusFuncionario(id, { ativo }) {
   return comoAdmin(() => {
     const usuario = byId(db.usuarios, id)
-    if (!usuario) throw erro('Funcionário não encontrado.', 404)
+    if (!funcionarioDaMarca(usuario)) throw erro('Funcionário não encontrado.', 404)
     if (!ativo && usuario.id === usuarioDaSessao()?.id) throw erro('Você não pode desativar a sua própria conta.')
-    if (!ativo && usuario.papel === 'ADMINISTRADOR' && !adminsAtivos(usuario.id).length) throw erro('É preciso manter pelo menos um Administrador ativo.')
+    if (!ativo && usuario.marca === 'GRUPO' && !adminsAtivos(usuario.id).length) throw erro('É preciso manter pelo menos um Administrador do grupo ativo.')
     if ((usuario.ativo !== false) === Boolean(ativo)) return respond(funcionarioView(usuario))
     usuario.ativo = Boolean(ativo)
     registrarLog({
@@ -133,6 +153,7 @@ export function alterarStatusFuncionario(id, { ativo }) {
 export function reenviarConvite(id) {
   return comoAdmin(() => {
     const usuario = byId(db.usuarios, id)
+    if (!funcionarioDaMarca(usuario)) throw erro('Funcionário não encontrado.', 404)
     if (!usuario?.convitePendente) throw erro('Este funcionário já criou a senha.')
     const linkDemo = criarLinkSenha('usuarios', usuario.id, VALIDADE_CONVITE_MS)
     registrarLog({ area: 'FUNCIONARIOS', acao: 'REENVIOU', descricao: `Reenviou o convite de acesso para ${usuario.nome}`, referencia: { tipo: 'funcionario', id: usuario.id } })
@@ -170,15 +191,18 @@ const ROTULOS_LOJA = { nome: 'Nome', cidade: 'Cidade', uf: 'Estado', endereco: '
 const FORMATOS_LOJA = { ativa: (v) => (v ? 'Sim' : 'Não') }
 
 export function listarLojas() {
-  return comoAdmin(() => respond(db.lojas.map(lojaView).sort((a, b) => Number(b.ativa) - Number(a.ativa) || a.nome.localeCompare(b.nome))))
+  return comoAdmin(() => respond(db.lojas.filter((l) => lojaNaMarca(l.id)).map(lojaView).sort((a, b) => Number(b.ativa) - Number(a.ativa) || a.nome.localeCompare(b.nome))))
 }
 
 // Loja nova já nasce com estoque zerado de todas as variações (para receber transferências)
 export function criarLoja(dados) {
   return comoAdmin(() => {
-    const loja = { id: nextId(db.lojas), ...validarLoja(dados) }
+    // Do Administrador da marca, sempre da marca dele; o do grupo escolhe (padrão Casa Lorenzi)
+    const marca = marcaDoAutor() ?? dados.marca ?? 'LORENZI'
+    const loja = { id: nextId(db.lojas), ...validarLoja(dados), marca, tipo: 'LOJA' }
     db.lojas.push(loja)
-    db.variacoes.forEach((v) => {
+    // Estoque zerado só das peças da mesma marca
+    db.variacoes.filter((v) => (byId(db.produtos, v.produtoId)?.marca ?? 'LORENZI') === marca).forEach((v) => {
       db.estoques.push({ id: nextId(db.estoques), lojaId: loja.id, variacaoId: v.id, quantidade: 0, quantidadeMin: 2, atualizadoEm: Date.now() })
     })
     registrarLog({ area: 'LOJAS', acao: 'CADASTROU', descricao: `Cadastrou a loja ${loja.nome} (${loja.cidade}, ${loja.uf})`, referencia: { tipo: 'loja', id: loja.id } })
@@ -189,7 +213,7 @@ export function criarLoja(dados) {
 export function atualizarLoja(id, dados) {
   return comoAdmin(() => {
     const loja = byId(db.lojas, id)
-    if (!loja) throw erro('Loja não encontrada.', 404)
+    if (!loja || !lojaNaMarca(loja.id)) throw erro('Loja não encontrada.', 404)
     const campos = validarLoja(dados, loja.id)
     const alteracoes = mudancas(loja, campos, ROTULOS_LOJA, FORMATOS_LOJA)
     const nomeAnterior = loja.nome
@@ -209,6 +233,8 @@ export function listarLog({ area, usuarioId, busca } = {}) {
   return comoAdmin(() =>
     respond(
       db.logs
+        // Administrador de uma marca: só as ações da equipe dela
+        .filter((l) => !marcaDoAutor() || byId(db.usuarios, l.usuarioId)?.marca === marcaDoAutor())
         .filter((l) => !area || l.area === area)
         .filter((l) => !usuarioId || l.usuarioId === Number(usuarioId))
         .map((l) => {

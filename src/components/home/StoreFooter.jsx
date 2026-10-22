@@ -1,17 +1,20 @@
 import { Link } from 'react-router-dom'
 import { inicioDaMarca } from '../../data/marcas'
 import { useMarca } from '../../hooks/useMarca'
+import { LogosDoGrupo } from '../LogosDoGrupo'
 
 const ANO = new Date().getFullYear()
 
 // Rodapé na cor da marca da vitrine aberta (azul-marinho na Casa Lorenzi, preto na Vulto)
-export function StoreFooter() {
-  const marca = useMarca()
+// marca: força a identidade (área do cliente: GRUPO, com as duas logos)
+export function StoreFooter({ marca: marcaFixa }) {
+  const marcaDaRota = useMarca()
+  const marca = marcaFixa ?? marcaDaRota
   return (
     <footer className="store-footer">
       <div className="store-footer__top">
         <Link to={inicioDaMarca(marca)} aria-label={`${marca.nome} — início`}>
-          <img src={marca.logoBranca} alt={marca.nome} className="store-footer__logo" />
+          {marca.id === 'GRUPO' ? <LogosDoGrupo claro /> : <img src={marca.logoBranca} alt={marca.nome} className="store-footer__logo" />}
         </Link>
         <nav className="store-footer__links" aria-label="Rodapé">
           {marca.nav.map((item) => (

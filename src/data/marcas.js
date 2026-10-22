@@ -40,6 +40,21 @@ export const MARCAS = {
 
 export const LISTA_MARCAS = [MARCAS.LORENZI, MARCAS.VULTO]
 
+// Marca de cada funcionário e de cada loja no painel (GRUPO: Administrador que vê as duas)
+export const NOMES_MARCAS = { LORENZI: 'Casa Lorenzi', VULTO: 'Vulto', GRUPO: 'Grupo' }
+
+// As duas juntas: área do cliente (uma conta só nas duas marcas). Cabeçalho e rodapé com as duas logos
+export const GRUPO = {
+  id: 'GRUPO',
+  nome: 'Casa Lorenzi e Vulto',
+  base: '',
+  nav: [
+    { to: '/', label: 'Casa Lorenzi' },
+    { to: '/vulto', label: 'Vulto' },
+  ],
+  rodape: 'Uma conta, duas marcas, os mesmos pontos Vulto+',
+}
+
 const ehVulto = (caminho) => caminho === '/vulto' || caminho.startsWith('/vulto/')
 
 export const marcaDoCaminho = (caminho) => (ehVulto(caminho) ? MARCAS.VULTO : MARCAS.LORENZI)
@@ -47,6 +62,10 @@ export const marcaDoCaminho = (caminho) => (ehVulto(caminho) ? MARCAS.VULTO : MA
 export const marcaDoProduto = (produto) => MARCAS[produto?.marca] ?? MARCAS.LORENZI
 
 export const inicioDaMarca = (marca) => marca.base || '/'
+
+// Telas de acesso de cada marca (/login e /vulto/login): a mesma conta e o mesmo destino depois de
+// entrar (cliente → /cliente, equipe → /dashboard); só muda a identidade. resto: '/criar-conta' etc.
+export const loginDaMarca = (marca, resto = '') => `${marca.base}/login${resto}`
 
 // A peça abre na vitrine da marca dela
 export const caminhoDoProduto = (produto) => `${marcaDoProduto(produto).base}/produto/${produto.id ?? produto.produtoId}`
