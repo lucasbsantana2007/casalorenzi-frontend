@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { useState } from 'react'
+import { useMarcaPainel } from '../../hooks/useMarcaPainel'
 import { imagemDoProduto } from '../../data/imagensProdutos'
 import { produtosService } from '../../services/produtosService'
 import { faixaDeMargem } from '../../utils/margem'
@@ -48,7 +49,10 @@ export function ProdutoFormModal({ open, produto, categorias, onClose, onSaved }
 }
 
 function ProdutoForm({ produto, categorias, onClose, onSaved }) {
+  // Marca da peça: a do Administrador; o do grupo escolhe no cadastro (começa pela do seletor). Depois não muda
+  const painel = useMarcaPainel()
   const [form, setForm] = useState({
+    marca: produto?.marca ?? painel.marca ?? 'LORENZI',
     nome: produto?.nome ?? '',
     categoria: produto?.categoria ?? '',
     genero: produto?.genero ?? '',
@@ -85,6 +89,8 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
     setSaving(true)
     const dados = {
       ...form,
+      // A Vulto não separa a vitrine por coleção (gênero)
+      genero: form.marca === 'VULTO' ? form.genero || null : form.genero,
       precoBase: Number(form.precoBase),
       imagem: foto && { nome: foto.nome, tipo: foto.tipo, conteudoBase64: foto.conteudoBase64 },
       removerImagem: fotoRemovida && !foto,
@@ -131,14 +137,24 @@ function ProdutoForm({ produto, categorias, onClose, onSaved }) {
         <Field label="Preço de venda (R$)" hint={margemTexto(form.precoBase, variacoes)}>
           <input className="input" type="number" min="0" step="0.01" value={form.precoBase} onChange={set('precoBase')} required />
         </Field>
-        <Field label="Coleção" hint="Em qual página da loja o produto aparece.">
-          <Select className="select" value={form.genero} onChange={set('genero')} required>
-            <option value="">Selecione…</option>
-            {GENEROS.map((g) => (
-              <option key={g}>{g}</option>
-            ))}
-          </Select>
-        </Field>
+        {painel.grupo && !produto && (
+          <Field label="Marca" hint="Em qual vitrine a peça é vendida. Depois do cadastro não muda.">
+            <Select className="select" value={form.marca} onChange={set('marca')}>
+              <option value="LORENZI">Casa Lorenzi</option>
+              <option value="VULTO">Vulto</option>
+            </Select>
+          </Field>
+        )}
+        {form.marca !== 'VULTO' && (
+          <Field label="Coleção" hint="Em qual página da loja o produto aparece.">
+            <Select className="select" value={form.genero} onChange={set('genero')} required>
+              <option value="">Selecione…</option>
+              {GENEROS.map((g) => (
+                <option key={g}>{g}</option>
+              ))}
+            </Select>
+          </Field>
+        )}
         <Field label="Estação" hint="Atemporal aparece em todos os filtros de estação.">
           <Select className="select" value={form.estacao} onChange={set('estacao')}>
             {ESTACOES.map((e) => (

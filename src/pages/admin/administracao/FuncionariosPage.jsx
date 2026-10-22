@@ -9,7 +9,9 @@ import { Modal } from '../../../components/ui/Modal'
 import { SearchInput } from '../../../components/ui/SearchInput'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
+import { NOMES_MARCAS } from '../../../data/marcas'
 import { useAsync } from '../../../hooks/useAsync'
+import { useMarcaPainel } from '../../../hooks/useMarcaPainel'
 import { useLojas } from '../../../hooks/useCadastros'
 import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
 import { useSession } from '../../../hooks/useSession'
@@ -55,6 +57,11 @@ export function FuncionariosPage() {
       ),
     },
     { key: 'papel', header: 'Cargo', render: (f) => <span className="tag">{PAPEIS[f.papel]}</span> },
+    {
+      key: 'marca',
+      header: 'Marca',
+      render: (f) => <span className={`tag tag-marca tag-marca--${(f.marca ?? 'LORENZI').toLowerCase()}`}>{NOMES_MARCAS[f.marca ?? 'LORENZI']}</span>,
+    },
     { key: 'loja', header: 'Loja', render: (f) => f.loja?.nome ?? <span className="subtle">Toda a rede</span> },
     { key: 'status', header: 'Status', render: (f) => <StatusBadge type="funcionario" value={situacao(f)} /> },
     {
@@ -180,7 +187,10 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
     email: funcionario?.email ?? '',
     papel: funcionario?.papel ?? 'LOJISTA',
     lojaId: funcionario?.lojaId ?? '',
+    marca: funcionario?.marca ?? 'GRUPO',
   })
+  // Só o Administrador do grupo escolhe a marca de um Administrador; Lojista e Operador ficam com a da loja
+  const { grupo } = useMarcaPainel()
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
   const set = (campo) => (e) => setForm((f) => ({ ...f, [campo]: e.target.value }))
@@ -219,7 +229,16 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
             ))}
           </Select>
         </Field>
-        <Field label="Loja">
+        {administrador && grupo && (
+          <Field label="Marca" hint="Grupo: vê e gerencia as duas marcas. Casa Lorenzi ou Vulto: só a dela." className="span-2">
+            <Select className="select" value={form.marca} onChange={set('marca')}>
+              <option value="GRUPO">Grupo (as duas marcas)</option>
+              <option value="LORENZI">Casa Lorenzi</option>
+              <option value="VULTO">Vulto</option>
+            </Select>
+          </Field>
+        )}
+        <Field label="Loja" hint={!administrador ? 'A marca do funcionário é a da loja.' : undefined}>
           <Select className="select" value={administrador ? '' : form.lojaId} onChange={set('lojaId')} disabled={administrador} required={!administrador}>
             <option value="">{administrador ? 'Toda a rede' : 'Selecione…'}</option>
             {lojas
@@ -227,6 +246,7 @@ function FuncionarioForm({ funcionario, lojas, onClose, onSaved }) {
               .map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.nome}
+                  {grupo ? ` · ${NOMES_MARCAS[l.marca ?? 'LORENZI']}` : ''}
                 </option>
               ))}
           </Select>
