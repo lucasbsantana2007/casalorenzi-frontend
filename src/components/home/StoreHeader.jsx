@@ -4,6 +4,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { useSacola } from '../../hooks/useSacola'
 import { useSession } from '../../hooks/useSession'
 import { BrandMark } from '../BrandMark'
+import { BuscaDaLoja } from './BuscaDaLoja'
 
 const NAV = [
   { to: '/colecao/masculino', label: 'Masculino' },
@@ -44,6 +45,7 @@ export function StoreHeader({ overlay = false }) {
       </nav>
 
       <div className="store-header__actions">
+        <BuscaDaLoja />
         <Link to={conta.to} className="store-header__icon" aria-label={conta.label} title={conta.label} onClick={fechar}>
           <User size={20} strokeWidth={1.5} aria-hidden="true" />
         </Link>
