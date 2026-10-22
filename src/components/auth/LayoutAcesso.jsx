@@ -26,7 +26,7 @@ function useTelaGrande() {
 function PainelVulto() {
   return (
     <div className="acesso__vulto">
-      <VideoLoop nome="garagem" />
+      <VideoLoop nome="vulto" />
       <p className="acesso__vulto-selo">Vulto+ · site · app · lojas</p>
       <p className="acesso__vulto-titulo">
         Uma conta.
