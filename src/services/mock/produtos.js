@@ -15,9 +15,12 @@ function produtoView(produto) {
   return { ...produto, variacoes, estoqueTotal: variacoes.reduce((sum, v) => sum + v.estoqueTotal, 0) }
 }
 
-export function listar({ busca, categoria, ativo } = {}) {
+// marca: a vitrine de cada marca pede a sua; sem ela, o visitante recebe a Casa Lorenzi e a equipe, as duas
+export function listar({ busca, categoria, ativo, marca } = {}) {
+  const daMarca = marca || (usuarioDaSessao() ? null : 'LORENZI')
   const lista = db.produtos
     .filter((p) => !p.removidoEm)
+    .filter((p) => !daMarca || (p.marca ?? 'LORENZI') === daMarca)
     .map(produtoView)
     .filter((p) => !categoria || p.categoria === categoria)
     .filter((p) => ativo === undefined || ativo === '' || String(p.ativo) === String(ativo))
@@ -72,7 +75,9 @@ function salvarVariacoes(produtoId, variacoes) {
     alteracoes.push({ campo: `Nova variação ${campos.sku}`, de: '—', para: `${campos.cor} · ${campos.tamanho} · custo ${formatCurrency(campos.precoCusto)}` })
     const variacao = { id: nextId(db.variacoes), produtoId, ...campos }
     db.variacoes.push(variacao)
-    db.lojas.forEach((loja) => {
+    // Estoque zerado só nas lojas da marca do produto (como na API)
+    const marca = byId(db.produtos, produtoId)?.marca ?? 'LORENZI'
+    db.lojas.filter((loja) => (loja.marca ?? 'LORENZI') === marca).forEach((loja) => {
       db.estoques.push({ id: nextId(db.estoques), lojaId: loja.id, variacaoId: variacao.id, quantidade: 0, quantidadeMin: 2, atualizadoEm: Date.now() })
     })
   })
@@ -119,6 +124,7 @@ export function criar(dados) {
     if (erro) return fail(erro, 422)
     const produto = {
       id: nextId(db.produtos),
+      marca: 'LORENZI',
       nome: dados.nome.trim(),
       categoria: dados.categoria,
       genero: dados.genero,

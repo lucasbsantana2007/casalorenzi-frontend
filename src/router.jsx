@@ -38,7 +38,7 @@ const publica = (carregar, nome) => ({
 
 export const router = createBrowserRouter([
   {
-    // Loja pública: início, coleções e lojas
+    // Loja pública: início, coleções e lojas da Casa Lorenzi (/) e da Vulto (/vulto)
     ...publica(() => import('./layouts/StoreLayout'), 'StoreLayout'),
     children: [
       { index: true, ...publica(() => import('./pages/HomePage'), 'HomePage') },
@@ -48,6 +48,16 @@ export const router = createBrowserRouter([
       { path: 'produto/:id', ...publica(() => import('./pages/ProdutoPage'), 'ProdutoPage') },
       { path: 'checkout', ...publica(() => import('./pages/CheckoutPage'), 'CheckoutPage') },
       { path: 'pedido/confirmado/:numero', ...publica(() => import('./pages/PedidoConfirmadoPage'), 'PedidoConfirmadoPage') },
+      // Vitrine da Vulto: mesmo layout, sacola e checkout, com a identidade dela
+      {
+        path: 'vulto',
+        children: [
+          { index: true, ...publica(() => import('./pages/vulto/VultoHomePage'), 'VultoHomePage') },
+          { path: 'loja', ...publica(() => import('./pages/vulto/VultoLojaPage'), 'VultoLojaPage') },
+          { path: 'lojas', ...publica(() => import('./pages/vulto/VultoLojasPage'), 'VultoLojasPage') },
+          { path: 'produto/:id', ...publica(() => import('./pages/ProdutoPage'), 'ProdutoPage') },
+        ],
+      },
     ],
   },
   // Login único (Iniciar sessão): cliente vai para /cliente, equipe para /dashboard

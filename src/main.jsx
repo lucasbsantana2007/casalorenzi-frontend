@@ -8,6 +8,7 @@ import './styles/pages.css'
 import './styles/login.css'
 import './styles/store.css'
 import './styles/checkout.css'
+import './styles/marcas.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

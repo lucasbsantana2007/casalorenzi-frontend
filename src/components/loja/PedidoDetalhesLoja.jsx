@@ -31,7 +31,7 @@ export function PedidoDetalhesLoja({ pedido }) {
         {pedido.itens.map((item) => (
           <li key={item.variacaoId}>
             <span className="co-items__image">
-              <img src={imagemDoProduto(item.variacao.produto)} alt="" />
+              <img src={imagemDoProduto(item.variacao.produto, item.variacao.cor)} alt="" />
               <span className="co-items__qty">{item.quantidade}</span>
             </span>
             <span className="co-items__info">

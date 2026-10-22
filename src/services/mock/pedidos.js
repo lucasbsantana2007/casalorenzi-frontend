@@ -15,15 +15,18 @@ function proximoNumero() {
 const estoqueTotal = (variacaoId) => db.estoques.filter((e) => e.variacaoId === variacaoId).reduce((sum, e) => sum + e.quantidade, 0)
 const saldoNaLoja = (lojaId, variacaoId) => estoquePor(lojaId, variacaoId)?.quantidade ?? 0
 
-// Escolhe a loja que envia: a que tem todas as peças; empate → mesma UF do CEP; senão a que cobre mais itens
+// Escolhe a loja que envia: a que tem todas as peças; empate → mesma UF do CEP; senão a que cobre mais itens.
+// Só lojas (e o CD) da marca das peças; sacola com as duas marcas → todas
 function escolherLojaExpedicao(itens, cep) {
+  const marcaDe = (variacaoId) => byId(db.produtos, byId(db.variacoes, variacaoId).produtoId).marca ?? 'LORENZI'
+  const marcas = new Set(itens.map((i) => marcaDe(i.variacaoId)))
   const uf = ufDoCep(cep)
   const pontuar = (loja) => {
     const cobertos = itens.filter((i) => saldoNaLoja(loja.id, i.variacaoId) >= i.quantidade).length
     return cobertos * 10 + (loja.uf === uf ? 1 : 0)
   }
   // Loja desativada no cadastro não despacha pedidos
-  return db.lojas.filter((l) => l.ativa !== false).sort((a, b) => pontuar(b) - pontuar(a))[0]
+  return db.lojas.filter((l) => l.ativa !== false && marcas.has(l.marca ?? 'LORENZI')).sort((a, b) => pontuar(b) - pontuar(a))[0]
 }
 
 // Cria transferências das outras lojas para a loja de expedição quando falta peça nela

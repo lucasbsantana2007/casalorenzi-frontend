@@ -1,25 +1,30 @@
 import { Link } from 'react-router-dom'
-import { BrandMark } from '../BrandMark'
+import { inicioDaMarca } from '../../data/marcas'
+import { useMarca } from '../../hooks/useMarca'
 
 const ANO = new Date().getFullYear()
 
-// Rodapé em azul-marinho, a cor da marca.
+// Rodapé na cor da marca da vitrine aberta (azul-marinho na Casa Lorenzi, preto na Vulto)
 export function StoreFooter() {
+  const marca = useMarca()
   return (
     <footer className="store-footer">
       <div className="store-footer__top">
-        <Link to="/" aria-label="Casa Lorenzi — início">
-          <BrandMark size="sm" inverse />
+        <Link to={inicioDaMarca(marca)} aria-label={`${marca.nome} — início`}>
+          <img src={marca.logoBranca} alt={marca.nome} className="store-footer__logo" />
         </Link>
         <nav className="store-footer__links" aria-label="Rodapé">
-          <Link to="/colecao/masculino">Masculino</Link>
-          <Link to="/colecao/feminino">Feminino</Link>
-          <Link to="/lojas">Lojas</Link>
-          <Link to="/lorenzi">Lorenzi</Link>
+          {marca.nav.map((item) => (
+            <Link key={item.to} to={item.to}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
       </div>
       <div className="store-footer__bottom">
-        <span>© {ANO} Casa Lorenzi · Oscar Freire · Lago Norte · Leblon · Pátio Batel · Belvedere</span>
+        <span>
+          © {ANO} {marca.nome} · {marca.rodape}
+        </span>
       </div>
     </footer>
   )

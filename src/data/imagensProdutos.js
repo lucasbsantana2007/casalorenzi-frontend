@@ -1,4 +1,5 @@
 import arara from '../assets/colecao/arara.jpg'
+import { cardDaVulto } from './cardsVulto'
 import cafe from '../assets/colecao/cafe.jpg'
 import calcaAlfaiataria from '../assets/colecao/calca-alfaiataria.jpg'
 import camisaria from '../assets/colecao/camisaria.jpg'
@@ -30,7 +31,15 @@ const POR_PRODUTO = {
   12: ruaItaliana,
 }
 
-export const imagemDoProduto = (produto) => produto.imagemUrl ?? POR_PRODUTO[produto.id] ?? arara
+// Peça da Vulto sem foto: card tipográfico na cor da peça (cor: a escolhida; senão a primeira variação).
+// Aceita o produto da API ou o item da sacola ({ produtoId, nome, cor, marca, imagemUrl }).
+export function imagemDoProduto(produto, cor) {
+  if (produto.imagemUrl) return produto.imagemUrl
+  if (produto.marca === 'VULTO') {
+    return cardDaVulto({ nome: produto.nome, cor: cor ?? produto.cor ?? produto.variacoes?.[0]?.cor, codigo: produto.codigoModelo })
+  }
+  return POR_PRODUTO[produto.id ?? produto.produtoId] ?? arara
+}
 
 // Uma foto por peça do pedido (a mesma peça em dois tamanhos aparece uma vez só)
 export function imagensDoPedido(pedido) {

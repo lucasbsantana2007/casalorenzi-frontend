@@ -6,7 +6,8 @@ import * as mock from './mock/cadastros'
 export const cadastrosService = USE_MOCKS
   ? mock
   : {
-      listarLojas: () => api.get('/lojas'),
+      // filtros: { marca } (LORENZI ou VULTO). Visitante sem marca recebe a Casa Lorenzi; a equipe, todas
+      listarLojas: (filtros) => api.get('/lojas', filtros),
       listarCategorias: () => api.get('/categorias'),
       listarUsuarios: (filtros) => api.get('/usuarios', filtros),
       listarTiposSolicitacao: () => api.get('/tipos-solicitacao', { ativo: true }),

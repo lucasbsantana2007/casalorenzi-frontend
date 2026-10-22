@@ -15,7 +15,7 @@ function selecaoDaEstacao(produtos) {
 
 // Início: duas fotos grandes e uma seleção curta de peças. Nada além disso.
 export function HomePage() {
-  const produtos = useAsync(() => produtosService.listar({ ativo: true }), []).data ?? []
+  const produtos = useAsync(() => produtosService.listar({ ativo: true, marca: 'LORENZI' }), []).data ?? []
 
   return (
     <main>

@@ -3,6 +3,8 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { useEffect, useId, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { imagemDoProduto } from '../../data/imagensProdutos'
+import { caminhoDoProduto } from '../../data/marcas'
+import { useMarca } from '../../hooks/useMarca'
 import { useVitrine } from '../../hooks/useVitrine'
 import { formatCurrency } from '../../utils/format'
 
@@ -36,7 +38,7 @@ export function BuscaDaLoja() {
   const [aberta, setAberta] = useState(false)
   const [busca, setBusca] = useState('')
   const [ativo, setAtivo] = useState(0)
-  const produtos = useVitrine()
+  const produtos = useVitrine(useMarca().id)
   const navigate = useNavigate()
   const location = useLocation()
   const reduzir = useReducedMotion()
@@ -73,7 +75,7 @@ export function BuscaDaLoja() {
     return () => document.removeEventListener('mousedown', fora)
   }, [aberta])
 
-  const abrirPeca = (produto) => produto && navigate(`/produto/${produto.id}`)
+  const abrirPeca = (produto) => produto && navigate(caminhoDoProduto(produto))
 
   const aoTeclar = (e) => {
     if (e.key === 'Escape') {

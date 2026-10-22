@@ -5,7 +5,7 @@ import { formatNumber } from '../../utils/format'
 import { animacaoDaOpcao, animacaoDoMenu } from '../ui/animacaoMenu'
 import { Slider } from '../ui/Slider'
 
-const ORDEM_TAMANHOS = ['PP', 'P', 'M', 'G', 'GG', 'XG']
+const ORDEM_TAMANHOS = ['XP', 'PP', 'P', 'M', 'G', 'GG', 'XG']
 const PASSO_PRECO = 10
 
 // disponivel desconta as peças reservadas por pedidos ainda não enviados (mocks: só estoqueTotal)

@@ -1,13 +1,17 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { BarraDeMarcas } from '../components/home/BarraDeMarcas'
 import { StoreFooter } from '../components/home/StoreFooter'
 import { StoreHeader } from '../components/home/StoreHeader'
 import { SacolaLateral } from '../components/loja/SacolaLateral'
+import { useMarca } from '../hooks/useMarca'
 import { useSession } from '../hooks/useSession'
 
-// Layout público da loja (início, coleções e lojas).
+// Layout público da loja (início, coleções e lojas), com a faixa das marcas no topo.
+// A vitrine da Vulto (/vulto) usa o mesmo layout com a identidade dela (classe store--vulto).
 export function StoreLayout() {
   const { logout } = useSession()
+  const marca = useMarca()
   const location = useLocation()
   const navigate = useNavigate()
   const sair = location.state?.sair
@@ -21,7 +25,8 @@ export function StoreLayout() {
   }, [sair, logout, navigate])
 
   return (
-    <div className="store">
+    <div className={`store store--${marca.id.toLowerCase()}`}>
+      <BarraDeMarcas />
       <StoreHeader overlay={location.pathname === '/'} />
       <Outlet />
       <StoreFooter />

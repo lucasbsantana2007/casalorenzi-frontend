@@ -6,7 +6,7 @@ import { useLojas } from '../hooks/useCadastros'
 
 export function LojasPage() {
   // Loja desativada no cadastro sai do site
-  const lojas = useLojas().filter((loja) => loja.ativa !== false)
+  const lojas = useLojas('LORENZI').filter((loja) => loja.ativa !== false)
   // Passar o mouse na lista acende o ponto no mapa, e vice-versa
   const [ativa, setAtiva] = useState(null)
   // Loja com foto e informações abertas: clique no nome ou no ponto do mapa
