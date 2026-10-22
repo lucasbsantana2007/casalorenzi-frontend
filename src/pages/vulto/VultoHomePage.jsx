@@ -96,8 +96,11 @@ export function VultoHomePage() {
           <ul className="vulto-onde__lista">
             {lojas.map((loja) => (
               <li key={loja.id}>
-                <strong>{loja.nome.replace(/^Vulto\s+/, '')}</strong>
-                <span>{loja.cidade}</span>
+                {/* Abre a página Lojas já com esta loja aberta */}
+                <Link to={`/vulto/lojas?loja=${loja.id}`}>
+                  <strong>{loja.nome.replace(/^Vulto\s+/, '')}</strong>
+                  <span>{loja.cidade}</span>
+                </Link>
               </li>
             ))}
           </ul>

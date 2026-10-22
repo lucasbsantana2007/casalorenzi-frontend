@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { MapaLojas } from '../components/loja/MapaLojas'
 import { nomeCurto } from '../data/coordenadasLojas'
 import { fotoDaLoja } from '../data/fotosLojas'
@@ -14,7 +15,15 @@ export function LojasPage() {
   // Passar o mouse na lista acende o ponto no mapa, e vice-versa
   const [ativa, setAtiva] = useState(null)
   // Loja com foto e informações abertas: clique no nome ou no ponto do mapa
-  const [aberta, setAberta] = useState(null)
+  // ?loja=<id> (links do início da Vulto): já abre essa loja e rola até ela
+  const [params] = useSearchParams()
+  const pedida = Number(params.get('loja')) || null
+  const [aberta, setAberta] = useState(pedida)
+  const carregou = lojas.length > 0
+  useEffect(() => {
+    if (!pedida || !carregou) return
+    requestAnimationFrame(() => document.getElementById(`loja-${pedida}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }))
+  }, [pedida, carregou])
 
   const alternar = (id) => setAberta((atual) => (atual === id ? null : id))
 

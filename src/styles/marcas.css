@@ -526,6 +526,17 @@ a.product-card--duas-fotos:hover .product-card__costas {
   padding: 22px 16px 22px 0;
 }
 
+.vulto-onde__lista a {
+  display: grid;
+  gap: 4px;
+}
+
+.vulto-onde__lista a:hover strong {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
 .vulto-onde__lista strong {
   font-family: var(--font-display);
   font-size: 20px;
