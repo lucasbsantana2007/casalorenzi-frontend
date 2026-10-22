@@ -1,6 +1,7 @@
 import { CircleCheck } from 'lucide-react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { PedidoDetalhesLoja, PedidoProgresso } from '../components/loja/PedidoDetalhesLoja'
+import { formatarPontos } from '../utils/fidelidade'
 
 export function PedidoConfirmadoPage() {
   const { numero } = useParams()
@@ -21,6 +22,11 @@ export function PedidoConfirmadoPage() {
           ) : null}
           Para acompanhar a entrega ou pedir trocas e ajuda, entre na sua conta com o seu e-mail e a sua senha.
         </p>
+        {pedido?.pontosGanhos > 0 && (
+          <p className="order-hero__note">
+            Esta compra rendeu <strong>{formatarPontos(pedido.pontosGanhos)} Vulto+</strong>. <Link to="/cliente/pontos">Ver meus pontos</Link>
+          </p>
+        )}
       </div>
 
       {pedido && (

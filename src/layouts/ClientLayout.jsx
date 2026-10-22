@@ -9,6 +9,7 @@ const LINKS = [
   { to: '/cliente', label: 'Minha conta', end: true },
   { to: '/cliente/solicitacoes', label: 'Solicitações' },
   { to: '/cliente/pedidos', label: 'Pedidos' },
+  { to: '/cliente/pontos', label: 'Vulto+' },
   { to: '/cliente/conta', label: 'Configurações' },
 ]
 

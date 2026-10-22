@@ -1,5 +1,6 @@
 import { calcularFrete, somenteDigitos, ufDoCep } from '../../utils/frete'
 import { ApiError } from '../api'
+import * as fidelidade from './fidelidade'
 import { aplicarMovimentacao, byId, clientePorId, db, estoquePor, fail, matches, nextId, registrarLog, respond, salvar, usuarioDaSessao, usuarioResumo, variacaoView } from './db'
 
 const PARCELAS_MAX = 6
@@ -109,7 +110,9 @@ function pedidoPublicoView(pedido) {
     frete: pedido.frete ? { tipo: pedido.frete.tipo, label: pedido.frete.label, valor: pedido.frete.valor, prazoDias: pedido.frete.prazoDias } : null,
     pagamento: pedido.pagamento ?? null,
     subtotal: pedido.subtotal ?? pedido.total,
+    desconto: pedido.desconto ?? 0,
     total: pedido.total,
+    pontosGanhos: pedido.pontosGanhos ?? null,
     itens: pedido.itens.map((item) => ({ ...item, variacao: variacaoView(item.variacaoId) })),
     historico: (pedido.historico ?? [{ status: pedido.status, em: pedido.criadoEm }]).map(({ status, em }) => ({ status, em })),
   }
@@ -148,6 +151,14 @@ export function finalizarCompra(dados) {
   if (!['PIX', 'CARTAO'].includes(metodo)) return fail('Escolha a forma de pagamento.', 422)
   const parcelas = metodo === 'CARTAO' ? Math.min(Math.max(Number(dados.pagamento.parcelas) || 1, 1), PARCELAS_MAX) : 1
 
+  // Resgate Vulto+: confere saldo e regras antes de gravar
+  let desconto = 0
+  try {
+    desconto = fidelidade.conferirResgate(cliente.id, subtotal, Number(dados.pontos) || 0)
+  } catch (error) {
+    return fail(error.message, error.status)
+  }
+
   const loja = escolherLojaExpedicao(itens, e.cep)
   const agora = Date.now()
   const pedido = {
@@ -161,7 +172,8 @@ export function finalizarCompra(dados) {
     codigoRastreio: null,
     itens,
     subtotal,
-    total: subtotal + frete.valor,
+    desconto,
+    total: subtotal - desconto + frete.valor,
     contato: { nome: cliente.nome, email: cliente.email, telefone: cliente.telefone ?? '' },
     endereco: { ...e, cep: somenteDigitos(e.cep) },
     frete,
@@ -171,6 +183,9 @@ export function finalizarCompra(dados) {
   registrar(pedido, 'PROCESSANDO', null, `Pagamento aprovado · expedição: ${loja.nome}`)
   db.pedidos.push(pedido)
   planejarTransferencias(pedido)
+  // Pagamento aprovado: os pontos usados saem e os da compra entram (sobre os produtos, sem o frete)
+  if (dados.pontos) fidelidade.registrarResgate(cliente.id, pedido, Number(dados.pontos))
+  pedido.pontosGanhos = fidelidade.creditarCompra(cliente.id, pedido)
 
   // E-mail de confirmação (simulado: fica registrado em db.emails)
   db.emails.push({
@@ -244,6 +259,8 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
       cancelarTransferenciasPendentes(pedido.id)
       pedido.status = status
       if (pedido.pagamento) pedido.pagamento = { ...pedido.pagamento, status: 'ESTORNADO' }
+      // Vulto+: a compra cancelada perde os pontos ganhos e devolve os usados nela
+      fidelidade.cancelarCompra(pedido)
       registrar(pedido, status, usuarioId, 'Pagamento estornado')
       descricao = `Cancelou o pedido ${pedido.numero} e estornou o pagamento`
     } else {

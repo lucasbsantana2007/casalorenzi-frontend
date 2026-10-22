@@ -6,6 +6,8 @@ import * as mock from './mock/conta'
 export const contaService = USE_MOCKS
   ? mock
   : {
+      // Vulto+ → { saldo, valorEmReais, categoria, bonus, aVencer: [{ data, pontos }], extrato, regras }
+      pontos: () => api.get('/conta/pontos'),
       // → { id, nome, email, cpf, telefone, clienteDesde }
       obter: () => api.get('/conta'),
       // { nome, email, telefone, senhaAtual? } → mesma resposta. O CPF não muda;

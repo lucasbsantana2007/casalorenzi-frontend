@@ -4,12 +4,15 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import { FormError } from '../components/ui/FormError'
 import { Select } from '../components/ui/Select'
 import { imagemDoProduto } from '../data/imagensProdutos'
+import { useAsync } from '../hooks/useAsync'
 import { useCondicoesFrete } from '../hooks/useCadastros'
 import { useSacola } from '../hooks/useSacola'
 import { useSession } from '../hooks/useSession'
+import { contaService } from '../services/contaService'
 import { pedidosService } from '../services/pedidosService'
 import { buscarEnderecoPorCep } from '../utils/cep'
 import { cpfValido, formatarCpf, somenteDigitosCpf } from '../utils/cpf'
+import { COMPRA_MINIMA_RESGATE, formatarPontos, maximoResgatavel, podeResgatar, pontosDaCompra, RESGATE_MULTIPLO, valorEmReais } from '../utils/fidelidade'
 import { calcularFrete, formatarCep } from '../utils/frete'
 import { formatCurrency } from '../utils/format'
 
@@ -51,6 +54,9 @@ export function CheckoutPage() {
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
   const condicoesFrete = useCondicoesFrete()
+  // Vulto+ do cliente logado (saldo para o resgate e a categoria para o bônus)
+  const vulto = useAsync(() => (isCliente ? contaService.pontos() : Promise.resolve(null)), [isCliente, usuario?.id]).data
+  const [pontosUsar, setPontosUsar] = useState(0)
   // CEP completo preenche rua, bairro, cidade e estado (ViaCEP); null | 'buscando' | 'nao-encontrado' | 'falhou'
   const [consultaCep, setConsultaCep] = useState(null)
   const ultimoCep = useRef('')
@@ -89,7 +95,12 @@ export function CheckoutPage() {
   }
   const opcoesFrete = calcularFrete(dados.cep, subtotal, condicoesFrete)
   const frete = opcoesFrete.find((f) => f.tipo === freteTipo) ?? opcoesFrete[0]
-  const total = subtotal + (frete?.valor ?? 0)
+  // Resgate: o máximo muda com a sacola, então o valor escolhido é limitado na hora
+  const maxPontos = vulto && podeResgatar(subtotal) ? maximoResgatavel(vulto.saldo, subtotal) : 0
+  const pontosAplicados = Math.min(pontosUsar, maxPontos)
+  const descontoPontos = valorEmReais(pontosAplicados)
+  const pontosAGanhar = pontosDaCompra(subtotal, 'E-commerce', vulto?.categoria)
+  const total = subtotal - descontoPontos + (frete?.valor ?? 0)
   const atualizarConta = (campo) => (e) => setConta((c) => ({ ...c, [campo]: e.target.value }))
   const emailInvalido = conta.email.length > 0 && !EMAIL_VALIDO.test(conta.email.trim())
   const cpfInvalido = somenteDigitosCpf(conta.cpf).length === 11 && !cpfValido(conta.cpf)
@@ -131,6 +142,7 @@ export function CheckoutPage() {
         endereco: { cep, rua, numero, complemento, bairro, cidade, uf },
         freteTipo: frete?.tipo,
         pagamento: { metodo, parcelas },
+        pontos: pontosAplicados,
         itens: itens.map(({ variacaoId, quantidade }) => ({ variacaoId, quantidade })),
       })
       esvaziar()
@@ -302,6 +314,15 @@ export function CheckoutPage() {
           <h2>
             <span>3</span> Pagamento
           </h2>
+          {vulto && (
+            <ResgateVultoMais
+              saldo={vulto.saldo}
+              subtotal={subtotal}
+              maximo={maxPontos}
+              valor={pontosAplicados}
+              onChange={(v) => setPontosUsar(Math.max(0, Math.floor(v / RESGATE_MULTIPLO) * RESGATE_MULTIPLO))}
+            />
+          )}
           <div className="co-options" role="radiogroup" aria-label="Forma de pagamento">
             <label className={`co-option ${metodo === 'PIX' ? 'is-selected' : ''}`}>
               <input type="radio" name="pagamento" checked={metodo === 'PIX'} onChange={() => setMetodo('PIX')} />
@@ -368,11 +389,22 @@ export function CheckoutPage() {
             <dt>Frete{frete ? ` · ${frete.label}` : ''}</dt>
             <dd>{frete ? (frete.valor === 0 ? 'Grátis' : formatCurrency(frete.valor)) : '—'}</dd>
           </div>
+          {pontosAplicados > 0 && (
+            <div className="co-totals__desconto">
+              <dt>Pontos Vulto+ ({pontosAplicados.toLocaleString('pt-BR')})</dt>
+              <dd>− {formatCurrency(descontoPontos)}</dd>
+            </div>
+          )}
           <div className="co-totals__total">
             <dt>Total</dt>
             <dd>{formatCurrency(total)}</dd>
           </div>
         </dl>
+        {pontosAGanhar > 0 && (
+          <p className="co-step__hint co-ganho">
+            Esta compra rende {formatarPontos(pontosAGanhar)} Vulto+{vulto?.bonus ? ` (bônus ${vulto.categoria} +${vulto.bonus}%)` : ''}.
+          </p>
+        )}
         {condicoesFrete && subtotal < condicoesFrete.gratisMinimo && (
           <p className="co-step__hint">Frete Padrão grátis a partir de {formatCurrency(condicoesFrete.gratisMinimo)}.</p>
         )}
@@ -381,5 +413,38 @@ export function CheckoutPage() {
         </button>
       </aside>
     </main>
+  )
+}
+
+// Uso dos pontos Vulto+ no pagamento: só para cliente logado, de 100 em 100, em compras a partir de R$ 500 em produtos
+function ResgateVultoMais({ saldo, subtotal, maximo, valor, onChange }) {
+  let aviso = null
+  if (saldo < RESGATE_MULTIPLO) aviso = `Você tem ${formatarPontos(saldo)} Vulto+. A partir de ${RESGATE_MULTIPLO} dá para usar como desconto.`
+  else if (!podeResgatar(subtotal))
+    aviso = `Você tem ${formatarPontos(saldo)} Vulto+ (${formatCurrency(valorEmReais(saldo))}). Dá para usar em compras a partir de ${formatCurrency(COMPRA_MINIMA_RESGATE)} em produtos: faltam ${formatCurrency(COMPRA_MINIMA_RESGATE - subtotal)}.`
+
+  return (
+    <div className="co-pontos">
+      <div className="co-pontos__topo">
+        <strong>Pontos Vulto+</strong>
+        <span>{formatarPontos(saldo)} · {formatCurrency(valorEmReais(saldo))}</span>
+      </div>
+      {aviso ? (
+        <p className="co-step__hint">{aviso}</p>
+      ) : (
+        <div className="co-pontos__uso">
+          <label className="co-field">
+            <span>Usar pontos (de {RESGATE_MULTIPLO} em {RESGATE_MULTIPLO})</span>
+            <input type="number" min={0} max={maximo} step={RESGATE_MULTIPLO} value={valor} onChange={(e) => onChange(Number(e.target.value) || 0)} />
+          </label>
+          <button type="button" className="co-pontos__tudo" onClick={() => onChange(valor === maximo ? 0 : maximo)}>
+            {valor === maximo ? 'Não usar' : `Usar ${formatarPontos(maximo)}`}
+          </button>
+          <p className="co-step__hint">
+            {valor > 0 ? `Desconto de ${formatCurrency(valorEmReais(valor))} nos produtos.` : `Até ${formatarPontos(maximo)} nesta compra (${formatCurrency(valorEmReais(maximo))}).`}
+          </p>
+        </div>
+      )}
+    </div>
   )
 }

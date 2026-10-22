@@ -16,6 +16,9 @@ import { useSession } from '../../../hooks/useSession'
 import { atendimentoService } from '../../../services/atendimentoService'
 import { formatDate, formatDateTime } from '../../../utils/format'
 import { etapaDoAtendimento, ETAPAS_ATENDIMENTO } from '../../../utils/status'
+import { CartaoVultoMais } from '../../../components/fidelidade/CartaoVultoMais'
+import { ExtratoPontos } from '../../../components/fidelidade/ExtratoPontos'
+import { clienteService } from '../../../services/clienteService'
 
 export function AtendimentoDetalhePage() {
   const { id } = useParams()
@@ -171,6 +174,8 @@ function Detalhe({ atendimento, onUpdate }) {
             </div>
           </div>
 
+          {atendimento.cliente.id && <PontosDoCliente cpf={atendimento.cliente.id} />}
+
           {atendimento.pedido && (
             <div className="card">
               <div className="card__header">
@@ -184,5 +189,22 @@ function Detalhe({ atendimento, onUpdate }) {
         </aside>
       </section>
     </>
+  )
+}
+
+// Vulto+ do cliente para a equipe: saldo, categoria e os últimos movimentos (o cliente não precisa informar nada)
+function PontosDoCliente({ cpf }) {
+  const pontos = useAsync(() => clienteService.obterPontos(cpf), [cpf]).data
+  if (!pontos) return null
+  return (
+    <div className="card">
+      <div className="card__header">
+        <h2 className="card__title">Pontos Vulto+</h2>
+      </div>
+      <div className="card__body stack-sm">
+        <CartaoVultoMais pontos={pontos} compacto />
+        <ExtratoPontos extrato={pontos.extrato} limite={4} />
+      </div>
+    </div>
   )
 }
