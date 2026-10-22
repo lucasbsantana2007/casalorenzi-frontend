@@ -287,6 +287,10 @@ a.product-card--duas-fotos:hover .product-card__costas {
   height: 24px;
 }
 
+.acesso__logo--lorenzi {
+  height: 38px;
+}
+
 .acesso--vulto .acesso__cabecalho h1 {
   font-size: 30px;
   font-weight: 500;

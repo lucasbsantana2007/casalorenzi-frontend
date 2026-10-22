@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { inicioDaMarca, loginDaMarca } from '../../data/marcas'
 import { useMarca } from '../../hooks/useMarca'
-import { BrandMark } from '../BrandMark'
 import { VideoLoop } from '../ui/VideoLoop'
 import agua1000 from '../../assets/login/agua-1000.jpg'
 import agua1800 from '../../assets/login/agua-1800.jpg'
@@ -60,7 +59,7 @@ export function LayoutAcesso({ titulo, subtitulo, voltar, children }) {
         </Link>
         <div className="acesso__conteudo">
           <Link to={inicioDaMarca(marca)} className="acesso__marca" aria-label={`${marca.nome} — início`}>
-            {vulto ? <img src={marca.logo} alt={marca.nome} className="acesso__logo" /> : <BrandMark size="sm" />}
+            <img src={marca.logo} alt={marca.nome} className={`acesso__logo acesso__logo--${marca.id.toLowerCase()}`} />
           </Link>
           <header className="acesso__cabecalho">
             <h1>{titulo}</h1>
