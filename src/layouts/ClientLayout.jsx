@@ -22,7 +22,10 @@ export function ClientLayout() {
   const from = `${location.pathname}${location.search}`
   const redirectState = useMemo(() => ({ from }), [from])
 
-  if (!isCliente) return <Navigate to="/login" replace state={redirectState} />
+  // Vulto+ é o programa da Vulto: sem sessão, os pontos pedem o login com a identidade dela
+  // (depois de entrar, volta para /cliente/pontos)
+  const login = location.pathname.startsWith('/cliente/pontos') ? '/vulto/login' : '/login'
+  if (!isCliente) return <Navigate to={login} replace state={redirectState} />
 
   return (
     <div className="store store--cliente">
