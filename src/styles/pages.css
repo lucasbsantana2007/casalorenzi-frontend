@@ -1909,3 +1909,217 @@ a.ticket-list__item:hover {
   object-fit: cover;
   background: var(--surface-muted);
 }
+
+/* ---------- Vulto+ (pontos) ---------- */
+.section-heading__titulo {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--navy-950);
+}
+
+.pontos-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .pontos-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Cartão: azul-marinho da marca; a categoria muda só o detalhe colorido */
+.vulto-card {
+  --vulto-detalhe: #8d98ad;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 24px;
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, var(--navy-950), var(--navy-800));
+  color: #fff;
+}
+
+.vulto-card--bronze {
+  --vulto-detalhe: #c08a5b;
+}
+
+.vulto-card--prata {
+  --vulto-detalhe: #c9ced8;
+}
+
+.vulto-card--ouro {
+  --vulto-detalhe: #d9b26a;
+}
+
+.vulto-card--vip {
+  --vulto-detalhe: var(--terracota-500);
+}
+
+.vulto-card__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vulto-card__marca {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 0.04em;
+}
+
+.vulto-card__categoria {
+  padding: 3px 10px;
+  border: 1px solid var(--vulto-detalhe);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vulto-detalhe);
+}
+
+.vulto-card__saldo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vulto-card__saldo strong {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.vulto-card__saldo span,
+.vulto-card__proxima,
+.vulto-card__bonus {
+  margin: 0;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.vulto-card__bonus {
+  color: var(--vulto-detalhe);
+}
+
+.vulto-card__progresso {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.vulto-card__progresso span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--vulto-detalhe);
+}
+
+.vulto-card__vencimentos {
+  margin: 4px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  list-style: none;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Home da área do cliente: o cartão leva ao extrato */
+.vulto-home {
+  display: block;
+  max-width: 420px;
+  border-radius: var(--radius);
+  transition: transform 0.15s;
+}
+
+.vulto-home:hover {
+  transform: translateY(-2px);
+}
+
+.pontos-regras ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--navy-900);
+}
+
+.pontos-regras strong {
+  color: var(--navy-950);
+}
+
+/* Extrato */
+.extrato-pontos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.extrato-pontos li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.extrato-pontos li + li {
+  border-top: 1px solid var(--border);
+}
+
+.extrato-pontos__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.extrato-pontos__info strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy-950);
+}
+
+.extrato-pontos__pedido {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.extrato-pontos__info span {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.extrato-pontos__qtd {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.extrato-pontos__qtd.is-entrada {
+  color: var(--success);
+}
+
+.extrato-pontos__qtd.is-saida {
+  color: var(--navy-800);
+}
+
+.extrato-pontos__qtd small {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-muted);
+}

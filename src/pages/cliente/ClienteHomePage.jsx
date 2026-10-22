@@ -1,11 +1,13 @@
 import { ArrowRight, MessageSquarePlus, PackageSearch, ScrollText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { SolicitacaoCard } from '../../components/atendimento/SolicitacaoCard'
+import { CartaoVultoMais } from '../../components/fidelidade/CartaoVultoMais'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { EmptyState } from '../../components/ui/EmptyState'
 import { useAsync } from '../../hooks/useAsync'
 import { useSession } from '../../hooks/useSession'
 import { clienteService } from '../../services/clienteService'
+import { contaService } from '../../services/contaService'
 
 const ATALHOS = [
   { to: '/cliente/solicitacoes/nova', icon: MessageSquarePlus, titulo: 'Nova solicitação', texto: 'Trocas, devoluções, ajustes de costura e dúvidas.' },
@@ -19,6 +21,7 @@ export function ClienteHomePage() {
   const solicitacoes = useAsync(() => clienteService.listarSolicitacoes(clienteId), [clienteId])
   // Pedidos do cliente: as peças viram a capa das solicitações sem foto
   const pedidos = useAsync(() => clienteService.listarPedidos(clienteId), [clienteId]).data ?? []
+  const pontos = useAsync(() => contaService.pontos(), [clienteId]).data
 
   return (
     <>
@@ -27,6 +30,12 @@ export function ClienteHomePage() {
         <h1 className="client-hero__title">{perfil ? `Olá, ${perfil.nome.split(' ')[0]}.` : 'Olá.'}</h1>
         <p className="client-hero__text">Como podemos ajudar hoje? Acompanhe seus pedidos e fale com a nossa equipe em um só lugar.</p>
       </section>
+
+      {pontos && (
+        <Link to="/cliente/pontos" className="vulto-home" aria-label="Ver o extrato Vulto+">
+          <CartaoVultoMais pontos={pontos} compacto />
+        </Link>
+      )}
 
       <section className="shortcut-grid">
         {ATALHOS.map(({ to, icon: Icon, titulo, texto }) => (
