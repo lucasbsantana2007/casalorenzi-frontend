@@ -33,7 +33,7 @@ export function StoreHeader({ overlay = false }) {
 
       <nav className="store-header__nav" aria-label="Navegação principal">
         {marca.nav.map((item) => (
-          <NavLink key={item.to} to={item.to} onClick={fechar} className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
+          <NavLink key={item.to} to={item.to} end onClick={fechar} className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
             {item.label}
           </NavLink>
         ))}

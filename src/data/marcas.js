@@ -17,6 +17,8 @@ export const MARCAS = {
       { to: '/colecao/feminino', label: 'Feminino' },
       { to: '/lojas', label: 'Lojas' },
       { to: '/lorenzi', label: 'Lorenzi' },
+      // A outra marca do grupo, escrita na identidade desta (a faixa do topo fica recolhida)
+      { to: '/vulto', label: 'Vulto' },
     ],
     rodape: 'Oscar Freire · Lago Norte · Leblon · Pátio Batel · Belvedere',
   },
@@ -30,6 +32,7 @@ export const MARCAS = {
       { to: '/vulto/loja', label: 'Loja' },
       { to: '/vulto/lojas', label: 'Lojas' },
       { to: '/cliente/pontos', label: 'Vulto+' },
+      { to: '/', label: 'Lorenzi' },
     ],
     rodape: 'Pinheiros · Eldorado · Savassi · Batel · site e app',
   },
