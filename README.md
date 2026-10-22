@@ -52,7 +52,9 @@ senha de demonstração. Para um uso real, defina `VITE_MODO_DEMO=false` na Verc
    - **Sacola e `/checkout`:** a sacola abre na lateral; o checkout leva a `/pedido/confirmado/:numero`.
    - **`/lojas`:** lojas no mapa do Brasil.
    - **`/lorenzi`:** parte da história da marca (texto de demonstração, fictício).
-   - **Menu:** Masculino, Feminino, Lojas e Lorenzi. À direita, o ícone de pessoa (abre o login; com sessão, leva ao perfil do cliente ou ao painel da equipe) e o carrinho da sacola.
+   - **Menu:** Masculino, Feminino, Lojas, Lorenzi e Vulto (leva à vitrine da Vulto). À direita, o ícone de pessoa (abre o login; com sessão, leva ao perfil do cliente ou ao painel da equipe) e o carrinho da sacola.
+   - **Duas marcas, um site:** a Casa Lorenzi fica em `/` e a Vulto em `/vulto`, cada uma com a sua logo, menu, rodapé e identidade (a Vulto troca a paleta e a fonte por variáveis, em `src/styles/marcas.css`). Sacola, login, checkout e Vulto+ são os mesmos. Uma faixa preta no topo, que só abre com o mouse em cima, troca de uma marca para a outra; o menu de cada uma também leva à outra. Configuração das marcas em `src/data/marcas.js`.
+   - **Vulto:** `/vulto` (início: drop mais recente, categorias, Vulto+ e lojas), `/vulto/loja` (todas as peças, com filtros; `?categoria=` abre filtrada), `/vulto/lojas` e `/vulto/produto/:id`. Uma peça da Vulto aberta em `/produto/:id` vai para `/vulto/produto/:id`. O catálogo migrado não tem fotos: cada peça mostra um card tipográfico na cor dela (`src/data/cardsVulto.js`).
 2. **Conta do cliente.** Pode ser criada no login (`/login/criar-conta`) ou no checkout, com nome, CPF, e-mail, celular e senha. Não há compra sem conta. O id do cliente é o CPF.
 3. **Login único em `/login`** (Iniciar sessão), para clientes e equipe. Depois de entrar, o cliente vai para o perfil (`/cliente`) e a equipe para a gestão (`/dashboard`), com os módulos do seu cargo. Quem tentou abrir uma página protegida volta para ela depois de entrar. O endereço antigo `/login/equipe` redireciona para `/login`.
 4. **"Sair"** encerra a sessão e volta para a página inicial.
@@ -69,7 +71,7 @@ Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, 
 
 Lojista e Operador veem os pedidos que a própria loja expede. O menu é uma lista simples, na mesma ordem para todos os cargos (Dashboard, Pedidos, Estoque, Transferências, Atendimento, Financeiro e Administração), e cada cargo vê só os módulos que pode acessar. **Estoque** reúne o cadastro de produtos e o estoque: abas Produtos (só Administrador; é a aba inicial dele), Posição atual, Posição em data e Movimentações. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
-**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
+**Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/vulto`, `/vulto/loja`, `/vulto/lojas`, `/vulto/produto/:id`, `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
 **Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`, `/cliente/conta` (configurações da conta: dados pessoais, senha e exclusão).
 
@@ -167,8 +169,9 @@ Datas em ISO 8601 ou timestamp; filtros de período usam `de`/`ate` no formato `
 - Tipos: `ENTRADA`, `VENDA`, `DEVOLUCAO`, `AJUSTE`, `TRANSFERENCIA_SAIDA`, `TRANSFERENCIA_ENTRADA`
 
 **Produtos**
-- `GET /produtos?busca&categoria&ativo` (inclui `variacoes[]` e `estoqueTotal`; `precoCusto` em cada variação **só para o Administrador**). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
-- `GET /produtos/{id}`
+- `GET /produtos?busca&categoria&ativo&marca` (`marca`: `LORENZI` ou `VULTO`, a vitrine de cada marca pede a sua; sem ela, o visitante recebe a Casa Lorenzi e a equipe, as duas. Inclui `variacoes[]` e `estoqueTotal`; `precoCusto` em cada variação **só para o Administrador**). A vitrine também usa `genero` (`Masculino`/`Feminino`) e `estacao` (`Inverno`/`Verão`/`Atemporal`), e `imagemUrl` quando existir.
+- `GET /produtos/{id}` (abre as peças das duas marcas; traz `marca` e `codigoModelo`)
+- `GET /lojas?marca` (site: só as lojas físicas da marca pedida, sem ela as da Casa Lorenzi; equipe: todas, com `marca` e `tipo`)
 - `POST /produtos` e `PUT /produtos/{id}` (só Administrador) com `{ nome, categoria, precoBase, ativo, genero, estacao, variacoes: [{ id?, sku, tamanho, cor, precoCusto }], imagem?, removerImagem? }`. `genero` (`Masculino` ou `Feminino`) é obrigatório no cadastro e define em qual coleção da loja o produto aparece; `estacao` é `Inverno`, `Verão` ou `Atemporal` (padrão). Produto ativo aparece na vitrine assim que é cadastrado.
 - `DELETE /produtos/{id}` (só Administrador) tira o produto da loja, do painel e do estoque; pedidos, vendas e o histórico continuam (o produto fica marcado como removido no banco). HTTP 409 se houver pedido em processamento ou transferência pendente da peça. Na tela Estoque, aba Produtos, é a lixeira ao lado do olho e do lápis. Mudanças de preço, custo e foto vão para o log.
 - Foto do produto: `imagem: { nome, tipo, conteudoBase64 }` (JPG, PNG ou WebP, até 2 MB, já reduzida no navegador para no máximo 1280 px) troca a foto; `removerImagem: true` volta à ilustração. O backend grava no S3 e devolve `imagemUrl` no produto (e em `variacao.produto` nos pedidos), que o site usa na vitrine, no carrinho, no checkout e nos pedidos.
