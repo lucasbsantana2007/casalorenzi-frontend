@@ -2,20 +2,31 @@
    Faixa das marcas no topo (como Nike / Jordan) e a identidade da Vulto na vitrine /vulto.
    A Vulto reaproveita todo o CSS da loja trocando as variáveis da paleta e a fonte. */
 
-/* Faixa preta com as duas logos: recolhida (altura 0) até a pessoa chegar ao topo */
+/* Faixa preta com as duas logos: só abre com o mouse em cima. Uma faixa invisível de 10 px no topo
+   da tela recebe o mouse; aberta, a barra fica por cima da página (não empurra nada) e fecha quando o
+   mouse sai. Pelo teclado, abre ao receber o foco. Fica abaixo da sacola lateral (z-index 50). */
+.barra-marcas-area {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 45;
+  height: 10px;
+}
+
 .barra-marcas {
   display: flex;
   align-items: center;
   gap: 28px;
-  height: var(--barra-marcas);
+  height: 0;
   padding: 0 var(--store-gutter);
   overflow: hidden;
   background: #0e0f11;
-  transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.5);
+  transition: height 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.barra-marcas:not(.is-aberta) .barra-marcas__marca {
-  opacity: 0;
+.barra-marcas-area:hover .barra-marcas,
+.barra-marcas-area:focus-within .barra-marcas {
+  height: 40px;
 }
 
 .barra-marcas__marca {
@@ -44,24 +55,6 @@
 
 .barra-marcas__marca--vulto img {
   height: 13px;
-}
-
-/* Início da Lorenzi: o cabeçalho sobre as fotos começa abaixo da faixa, e as fotos descontam a altura dela */
-.store {
-  --barra-marcas: 0px;
-}
-
-.store--barra-aberta {
-  --barra-marcas: 40px;
-}
-
-.store-header--overlay {
-  top: var(--barra-marcas);
-  transition: top 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.split-hero {
-  height: calc(100vh - var(--barra-marcas));
 }
 
 /* Logo do cabeçalho e do rodapé (wordmarks horizontais) */
@@ -376,10 +369,6 @@
 }
 
 @media (max-width: 900px) {
-  .store--barra-aberta {
-    --barra-marcas: 36px;
-  }
-
   .barra-marcas {
     gap: 22px;
   }
@@ -412,8 +401,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .barra-marcas,
-  .store-header--overlay {
+  .barra-marcas {
     transition: none;
   }
 }

@@ -4,7 +4,6 @@ import { BarraDeMarcas } from '../components/home/BarraDeMarcas'
 import { StoreFooter } from '../components/home/StoreFooter'
 import { StoreHeader } from '../components/home/StoreHeader'
 import { SacolaLateral } from '../components/loja/SacolaLateral'
-import { useBarraNoTopo } from '../hooks/useBarraNoTopo'
 import { useMarca } from '../hooks/useMarca'
 import { useSession } from '../hooks/useSession'
 
@@ -13,7 +12,6 @@ import { useSession } from '../hooks/useSession'
 export function StoreLayout() {
   const { logout } = useSession()
   const marca = useMarca()
-  const barraAberta = useBarraNoTopo()
   const location = useLocation()
   const navigate = useNavigate()
   const sair = location.state?.sair
@@ -27,8 +25,8 @@ export function StoreLayout() {
   }, [sair, logout, navigate])
 
   return (
-    <div className={`store store--${marca.id.toLowerCase()} ${barraAberta ? 'store--barra-aberta' : ''}`}>
-      <BarraDeMarcas aberta={barraAberta} />
+    <div className={`store store--${marca.id.toLowerCase()}`}>
+      <BarraDeMarcas />
       <StoreHeader overlay={location.pathname === '/'} />
       <Outlet />
       <StoreFooter />
