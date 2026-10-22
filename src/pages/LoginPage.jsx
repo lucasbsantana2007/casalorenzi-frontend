@@ -21,13 +21,14 @@ export function LoginPage() {
   const marca = useMarca()
   const vulto = marca.id === 'VULTO'
   const location = useLocation()
-  // Vindo da exclusão da conta: encerra aqui a sessão (a conta já não existe) e mostra o aviso
+  // Vindo da exclusão da conta, de "Esqueceu a senha?" ou do convite: a sessão que já estava aberta é de
+  // outra pessoa (ou de uma conta que não existe mais). Encerra só ela; quem entrar daqui segue normal
   const contaExcluida = location.state?.contaExcluida
-  useEffect(() => {
-    if (contaExcluida && usuario) logout()
-  }, [contaExcluida, usuario, logout])
-  // Voltando de "Esqueceu a senha?": e-mail já preenchido e aviso de sucesso
   const senhaNova = location.state?.senhaNova
+  const [sessaoAntiga] = useState(() => ((contaExcluida || senhaNova) && usuario ? usuario.id : null))
+  useEffect(() => {
+    if (sessaoAntiga !== null) logout()
+  }, [sessaoAntiga, logout])
   // Sessão vencida (src/services/api.js): aviso e, depois de entrar, volta à página em que estava
   const consulta = new URLSearchParams(location.search)
   const sessaoExpirada = consulta.get('sessao') === 'expirada'
@@ -40,7 +41,7 @@ export function LoginPage() {
   const [entrando, setEntrando] = useState(false)
   const [error, setError] = useState(null)
 
-  if (usuario && !contaExcluida) return <Navigate to={destinoPara(usuario, voltarPara)} replace />
+  if (usuario && usuario.id !== sessaoAntiga) return <Navigate to={destinoPara(usuario, voltarPara)} replace />
 
   async function entrar(credenciais) {
     setError(null)
