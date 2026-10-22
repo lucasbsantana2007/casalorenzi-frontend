@@ -39,7 +39,8 @@ function funcionarioView(u) {
   }
 }
 
-const adminsAtivos = (excetoId) => db.usuarios.filter((u) => u.papel === 'ADMINISTRADOR' && u.ativo !== false && u.id !== excetoId)
+// A rede nunca fica sem um Administrador do grupo (o que vê as duas marcas) ativo
+const adminsAtivos = (excetoId) => db.usuarios.filter((u) => u.papel === 'ADMINISTRADOR' && u.marca === 'GRUPO' && u.ativo !== false && u.id !== excetoId)
 
 // Administrador de uma marca só cadastra funcionários dela; o do grupo escolhe (GRUPO só para Administrador).
 // Lojista e Operador ficam com a marca da loja em que trabalham
@@ -116,8 +117,9 @@ export function atualizarFuncionario(id, dados) {
     const usuario = byId(db.usuarios, id)
     if (!funcionarioDaMarca(usuario)) throw erro('Funcionário não encontrado.', 404)
     const campos = validarFuncionario(dados, usuario.id)
-    if (usuario.papel === 'ADMINISTRADOR' && campos.papel !== 'ADMINISTRADOR' && usuario.ativo !== false && !adminsAtivos(usuario.id).length) {
-      throw erro('É preciso manter pelo menos um Administrador ativo.')
+    const deixaDeSerGrupo = usuario.marca === 'GRUPO' && (campos.papel !== 'ADMINISTRADOR' || campos.marca !== 'GRUPO')
+    if (deixaDeSerGrupo && usuario.ativo !== false && !adminsAtivos(usuario.id).length) {
+      throw erro('É preciso manter pelo menos um Administrador do grupo ativo.')
     }
     const alteracoes = mudancas(usuario, campos, ROTULOS_FUNCIONARIO, FORMATOS_FUNCIONARIO)
     Object.assign(usuario, campos)
@@ -134,7 +136,7 @@ export function alterarStatusFuncionario(id, { ativo }) {
     const usuario = byId(db.usuarios, id)
     if (!funcionarioDaMarca(usuario)) throw erro('Funcionário não encontrado.', 404)
     if (!ativo && usuario.id === usuarioDaSessao()?.id) throw erro('Você não pode desativar a sua própria conta.')
-    if (!ativo && usuario.papel === 'ADMINISTRADOR' && !adminsAtivos(usuario.id).length) throw erro('É preciso manter pelo menos um Administrador ativo.')
+    if (!ativo && usuario.marca === 'GRUPO' && !adminsAtivos(usuario.id).length) throw erro('É preciso manter pelo menos um Administrador do grupo ativo.')
     if ((usuario.ativo !== false) === Boolean(ativo)) return respond(funcionarioView(usuario))
     usuario.ativo = Boolean(ativo)
     registrarLog({
