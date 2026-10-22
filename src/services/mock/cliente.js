@@ -1,5 +1,6 @@
 import { atendimentoView, pedidoView } from './atendimento'
 import { anexoView, byId, clientePorId, db, fail, nextId, normalize, respond } from './db'
+import { resumo } from './fidelidade'
 import { guardarAnexo } from './pedidos'
 
 export function obterPerfil(clienteId) {
@@ -76,4 +77,9 @@ export function consultarPedido(clienteId, numero) {
   const termo = normalize(numero).replace(/\s/g, '').replace(/^cl-?/, '')
   const pedido = db.pedidos.find((p) => p.clienteId === String(clienteId) && normalize(p.numero).replace('cl-', '') === termo)
   return pedido ? respond(pedidoView(pedido)) : fail('Não encontramos um pedido com esse número.', 404)
+}
+
+// Vulto+ do cliente (equipe de atendimento ou o próprio cliente)
+export function obterPontos(clienteId) {
+  return clientePorId(clienteId) ? respond(resumo(clienteId)) : fail('Cliente não encontrado.', 404)
 }

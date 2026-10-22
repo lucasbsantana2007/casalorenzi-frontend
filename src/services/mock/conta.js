@@ -1,6 +1,7 @@
 import { getUsuarioSalvo } from '../authStorage'
 import { hashSenha, SENHA_MINIMA, senhaConfere } from './auth'
 import { clientePorEmail, clientePorId, db, fail, respond } from './db'
+import { resumo } from './fidelidade'
 
 // Configurações da conta do cliente. Na API real, o cliente vem do token; aqui, da sessão salva.
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -14,6 +15,12 @@ function clienteDaSessao() {
 const semSessao = () => fail('Entre na sua conta de cliente para continuar.', 401)
 
 const contaView = (c) => ({ id: c.id, nome: c.nome, email: c.email, cpf: c.id, telefone: c.telefone ?? '', clienteDesde: c.clienteDesde ?? null })
+
+// Vulto+ do cliente logado: { saldo, valorEmReais, categoria, bonus, aVencer, extrato, regras }
+export function pontos() {
+  const cliente = clienteDaSessao()
+  return cliente ? respond(resumo(cliente.id)) : semSessao()
+}
 
 export function obter() {
   const cliente = clienteDaSessao()
