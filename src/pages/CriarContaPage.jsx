@@ -3,6 +3,8 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { AuthField } from '../components/auth/AuthField'
 import { LayoutAcesso } from '../components/auth/LayoutAcesso'
 import { FormError } from '../components/ui/FormError'
+import { loginDaMarca } from '../data/marcas'
+import { useMarca } from '../hooks/useMarca'
 import { useSession } from '../hooks/useSession'
 import { cpfValido, formatarCpf, somenteDigitosCpf } from '../utils/cpf'
 import { destinoPara } from '../utils/destinoLogin'
@@ -14,6 +16,7 @@ const SENHA_MINIMA = 8
 export function CriarContaPage() {
   const { usuario, cadastrar } = useSession()
   const location = useLocation()
+  const marca = useMarca()
   const [conta, setConta] = useState({ nome: '', cpf: '', email: '', telefone: '', senha: '', senhaConfirmacao: '' })
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
@@ -94,7 +97,7 @@ export function CriarContaPage() {
       </form>
       <p className="acesso__alternativa">
         Já tem uma conta?{' '}
-        <Link to="/login" state={location.state}>
+        <Link to={loginDaMarca(marca)} state={location.state}>
           Entrar
         </Link>
       </p>

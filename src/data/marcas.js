@@ -48,5 +48,9 @@ export const marcaDoProduto = (produto) => MARCAS[produto?.marca] ?? MARCAS.LORE
 
 export const inicioDaMarca = (marca) => marca.base || '/'
 
+// Telas de acesso de cada marca (/login e /vulto/login): a mesma conta e o mesmo destino depois de
+// entrar (cliente → /cliente, equipe → /dashboard); só muda a identidade. resto: '/criar-conta' etc.
+export const loginDaMarca = (marca, resto = '') => `${marca.base}/login${resto}`
+
 // A peça abre na vitrine da marca dela
 export const caminhoDoProduto = (produto) => `${marcaDoProduto(produto).base}/produto/${produto.id ?? produto.produtoId}`

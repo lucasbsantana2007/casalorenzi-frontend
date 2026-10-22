@@ -3,15 +3,15 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSacola } from '../../hooks/useSacola'
 import { useSession } from '../../hooks/useSession'
-import { inicioDaMarca } from '../../data/marcas'
+import { inicioDaMarca, loginDaMarca } from '../../data/marcas'
 import { useMarca } from '../../hooks/useMarca'
 import { BuscaDaLoja } from './BuscaDaLoja'
 
 // Boneco do cabeçalho: abre o login; com sessão, leva cada um para a sua área
-function itemDaConta({ isCliente, isEquipe }) {
+function itemDaConta({ isCliente, isEquipe }, marca) {
   if (isCliente) return { to: '/cliente', label: 'Minha conta' }
   if (isEquipe) return { to: '/dashboard', label: 'Painel' }
-  return { to: '/login', label: 'Iniciar sessão' }
+  return { to: loginDaMarca(marca), label: 'Iniciar sessão' }
 }
 
 // Cabeçalho da loja: fica no topo da página e sai de vista ao rolar (não acompanha a rolagem).
@@ -19,7 +19,7 @@ function itemDaConta({ isCliente, isEquipe }) {
 export function StoreHeader({ overlay = false }) {
   const sessao = useSession()
   const marca = useMarca()
-  const conta = itemDaConta(sessao)
+  const conta = itemDaConta(sessao, marca)
   const { quantidadeTotal, abrir: abrirSacola } = useSacola()
   const [menuAberto, setMenuAberto] = useState(false)
   const fechar = () => setMenuAberto(false)
