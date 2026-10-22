@@ -142,3 +142,144 @@ export function buildVulto({ primeiraVariacao, primeiroEstoque, primeiraMoviment
   }
   return { variacoes, estoques, movimentacoes }
 }
+
+// ---------- Operação da Vulto na demonstração ----------
+// Pedidos (site, app e lojas), as vendas que eles baixaram do estoque, atendimentos de WhatsApp e
+// Instagram e transferências entre as lojas e o CD, para o painel da Vulto ter o que mostrar.
+const CLIENTES_VULTO = ['15881399803', '69879730917', '11417075350', '64556815177', '88447294072', '97880932054']
+const CANAIS = ['E-commerce', 'App', 'Loja física']
+
+// [canal, tipo de solicitação, status, responsável, dias atrás, falas (cliente e atendente alternados)]
+const CONVERSAS_VULTO = [
+  ['WHATSAPP', 1, 'EM_ANDAMENTO', 10, 1, ['Oi! Comprei a {produto} e veio grande, dá pra trocar por um número menor?', 'Oi! Dá sim. Você prefere trocar na Vulto Pinheiros ou pelo site?', 'Na Pinheiros, passo amanhã.']],
+  ['INSTAGRAM', 6, 'ABERTO', null, 0, ['Vocês vão ter reposição da {produto} na cor {cor}?']],
+  ['WHATSAPP', 3, 'ABERTO', null, 3, ['Meu pedido saiu do CD há 3 dias e ainda não chegou. Tem previsão?']],
+  ['INSTAGRAM', 2, 'CONCLUIDO', 10, 12, ['Quero devolver a {produto}, não serviu.', 'Tudo certo! Abrimos a devolução e o estorno cai em até 5 dias úteis.']],
+  ['WHATSAPP', 5, 'EM_ANDAMENTO', 9, 2, ['Consegue reservar a {produto} tamanho {tamanho} na Savassi?', 'Reservado até sábado, é só falar seu nome no caixa.']],
+]
+
+export function buildOperacaoVulto({ variacoes, estoques, movimentacoes, ids }) {
+  const rand = createRandom(20261022)
+  const pedidos = []
+  const novasMovs = []
+  let movId = ids.movimentacao
+  const estoqueDe = (lojaId, variacaoId) => estoques.find((e) => e.lojaId === lojaId && e.variacaoId === variacaoId)
+  const precoDe = (variacaoId) => PRODUTOS_VULTO.find((p) => p.id === variacoes.find((v) => v.id === variacaoId).produtoId).precoBase
+
+  // Venda baixa o estoque da loja (ou do CD, nas vendas online) com uma movimentação VENDA
+  const vender = (lojaId, variacaoId, quando, origem) => {
+    const estoque = estoqueDe(lojaId, variacaoId)
+    if (!estoque || estoque.quantidade < 1) return false
+    estoque.quantidade -= 1
+    estoque.atualizadoEm = quando
+    novasMovs.push({ id: movId++, estoqueId: estoque.id, tipo: 'VENDA', quantidade: -1, saldoResultante: estoque.quantidade, criadoEm: quando, origem, usuarioId: lojaId === CD_VULTO.id ? 11 : 10 })
+    return true
+  }
+
+  for (let i = 0; i < 36; i++) {
+    const canal = CANAIS[i % 3]
+    const lojaId = canal === 'Loja física' ? LOJAS_VULTO[i % LOJAS_VULTO.length].id : CD_VULTO.id
+    const dias = Math.round(((36 - i) / 36) * 60)
+    const quando = daysAgo(dias, rand.int(10, 21), rand.int(0, 59))
+    const numero = `VLT-${70100 + i * 3}`
+    const itens = []
+    const quantidadeDeItens = rand.int(1, 2)
+    for (let k = 0; k < quantidadeDeItens; k++) {
+      const variacao = rand.pick(variacoes)
+      const origem = `${canal === 'Loja física' ? 'Venda PDV' : `Venda ${canal}`} · ${numero}`
+      if (vender(lojaId, variacao.id, quando, origem)) itens.push({ variacaoId: variacao.id, quantidade: 1, precoUnitario: precoDe(variacao.id) })
+    }
+    if (!itens.length) continue
+    let status = 'ENTREGUE'
+    if (canal !== 'Loja física' && dias <= 2) status = 'PROCESSANDO'
+    else if (canal !== 'Loja física' && dias <= 10) status = 'ENVIADO'
+    if (i === 20) status = 'CANCELADO'
+    const total = itens.reduce((s, item) => s + item.precoUnitario, 0)
+    pedidos.push({
+      id: ids.pedido + pedidos.length,
+      numero,
+      clienteId: CLIENTES_VULTO[i % CLIENTES_VULTO.length],
+      lojaId,
+      canal,
+      status,
+      criadoEm: quando,
+      codigoRastreio: canal !== 'Loja física' && status !== 'PROCESSANDO' ? `BR${rand.int(100000000, 999999999)}SP` : null,
+      itens,
+      subtotal: total,
+      desconto: 0,
+      total,
+      historico: [],
+    })
+  }
+
+  // Atendimentos dos canais da Vulto (WhatsApp e Instagram), ligados a um pedido
+  const atendimentos = []
+  const mensagens = []
+  let mensagemId = ids.mensagem
+  CONVERSAS_VULTO.forEach(([canal, tipoId, status, responsavelId, dias, falas], index) => {
+    const pedido = pedidos[pedidos.length - 1 - index * 4]
+    const variacao = variacoes.find((v) => v.id === pedido.itens[0].variacaoId)
+    const produto = PRODUTOS_VULTO.find((p) => p.id === variacao.produtoId)
+    const id = ids.atendimento + index
+    const criadoEm = daysAgo(dias, rand.int(9, 15), rand.int(0, 59))
+    let ultima = criadoEm
+    falas.forEach((texto, f) => {
+      ultima = Math.min(criadoEm + f * 2 * 3600000, Date.now() - 60000)
+      mensagens.push({
+        id: mensagemId++,
+        atendimentoId: id,
+        autorId: f % 2 === 0 ? pedido.clienteId : responsavelId,
+        autorTipo: f % 2 === 0 ? 'CLIENTE' : 'ATENDENTE',
+        conteudo: texto.replace('{produto}', produto.nome).replace('{cor}', variacao.cor).replace('{tamanho}', variacao.tamanho),
+        enviadoEm: ultima,
+      })
+    })
+    atendimentos.push({
+      id,
+      protocolo: `VLT-${40000 + id}`,
+      marca: 'VULTO',
+      canal,
+      solicitanteId: pedido.clienteId,
+      responsavelId,
+      tipoSolicitacaoId: tipoId,
+      status,
+      pedidoId: pedido.id,
+      lojaId: pedido.lojaId === CD_VULTO.id ? null : pedido.lojaId,
+      criadoEm,
+      atualizadoEm: ultima,
+    })
+  })
+
+  // Transferências do CD para as lojas e entre lojas
+  const transferencias = []
+  const roteiro = [
+    [CD_VULTO.id, 6, 'CONCLUIDA', 9],
+    [CD_VULTO.id, 8, 'EM_TRANSITO', 2],
+    [7, 6, 'SOLICITADA', 1],
+    [CD_VULTO.id, 9, 'SOLICITADA', 0],
+  ]
+  const nomeDa = (lojaId) => [...LOJAS_VULTO, CD_VULTO].find((l) => l.id === lojaId).nome
+  roteiro.forEach(([origem, destino, status, dias], index) => {
+    const variacao = variacoes[(index * 7) % variacoes.length]
+    const id = ids.transferencia + index
+    const codigo = `TRF-${String(id).padStart(4, '0')}`
+    const criadoEm = daysAgo(dias, 9, 30)
+    const enviadoEm = status === 'EM_TRANSITO' || status === 'CONCLUIDA' ? criadoEm + 2 * 3600000 : null
+    const recebidoEm = status === 'CONCLUIDA' ? criadoEm + 30 * 3600000 : null
+    const rota = `${codigo} · ${nomeDa(origem)} → ${nomeDa(destino)}`
+    const saida = estoqueDe(origem, variacao.id)
+    if (enviadoEm && saida.quantidade >= 2) {
+      saida.quantidade -= 2
+      novasMovs.push({ id: movId++, estoqueId: saida.id, tipo: 'TRANSFERENCIA_SAIDA', quantidade: -2, saldoResultante: saida.quantidade, criadoEm: enviadoEm, origem: rota, usuarioId: 11, transferenciaId: id })
+      if (recebidoEm) {
+        const entrada = estoqueDe(destino, variacao.id)
+        entrada.quantidade += 2
+        novasMovs.push({ id: movId++, estoqueId: entrada.id, tipo: 'TRANSFERENCIA_ENTRADA', quantidade: 2, saldoResultante: entrada.quantidade, criadoEm: recebidoEm, origem: rota, usuarioId: 10, transferenciaId: id })
+      }
+    }
+    transferencias.push({ id, codigo, variacaoId: variacao.id, lojaOrigemId: origem, lojaDestinoId: destino, quantidade: 2, status, solicitanteId: 10, responsavelId: 11, criadoEm, enviadoEm, recebidoEm, observacao: 'Reposição de grade' })
+  })
+
+  movimentacoes.push(...novasMovs)
+  return { pedidos, atendimentos, mensagens, transferencias }
+}
