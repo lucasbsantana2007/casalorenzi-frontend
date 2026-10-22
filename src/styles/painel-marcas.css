@@ -213,64 +213,21 @@
   height: 19px;
 }
 
-/* Faixa cortada na diagonal: o nome de cada marca no lado dela, na fonte dela */
-.cliente-faixa {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  min-height: 132px;
-  padding: 0 var(--store-gutter);
-  overflow: hidden;
-  background:
-    linear-gradient(108deg, transparent 0 49.7%, #b8542e 49.7% 50.1%, transparent 50.1%),
-    linear-gradient(108deg, #13203b 0 49.9%, #17191c 49.9% 100%);
-  color: #fff;
-}
-
-.cliente-faixa__lorenzi {
-  font-family: 'Marcellus', Georgia, serif;
-  font-size: clamp(26px, 3.4vw, 44px);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.cliente-faixa__vulto {
-  justify-self: end;
-  font-family: 'Archivo', Arial, sans-serif;
-  font-size: clamp(28px, 3.8vw, 50px);
-  font-stretch: 75%;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-}
-
-.cliente-faixa__texto {
-  position: absolute;
-  left: 50%;
-  bottom: 14px;
-  transform: translateX(-50%);
-  max-width: 90%;
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.72);
+/* Neutro: as cores da Lorenzi (marinho e terracota) viram grafite e cinza; só as logos identificam as marcas */
+.store--grupo {
+  --navy-950: #1c1d21;
+  --navy-900: #26282d;
+  --navy-800: #33363c;
+  --navy-700: #4a4d54;
+  --navy-100: #ebeae7;
+  --navy-50: #f3f2ef;
+  --marrom-600: #1c1d21;
+  --marrom-700: #000;
+  --terracota-500: #6b6a66;
 }
 
 .store--grupo .store-footer {
-  background: linear-gradient(108deg, #13203b 0 50%, #17191c 50% 100%);
-}
-
-@media (max-width: 700px) {
-  .cliente-faixa {
-    min-height: 110px;
-    padding-bottom: 28px;
-  }
-
-  .cliente-faixa__texto {
-    font-size: 10.5px;
-  }
+  background: #1c1d21;
 }
 
 /* Marca de funcionários e lojas nas tabelas da central */

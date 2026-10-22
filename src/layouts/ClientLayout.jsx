@@ -14,8 +14,8 @@ const LINKS = [
   { to: '/cliente/conta', label: 'Configurações' },
 ]
 
-// Área do cliente: a mesma conta nas duas marcas. Cabeçalho e rodapé com as duas logos, uma faixa de
-// boas-vindas cortada na diagonal (marinho da Lorenzi e preto da Vulto) e a navegação própria abaixo.
+// Área do cliente: a mesma conta nas duas marcas. Visual neutro (grafite e cinza), só com as duas logos
+// no cabeçalho e no rodapé, e a navegação própria abaixo.
 export function ClientLayout() {
   const { usuario, isCliente } = useSession()
   const location = useLocation()
@@ -33,11 +33,6 @@ export function ClientLayout() {
     <div className="store store--cliente store--grupo">
       <StoreHeader marca={GRUPO} />
 
-      <section className="cliente-faixa" aria-label="Boas-vindas">
-        <p className="cliente-faixa__lorenzi">Casa Lorenzi</p>
-        <p className="cliente-faixa__vulto">Vulto</p>
-        <p className="cliente-faixa__texto">Uma conta, duas marcas: pedidos, trocas e pontos Vulto+ no mesmo lugar.</p>
-      </section>
 
       <div className="client-bar">
         <nav className="client-bar__nav" aria-label="Área do cliente">
