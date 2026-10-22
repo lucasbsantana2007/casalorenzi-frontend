@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { AuthField } from '../components/auth/AuthField'
 import { LayoutAcesso } from '../components/auth/LayoutAcesso'
 import { FormError } from '../components/ui/FormError'
+import { useSession } from '../hooks/useSession'
 import { authService } from '../services/authService'
 
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -77,6 +78,7 @@ export function EsqueciSenhaPage() {
 export function NovaSenhaPage() {
   const [params] = useSearchParams()
   const navigate = useNavigate()
+  const { logout } = useSession()
   const token = params.get('token') ?? ''
   const [senha, setSenha] = useState('')
   const [senhaConfirmacao, setSenhaConfirmacao] = useState('')
@@ -91,6 +93,9 @@ export function NovaSenhaPage() {
     setEnviando(true)
     try {
       const { email } = await authService.redefinirSenha({ token, senha, senhaConfirmacao })
+      // A senha é de outra conta (ex.: o Administrador abriu o convite do funcionário no mesmo navegador):
+      // encerra a sessão aberta para o login não entrar na conta antiga
+      logout()
       // E-mail vai no state da navegação, não na URL (não fica no histórico)
       navigate('/login', { replace: true, state: { senhaNova: true, email } })
     } catch (error) {
