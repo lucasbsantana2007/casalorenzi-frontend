@@ -1,0 +1,412 @@
+/* ---------- Duas marcas, um site ----------
+   Faixa das marcas no topo (como Nike / Jordan) e a identidade da Vulto na vitrine /vulto.
+   A Vulto reaproveita todo o CSS da loja trocando as variáveis da paleta e a fonte. */
+
+/* Faixa preta com as duas logos */
+.barra-marcas {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  height: var(--barra-marcas);
+  padding: 0 var(--store-gutter);
+  background: #0e0f11;
+}
+
+.barra-marcas__marca {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  opacity: 0.55;
+  transition: opacity 0.2s;
+}
+
+.barra-marcas__marca:hover,
+.barra-marcas__marca:focus-visible,
+.barra-marcas__marca[aria-current='page'] {
+  opacity: 1;
+}
+
+.barra-marcas__marca img {
+  display: block;
+  width: auto;
+}
+
+/* As duas com a mesma presença: a Lorenzi tem duas linhas (CASA + LORENZI), a Vulto uma só */
+.barra-marcas__marca--lorenzi img {
+  height: 20px;
+}
+
+.barra-marcas__marca--vulto img {
+  height: 13px;
+}
+
+/* Início da Lorenzi: o cabeçalho sobre as fotos começa abaixo da faixa, e as fotos descontam a altura dela */
+.store {
+  --barra-marcas: 40px;
+}
+
+.store-header--overlay {
+  top: var(--barra-marcas);
+}
+
+.split-hero {
+  height: calc(100vh - var(--barra-marcas));
+}
+
+/* Logo do cabeçalho e do rodapé (wordmarks horizontais) */
+.store-header__logo {
+  display: block;
+  width: auto;
+  height: 34px;
+}
+
+.store--vulto .store-header__logo {
+  height: 26px;
+}
+
+.store-header.is-transparent .store-header__logo {
+  filter: drop-shadow(0 1px 6px rgba(0, 0, 0, 0.45));
+}
+
+.store-footer__logo {
+  display: block;
+  width: auto;
+  height: 40px;
+}
+
+.store--vulto .store-footer__logo {
+  height: 30px;
+}
+
+/* ---------- Vulto: preto, branco e um laranja de sinalização ---------- */
+.store--vulto {
+  --vulto-preto: #17191c;
+  --vulto-papel: #f2f0eb;
+  --vulto-sinal: #e8481c;
+  --vulto-sinal-escuro: #c63a12;
+  /* A loja inteira lê estas variáveis: trocar aqui troca cabeçalho, grade, filtros, sacola e rodapé */
+  --navy-950: var(--vulto-preto);
+  --navy-900: var(--vulto-preto);
+  --navy-50: var(--vulto-papel);
+  --marrom-600: var(--vulto-sinal);
+  --marrom-700: var(--vulto-sinal-escuro);
+  --font-display: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+}
+
+/* Títulos, menu e botões: caixa alta pesada e condensada, letras juntas */
+.store--vulto .store-header,
+.store--vulto .store-heading,
+.store--vulto .store-heading-link,
+.store--vulto .product-card h3,
+.store--vulto .pdp__title,
+.store--vulto .pdp__cta,
+.store--vulto .store-filter-btn,
+.store--vulto .store-footer {
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.store--vulto .store-heading {
+  font-size: 34px;
+  letter-spacing: -0.01em;
+}
+
+.store--vulto .store-heading--lg {
+  font-size: 44px;
+}
+
+.store--vulto .product-card {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.store--vulto .product-card__image {
+  background: var(--vulto-papel);
+}
+
+.store--vulto .product-card h3 {
+  font-size: 16px;
+}
+
+.store--vulto .product-card p {
+  color: var(--vulto-preto);
+  font-weight: 600;
+}
+
+.store--vulto .store-header:not(.is-transparent) a:hover,
+.store--vulto .store-header:not(.is-transparent) a.is-active {
+  text-decoration-color: var(--vulto-sinal);
+}
+
+.store--vulto .store-footer {
+  background: #0e0f11;
+}
+
+/* Página da peça: o card tipográfico aparece inteiro (as fotos da Lorenzi continuam cortadas em cover) */
+.store--vulto .pdp__media {
+  display: grid;
+  place-items: center;
+  padding: 48px;
+  background: var(--vulto-papel);
+}
+
+.store--vulto .pdp__media img {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: contain;
+}
+
+/* Início da Vulto */
+.vulto-inicio {
+  width: 100%;
+}
+
+.vulto-hero {
+  display: grid;
+  align-content: end;
+  justify-items: start;
+  gap: 22px;
+  min-height: min(78vh, 720px);
+  padding: 64px var(--store-gutter) 56px;
+  background:
+    linear-gradient(135deg, transparent 0 62%, rgba(232, 72, 28, 0.9) 62% 63.2%, transparent 63.2%),
+    var(--vulto-preto);
+  color: #fff;
+}
+
+.vulto-hero__selo {
+  padding: 6px 12px;
+  background: var(--vulto-sinal);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.vulto-hero__titulo {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 11vw, 168px);
+  font-stretch: 62%;
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.vulto-hero__texto {
+  max-width: 460px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #c9c7c2;
+}
+
+.vulto-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 24px;
+  background: var(--vulto-sinal);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: background-color 0.2s;
+}
+
+.vulto-cta:hover {
+  background: var(--vulto-sinal-escuro);
+}
+
+.vulto-cta--claro {
+  background: #fff;
+  color: var(--vulto-preto);
+}
+
+.vulto-cta--claro:hover {
+  background: var(--vulto-papel);
+}
+
+.vulto-categorias ul,
+.vulto-onde__lista,
+.vulto-lojas__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vulto-categorias ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.vulto-categorias a {
+  display: inline-block;
+  padding: 12px 18px;
+  border: 2px solid var(--vulto-preto);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-stretch: 75%;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.vulto-categorias a:hover {
+  background: var(--vulto-preto);
+  color: #fff;
+}
+
+.vulto-mais {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 96px var(--store-gutter) 0;
+  padding: 40px;
+  background: var(--vulto-sinal);
+  color: #fff;
+}
+
+.vulto-mais h2 {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-stretch: 62%;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.vulto-mais p {
+  max-width: 560px;
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.vulto-onde__lista {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border-top: 2px solid var(--vulto-preto);
+}
+
+.vulto-onde__lista li {
+  display: grid;
+  gap: 4px;
+  padding: 20px 16px 20px 0;
+}
+
+.vulto-onde__lista strong,
+.vulto-lojas__lista h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-stretch: 62%;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.vulto-onde__lista span,
+.vulto-lojas__cidade {
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* Página Lojas da Vulto */
+.vulto-lojas__intro {
+  max-width: 560px;
+  margin: -8px 0 32px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.vulto-lojas__lista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 40px;
+}
+
+.vulto-lojas__lista li {
+  display: grid;
+  gap: 6px;
+  padding: 24px 0;
+  border-top: 2px solid var(--vulto-preto);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.vulto-lojas__horario {
+  color: var(--text-muted);
+}
+
+.vulto-lojas__telefone {
+  justify-self: start;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 900px) {
+  .store {
+    --barra-marcas: 36px;
+  }
+
+  .barra-marcas {
+    gap: 22px;
+  }
+
+  .store--vulto .pdp__media {
+    padding: 24px;
+  }
+
+  .store-header__logo {
+    height: 26px;
+  }
+
+  .store--vulto .store-header__logo {
+    height: 20px;
+  }
+
+  .vulto-hero {
+    min-height: 70vh;
+    padding-top: 48px;
+  }
+
+  .vulto-mais {
+    padding: 28px;
+  }
+
+  .vulto-onde__lista,
+  .vulto-lojas__lista {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .vulto-onde__lista,
+  .vulto-lojas__lista {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .vulto-mais h2 {
+    font-size: 40px;
+  }
+}

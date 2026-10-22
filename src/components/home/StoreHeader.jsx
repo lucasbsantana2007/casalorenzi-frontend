@@ -3,15 +3,9 @@ import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useSacola } from '../../hooks/useSacola'
 import { useSession } from '../../hooks/useSession'
-import { BrandMark } from '../BrandMark'
+import { inicioDaMarca } from '../../data/marcas'
+import { useMarca } from '../../hooks/useMarca'
 import { BuscaDaLoja } from './BuscaDaLoja'
-
-const NAV = [
-  { to: '/colecao/masculino', label: 'Masculino' },
-  { to: '/colecao/feminino', label: 'Feminino' },
-  { to: '/lojas', label: 'Lojas' },
-  { to: '/lorenzi', label: 'Lorenzi' },
-]
 
 // Boneco do cabeçalho: abre o login; com sessão, leva cada um para a sua área
 function itemDaConta({ isCliente, isEquipe }) {
@@ -21,9 +15,10 @@ function itemDaConta({ isCliente, isEquipe }) {
 }
 
 // Cabeçalho da loja: fica no topo da página e sai de vista ao rolar (não acompanha a rolagem).
-// `overlay` (início): por cima das fotos, com texto claro.
+// `overlay` (início): por cima das fotos, com texto claro. Logo e menu são os da marca da vitrine aberta.
 export function StoreHeader({ overlay = false }) {
   const sessao = useSession()
+  const marca = useMarca()
   const conta = itemDaConta(sessao)
   const { quantidadeTotal, abrir: abrirSacola } = useSacola()
   const [menuAberto, setMenuAberto] = useState(false)
@@ -32,12 +27,12 @@ export function StoreHeader({ overlay = false }) {
 
   return (
     <header className={`store-header ${overlay ? 'store-header--overlay' : ''} ${transparente ? 'is-transparent' : ''} ${menuAberto ? 'is-open' : ''}`}>
-      <Link to="/" className="store-header__brand" aria-label="Casa Lorenzi — início" onClick={fechar}>
-        <BrandMark size="sm" inverse={transparente} />
+      <Link to={inicioDaMarca(marca)} className="store-header__brand" aria-label={`${marca.nome} — início`} onClick={fechar}>
+        <img src={transparente ? marca.logoBranca : marca.logo} alt={marca.nome} className="store-header__logo" />
       </Link>
 
       <nav className="store-header__nav" aria-label="Navegação principal">
-        {NAV.map((item) => (
+        {marca.nav.map((item) => (
           <NavLink key={item.to} to={item.to} onClick={fechar} className={({ isActive }) => (isActive ? 'is-active' : undefined)}>
             {item.label}
           </NavLink>
