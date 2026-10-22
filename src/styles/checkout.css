@@ -1232,3 +1232,65 @@ a.drawer__btn:hover {
   text-underline-offset: 3px;
   justify-self: start;
 }
+
+/* Vulto+ no checkout */
+.co-pontos {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--navy-50);
+}
+
+.co-pontos__topo {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--navy-950);
+}
+
+.co-pontos__topo span {
+  color: var(--text-muted);
+}
+
+.co-pontos__uso {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) auto;
+  align-items: end;
+  gap: 8px 12px;
+}
+
+.co-pontos__uso .co-step__hint {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.co-pontos__tudo {
+  height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--navy-800);
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--navy-900);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.co-pontos__tudo:hover {
+  background: var(--navy-900);
+  color: #fff;
+}
+
+.co-totals__desconto dd {
+  color: var(--success);
+}
+
+.co-ganho {
+  color: var(--navy-800);
+}
