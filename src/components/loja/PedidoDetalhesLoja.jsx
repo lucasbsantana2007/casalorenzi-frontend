@@ -50,6 +50,12 @@ export function PedidoDetalhesLoja({ pedido }) {
           <dt>Subtotal</dt>
           <dd>{formatCurrency(pedido.subtotal)}</dd>
         </div>
+        {pedido.desconto > 0 && (
+          <div className="co-totals__desconto">
+            <dt>Pontos Vulto+</dt>
+            <dd>− {formatCurrency(pedido.desconto)}</dd>
+          </div>
+        )}
         {pedido.frete && (
           <div>
             <dt>Frete · {pedido.frete.label}</dt>
