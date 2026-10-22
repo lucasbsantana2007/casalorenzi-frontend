@@ -2,6 +2,7 @@ import { Minus, Plus, X } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { imagemDoProduto } from '../../data/imagensProdutos'
+import { caminhoDoProduto } from '../../data/marcas'
 import { useCondicoesFrete } from '../../hooks/useCadastros'
 import { useSacola } from '../../hooks/useSacola'
 import { formatCurrency } from '../../utils/format'
@@ -60,11 +61,11 @@ export function SacolaLateral() {
             <ul className="drawer__items">
               {itens.map((item) => (
                 <li key={item.variacaoId} className="drawer-item">
-                  <Link to={`/produto/${item.produtoId}`} className="drawer-item__image">
-                    <img src={imagemDoProduto({ id: item.produtoId, imagemUrl: item.imagemUrl })} alt={item.nome} />
+                  <Link to={caminhoDoProduto(item)} className="drawer-item__image">
+                    <img src={imagemDoProduto(item)} alt={item.nome} />
                   </Link>
                   <div className="drawer-item__info">
-                    <Link to={`/produto/${item.produtoId}`} className="drawer-item__name">
+                    <Link to={caminhoDoProduto(item)} className="drawer-item__name">
                       {item.nome}
                     </Link>
                     <span className="drawer-item__meta">
