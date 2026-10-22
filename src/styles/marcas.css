@@ -2,14 +2,20 @@
    Faixa das marcas no topo (como Nike / Jordan) e a identidade da Vulto na vitrine /vulto.
    A Vulto reaproveita todo o CSS da loja trocando as variáveis da paleta e a fonte. */
 
-/* Faixa preta com as duas logos */
+/* Faixa preta com as duas logos: recolhida (altura 0) até a pessoa chegar ao topo */
 .barra-marcas {
   display: flex;
   align-items: center;
   gap: 28px;
   height: var(--barra-marcas);
   padding: 0 var(--store-gutter);
+  overflow: hidden;
   background: #0e0f11;
+  transition: height 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.barra-marcas:not(.is-aberta) .barra-marcas__marca {
+  opacity: 0;
 }
 
 .barra-marcas__marca {
@@ -42,11 +48,16 @@
 
 /* Início da Lorenzi: o cabeçalho sobre as fotos começa abaixo da faixa, e as fotos descontam a altura dela */
 .store {
+  --barra-marcas: 0px;
+}
+
+.store--barra-aberta {
   --barra-marcas: 40px;
 }
 
 .store-header--overlay {
   top: var(--barra-marcas);
+  transition: top 0.32s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .split-hero {
@@ -365,7 +376,7 @@
 }
 
 @media (max-width: 900px) {
-  .store {
+  .store--barra-aberta {
     --barra-marcas: 36px;
   }
 
@@ -397,6 +408,13 @@
   .vulto-onde__lista,
   .vulto-lojas__lista {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barra-marcas,
+  .store-header--overlay {
+    transition: none;
   }
 }
 
