@@ -453,8 +453,7 @@ a.product-card--duas-fotos:hover .product-card__costas {
 }
 
 .vulto-categorias ul,
-.vulto-onde__lista,
-.vulto-lojas__lista {
+.vulto-onde__lista {
   margin: 0;
   padding: 0;
   list-style: none;
@@ -517,57 +516,19 @@ a.product-card--duas-fotos:hover .product-card__costas {
   padding: 22px 16px 22px 0;
 }
 
-.vulto-onde__lista strong,
-.vulto-lojas__lista h2 {
+.vulto-onde__lista strong {
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 500;
   line-height: 1.2;
 }
 
-.vulto-onde__lista span,
-.vulto-lojas__cidade {
+.vulto-onde__lista span {
   font-size: 11.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-muted);
 }
-
-/* Página Lojas da Vulto */
-.vulto-lojas__intro {
-  max-width: 560px;
-  margin: -8px 0 32px;
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--text-muted);
-}
-
-.vulto-lojas__lista {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 40px;
-}
-
-.vulto-lojas__lista li {
-  display: grid;
-  gap: 6px;
-  padding: 24px 0;
-  border-top: 1px solid var(--border-strong);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.vulto-lojas__horario {
-  color: var(--text-muted);
-}
-
-.vulto-lojas__telefone {
-  justify-self: start;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
 
 @media (max-width: 900px) {
   .barra-marcas {
@@ -595,8 +556,7 @@ a.product-card--duas-fotos:hover .product-card__costas {
     padding: 28px 24px;
   }
 
-  .vulto-onde__lista,
-  .vulto-lojas__lista {
+  .vulto-onde__lista {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -608,8 +568,7 @@ a.product-card--duas-fotos:hover .product-card__costas {
 }
 
 @media (max-width: 560px) {
-  .vulto-onde__lista,
-  .vulto-lojas__lista {
+  .vulto-onde__lista {
     grid-template-columns: minmax(0, 1fr);
   }
 
