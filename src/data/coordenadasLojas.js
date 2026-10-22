@@ -11,3 +11,20 @@ export const COORDENADAS_LOJAS = {
 
 // Loja de onde saem as linhas do mapa (a matriz).
 export const LOJA_MATRIZ_ID = 1
+
+// Lojas da Vulto, pelo nome (os ids mudam entre a demonstração e a API real). Pinheiros e Eldorado
+// ficam a 1 km uma da outra: rótulos em lados opostos
+const COORDENADAS_VULTO = {
+  'Vulto Pinheiros': { lat: -23.5665, lng: -46.69, lado: 'esquerda' },
+  'Vulto Shopping Eldorado': { lat: -23.5727, lng: -46.6964, lado: 'direita' },
+  'Vulto Savassi': { lat: -19.9387, lng: -43.9346, lado: 'direita' },
+  'Vulto Batel': { lat: -25.442, lng: -49.287, lado: 'esquerda' },
+}
+
+export const coordenadasDaLoja = (loja) => (loja.marca === 'VULTO' ? COORDENADAS_VULTO[loja.nome] : COORDENADAS_LOJAS[loja.id])
+
+// Nome curto para mapa e lista: as lojas da Vulto se chamam "Vulto Pinheiros" etc.
+export const nomeCurto = (loja) => loja.nome.replace(/^Vulto\s+/, '')
+
+// Matriz de cada marca (de onde saem as linhas): Oscar Freire na Lorenzi, Pinheiros na Vulto
+export const ehMatriz = (loja) => (loja.marca === 'VULTO' ? loja.nome === 'Vulto Pinheiros' : loja.id === LOJA_MATRIZ_ID)

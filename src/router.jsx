@@ -54,7 +54,7 @@ export const router = createBrowserRouter([
         children: [
           { index: true, ...publica(() => import('./pages/vulto/VultoHomePage'), 'VultoHomePage') },
           { path: 'loja', ...publica(() => import('./pages/vulto/VultoLojaPage'), 'VultoLojaPage') },
-          { path: 'lojas', ...publica(() => import('./pages/vulto/VultoLojasPage'), 'VultoLojasPage') },
+          { path: 'lojas', ...publica(() => import('./pages/LojasPage'), 'LojasPage') },
           { path: 'produto/:id', ...publica(() => import('./pages/ProdutoPage'), 'ProdutoPage') },
         ],
       },

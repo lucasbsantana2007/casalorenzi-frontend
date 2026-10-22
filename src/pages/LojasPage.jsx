@@ -1,12 +1,16 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import { MapaLojas } from '../components/loja/MapaLojas'
-import { FOTOS_LOJAS } from '../data/fotosLojas'
+import { nomeCurto } from '../data/coordenadasLojas'
+import { fotoDaLoja } from '../data/fotosLojas'
+import { useMarca } from '../hooks/useMarca'
 import { useLojas } from '../hooks/useCadastros'
 
+// Página Lojas das duas marcas (/lojas e /vulto/lojas): mapa, lista e a foto de cada loja
 export function LojasPage() {
+  const marca = useMarca()
   // Loja desativada no cadastro sai do site
-  const lojas = useLojas('LORENZI').filter((loja) => loja.ativa !== false)
+  const lojas = useLojas(marca.id).filter((loja) => loja.ativa !== false)
   // Passar o mouse na lista acende o ponto no mapa, e vice-versa
   const [ativa, setAtiva] = useState(null)
   // Loja com foto e informações abertas: clique no nome ou no ponto do mapa
@@ -29,7 +33,7 @@ export function LojasPage() {
         <MapaLojas lojas={lojas} ativa={ativa ?? aberta} onAtivar={setAtiva} onSelecionar={abrirPeloMapa} />
         <ul className="store-list">
           {lojas.map((loja) => {
-            const detalhes = loja.endereco ? { ...loja, foto: FOTOS_LOJAS[loja.id] } : null
+            const detalhes = loja.endereco ? { ...loja, foto: fotoDaLoja(loja) } : null
             const estaAberta = aberta === loja.id
             return (
               <li
@@ -48,7 +52,7 @@ export function LojasPage() {
                   disabled={!detalhes}
                 >
                   <strong>
-                    {loja.nome}
+                    {nomeCurto(loja)}
                     {detalhes && <ChevronDown className="store-list__seta" size={14} strokeWidth={1.5} aria-hidden="true" />}
                   </strong>
                   <span>
@@ -57,7 +61,7 @@ export function LojasPage() {
                 </button>
                 {detalhes && estaAberta && (
                   <div className="store-list__detalhes" id={`loja-${loja.id}-detalhes`}>
-                    {detalhes.foto && <img src={detalhes.foto} alt={`Fachada da Casa Lorenzi ${loja.nome}`} />}
+                    {detalhes.foto && <img src={detalhes.foto} alt={`Fachada da ${loja.nome.startsWith(marca.nome) ? loja.nome : `${marca.nome} ${loja.nome}`}`} />}
                     <dl>
                       <div>
                         <dt>Endereço</dt>
