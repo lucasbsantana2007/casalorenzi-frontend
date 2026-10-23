@@ -1,7 +1,7 @@
 // Vulto+ (programa de pontos). As mesmas regras de src/entities/fidelidade.py do backend:
 // R$ 1 em produtos = 1 ponto na loja física e 2 no site e no app (o frete não conta), bônus da categoria
 // antes da compra (Ouro +25%, Vip +50%), resgate de 100 em 100 pontos (100 = R$ 5,00) em compras com
-// pelo menos R$ 500 em produtos, validade de 12 meses. Decisões 67 a 69 do registro da união.
+// pelo menos R$ 500 em produtos, validade de 12 meses. Decisões 78 a 80 do registro da união.
 
 export const VALOR_PONTO = 0.05
 export const RESGATE_MULTIPLO = 100
