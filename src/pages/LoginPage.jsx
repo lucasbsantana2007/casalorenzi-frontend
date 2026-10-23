@@ -115,8 +115,6 @@ export function LoginPage() {
         </Link>
       </p>
 
-      {vulto && <p className="acesso__equipe">Equipe da Vulto: entre com o seu e-mail. O painel de gestão é o mesmo das duas marcas, e cada um vê a marca em que trabalha.</p>}
-
       {MODO_DEMO && (
         <details className="login__demo">
           <summary>Acesso de demonstração</summary>

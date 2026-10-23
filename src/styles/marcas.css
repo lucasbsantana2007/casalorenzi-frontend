@@ -312,16 +312,6 @@ a.product-card--duas-fotos:hover .product-card__costas {
   background: #000;
 }
 
-.acesso__equipe {
-  margin: 0;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--text-muted);
-}
-
-
 /* ---------- Início da Vulto ---------- */
 .vulto-inicio {
   width: 100%;
