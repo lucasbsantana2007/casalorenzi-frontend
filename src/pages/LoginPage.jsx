@@ -7,12 +7,13 @@ import { FormError } from '../components/ui/FormError'
 import { MODO_DEMO } from '../config/env'
 import { inicioDaMarca, loginDaMarca } from '../data/marcas'
 import { useMarca } from '../hooks/useMarca'
-import { CLIENTE_DEMO, PERFIS_DEMO, SENHA_DEMO } from '../context/perfisDemo'
+import { ACESSO_DEMO, CLIENTE_DEMO, SENHA_DEMO } from '../context/perfisDemo'
 import { useSession } from '../hooks/useSession'
 import { destinoPara } from '../utils/destinoLogin'
 import { PAPEIS } from '../utils/permissions'
 
-const CONTAS_DEMO = [{ ...CLIENTE_DEMO, rotulo: 'Cliente' }, ...PERFIS_DEMO.map((p) => ({ ...p, rotulo: PAPEIS[p.papel] }))]
+// A equipe da marca da página e, nas duas, a cliente de demonstração
+const gruposDemo = (marca) => [...ACESSO_DEMO[marca], { titulo: 'Cliente', contas: [CLIENTE_DEMO] }]
 
 // Login único (Iniciar sessão) para clientes e equipe, em /login (Casa Lorenzi) e /vulto/login (Vulto).
 // Os dois entram na mesma conta e levam ao mesmo lugar: cliente → /cliente, equipe → /dashboard.
@@ -114,19 +115,24 @@ export function LoginPage() {
         </Link>
       </p>
 
-      {vulto && <p className="acesso__equipe">Equipe da Vulto ou da Casa Lorenzi: entre com o seu e-mail. Você vai para o mesmo painel de gestão das duas marcas.</p>}
+      {vulto && <p className="acesso__equipe">Equipe da Vulto: entre com o seu e-mail. O painel de gestão é o mesmo das duas marcas, e cada um vê a marca em que trabalha.</p>}
 
       {MODO_DEMO && (
         <details className="login__demo">
           <summary>Acesso de demonstração</summary>
-          <div className="login__quick-grid login__quick-grid--4">
-            {CONTAS_DEMO.map((conta) => (
-              <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
-                <strong>{conta.rotulo}</strong>
-                <span>{conta.nome}</span>
-              </button>
-            ))}
-          </div>
+          {gruposDemo(marca.id).map((grupo) => (
+            <div key={grupo.titulo} className="login__demo-grupo">
+              <span className="login__demo-titulo">{grupo.titulo}</span>
+              <div className={`login__quick-grid${grupo.contas.length === 1 ? ' login__quick-grid--1' : ''}`}>
+                {grupo.contas.map((conta) => (
+                  <button key={conta.id} type="button" className="login__quick-btn" disabled={entrando} onClick={() => acessoRapido(conta)}>
+                    <strong>{PAPEIS[conta.papel] ?? 'Cliente'}</strong>
+                    <span>{conta.nome}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
           <p>
             Ou entre com qualquer conta de demonstração e a senha <code>{SENHA_DEMO}</code>.
           </p>

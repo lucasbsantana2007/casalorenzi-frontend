@@ -13,6 +13,8 @@ export const USUARIOS = [
   { id: 9, nome: 'Paula Ferraz', email: 'paula.ferraz@vulto.com.br', papel: 'ADMINISTRADOR', lojaId: null, marca: 'VULTO' },
   { id: 10, nome: 'Lia Okada', email: 'lia.okada@vulto.com.br', papel: 'LOJISTA', lojaId: 6, marca: 'VULTO' },
   { id: 11, nome: 'Bruno Sales', email: 'bruno.sales@vulto.com.br', papel: 'OPERADOR', lojaId: 10, marca: 'VULTO' },
+  // Administrador só da Casa Lorenzi (Helena é a do grupo, das duas marcas)
+  { id: 12, nome: 'Otávio Vasconcelos', email: 'otavio.vasconcelos@casalorenzi.com.br', papel: 'ADMINISTRADOR', lojaId: null, marca: 'LORENZI' },
 ].map((u) => ({ ...u, marca: u.marca ?? (u.papel === 'ADMINISTRADOR' ? 'GRUPO' : 'LORENZI') }))
 
 // CLIENTE: o id é o CPF (11 dígitos, sem pontuação)
