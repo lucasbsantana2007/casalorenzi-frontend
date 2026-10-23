@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { ProductGrid } from '../../components/home/ProductGrid'
 import { VideoLoop } from '../../components/ui/VideoLoop'
+import { temFoto } from '../../data/imagensProdutos'
 import { useAsync } from '../../hooks/useAsync'
 import { useLojas } from '../../hooks/useCadastros'
 import { produtosService } from '../../services/produtosService'
@@ -13,8 +14,8 @@ const DESTAQUES = 8
 export function VultoHomePage() {
   const produtos = useAsync(() => produtosService.listar({ ativo: true, marca: 'VULTO' }), []).data ?? []
   const lojas = useLojas('VULTO').filter((loja) => loja.ativa !== false)
-  // As peças cadastradas por último são as do drop mais recente
-  const drop = [...produtos].sort((a, b) => b.id - a.id).slice(0, DESTAQUES)
+  // Novidades: as peças com foto primeiro, as cadastradas por último na frente
+  const drop = [...produtos].sort((a, b) => Number(temFoto(b)) - Number(temFoto(a)) || b.id - a.id).slice(0, DESTAQUES)
   const categorias = [...new Set(produtos.map((p) => p.categoria))].sort((a, b) => a.localeCompare(b, 'pt-BR'))
 
   return (

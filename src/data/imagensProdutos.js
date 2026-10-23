@@ -61,6 +61,9 @@ export function fotosDoProduto(produto, cor) {
   return fotos
 }
 
+// Peça da Vulto com foto do catálogo (as outras mostram o card tipográfico)
+export const temFoto = (produto) => Boolean(produto.imagemUrl || (produto.marca === 'VULTO' && fotoDaVulto(produto.codigoModelo, 'frente')))
+
 // Foto que aparece na grade com o mouse em cima: a peça vestida; sem ela, as costas
 export function fotoAlternativa(produto) {
   if (produto.marca !== 'VULTO') return undefined
@@ -79,10 +82,11 @@ const ORDEM_VITRINE = [
   4, 3, 2, 1, 11, 8,
 ]
 
+// Na Vulto, as peças com foto vêm primeiro (o catálogo migrado tem muitas sem)
 export function ordenarVitrine(produtos) {
   const posicao = (p) => {
     const i = ORDEM_VITRINE.indexOf(p.id)
     return i === -1 ? ORDEM_VITRINE.length : i
   }
-  return [...produtos].sort((a, b) => posicao(a) - posicao(b))
+  return [...produtos].sort((a, b) => Number(temFoto(b)) - Number(temFoto(a)) || posicao(a) - posicao(b))
 }
