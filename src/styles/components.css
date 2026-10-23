@@ -958,3 +958,37 @@ button.seletor__gatilho:disabled {
     flex: 1 1 140px;
   }
 }
+
+/* Tela de erro das rotas (versão nova publicada com a aba aberta ou falha inesperada) */
+.erro-app {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: center;
+}
+
+.erro-app h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.erro-app p {
+  margin: 0;
+  max-width: 420px;
+  color: var(--text-muted);
+}
+
+.erro-app__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}

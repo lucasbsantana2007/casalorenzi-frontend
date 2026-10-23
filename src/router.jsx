@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { ErroDaAplicacao } from './components/ErroDaAplicacao'
 import { RequireAccess } from './components/RequireAccess'
 import { LoadingState } from './components/ui/LoadingState'
+import { importarComRecarga } from './utils/versaoNova'
 import { AdminLayout } from './layouts/AdminLayout'
 import { ClientLayout } from './layouts/ClientLayout'
 import { NotFoundPage } from './pages/NotFoundPage'
@@ -31,12 +33,22 @@ import { SolicitacaoDetalhePage } from './pages/cliente/SolicitacaoDetalhePage'
 const protegida = (modulo, element) => <RequireAccess modulo={modulo}>{element}</RequireAccess>
 
 // Páginas públicas carregadas sob demanda: o shader e as animações ficam fora do pacote principal
+// (versão antiga numa aba aberta depois de um deploy: recarrega em vez de quebrar; ver utils/versaoNova.js)
 const publica = (carregar, nome) => ({
   hydrateFallbackElement: <LoadingState />,
-  lazy: async () => ({ Component: (await carregar())[nome] }),
+  lazy: async () => ({ Component: (await importarComRecarga(carregar, destinoPendente))[nome] }),
 })
 
-export const router = createBrowserRouter([
+// Endereço da navegação em andamento (a página nova que falhou ao carregar), para recarregar já nela
+export function destinoPendente() {
+  const local = router.state.navigation.location
+  return local ? router.createHref(local) : null
+}
+
+// Toda rota de primeiro nível ganha a tela de erro amigável
+const comTelaDeErro = (rotas) => rotas.map((rota) => ({ errorElement: <ErroDaAplicacao />, ...rota }))
+
+export const router = createBrowserRouter(comTelaDeErro([
   {
     // Loja pública: início, coleções e lojas da Casa Lorenzi (/) e da Vulto (/vulto)
     ...publica(() => import('./layouts/StoreLayout'), 'StoreLayout'),
@@ -137,4 +149,4 @@ export const router = createBrowserRouter([
       </main>
     ),
   },
-])
+]))
