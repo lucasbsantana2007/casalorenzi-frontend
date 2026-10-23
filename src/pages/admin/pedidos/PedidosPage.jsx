@@ -69,6 +69,9 @@ const columns = [
   },
 ]
 
+// Máximo de pedidos que a lista do painel recebe da API (src/use_cases/pedidos.py, LIMITE_LISTA)
+const LIMITE_LISTA = 300
+
 export function PedidosPage() {
   const navigate = useNavigate()
   const { usuario } = useSession()
@@ -117,6 +120,10 @@ export function PedidosPage() {
         </Select>
       </div>
 
+      {/* A API devolve no máximo os 300 mais recentes (a Vulto trouxe dezenas de milhares); a busca procura em todos */}
+      {todos.length >= LIMITE_LISTA && (
+        <p className="subtle">Mostrando os {LIMITE_LISTA} pedidos mais recentes. Para um pedido antigo, busque pelo número, nome ou e-mail do cliente.</p>
+      )}
       <AsyncContent
         state={{ ...state, data: state.data && todos.filter((p) => pertence(p, aba)) }}
         empty={<EmptyState icon={ShoppingBag} title="Nenhum pedido encontrado" description="Não há pedidos com os filtros selecionados." />}
