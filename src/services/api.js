@@ -32,8 +32,8 @@ function extractMessage(body, status) {
   return `A requisição falhou (HTTP ${status}).`
 }
 
-async function request(path, { method = 'GET', params, body } = {}) {
-  const headers = { Accept: 'application/json' }
+async function request(path, { method = 'GET', params, body, headers: extras } = {}) {
+  const headers = { Accept: 'application/json', ...extras }
   const token = getToken()
   if (token) headers.Authorization = `Bearer ${token}`
   // Seletor de marca do Administrador do grupo (a API ignora para quem é de uma marca só)
@@ -68,9 +68,10 @@ async function request(path, { method = 'GET', params, body } = {}) {
   return data
 }
 
+// opcoes.headers: cabeçalhos extras da chamada (ex.: X-Conversa-Chave do assistente do site)
 export const api = {
-  get: (path, params) => request(path, { params }),
-  post: (path, body) => request(path, { method: 'POST', body }),
+  get: (path, params, opcoes) => request(path, { params, ...opcoes }),
+  post: (path, body, opcoes) => request(path, { method: 'POST', body, ...opcoes }),
   put: (path, body) => request(path, { method: 'PUT', body }),
   patch: (path, body) => request(path, { method: 'PATCH', body }),
   delete: (path) => request(path, { method: 'DELETE' }),
