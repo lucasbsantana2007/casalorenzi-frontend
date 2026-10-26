@@ -6,26 +6,13 @@
   right: 24px;
   bottom: 24px;
   z-index: 60;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px 20px;
-  border: 0;
-  border-radius: var(--radius-lg);
-  background: var(--navy-950);
-  color: #fff;
+  padding: 13px 22px;
   font-family: var(--store-font, var(--font-display));
   font-size: 13px;
+  font-weight: 400;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   box-shadow: 0 12px 28px -12px rgba(12, 22, 40, 0.55);
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.chat-fab:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 16px 32px -12px rgba(12, 22, 40, 0.6);
 }
 
 .chat {
@@ -195,9 +182,6 @@
 @media (prefers-reduced-motion: reduce) {
   .chat-digitando span {
     animation: none;
-  }
-  .chat-fab {
-    transition: none;
   }
 }
 
