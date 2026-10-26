@@ -1,11 +1,16 @@
 /* ---------- Assistente do site (chat) ----------
    Usa os tokens da loja: dentro de .store--vulto, a paleta troca sozinha para a da Vulto. */
 
+/* O botão fica num lugar fixo (.chat-fab); a janela nasce desse mesmo lugar e volta para ele ao fechar. */
 .chat-fab {
   position: fixed;
   right: 24px;
   bottom: 24px;
-  z-index: 60;
+  z-index: 61;
+  display: flex;
+}
+
+.chat-fab__botao {
   padding: 13px 22px;
   font-family: var(--store-font, var(--font-display));
   font-size: 13px;
@@ -15,22 +20,47 @@
   box-shadow: 0 12px 28px -12px rgba(12, 22, 40, 0.55);
 }
 
-.chat {
+/* Moldura: posição e sombra. A sombra é um drop-shadow para seguir a forma recortada durante a abertura. */
+.chat-moldura {
   position: fixed;
   right: 24px;
   bottom: 24px;
   z-index: 60;
-  display: flex;
-  flex-direction: column;
   width: min(410px, calc(100vw - 32px));
   height: min(640px, calc(100vh - 48px));
+  filter: drop-shadow(0 18px 28px rgba(12, 22, 40, 0.28));
+}
+
+/* Recorte animado (clip-path) da pílula do botão até a janela inteira */
+.chat-recorte {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: 18px;
   background: #fff;
   color: var(--navy-950);
-  box-shadow: 0 24px 60px -20px rgba(12, 22, 40, 0.45);
   overflow: hidden;
   font-size: 14px;
+}
+
+/* O conteúdo surge logo depois de a janela começar a crescer */
+.chat > * {
+  animation: chat-surgir 0.4s 0.14s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes chat-surgir {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
 }
 
 .chat__topo {
@@ -180,7 +210,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chat-digitando span {
+  .chat-digitando span,
+  .chat > * {
     animation: none;
   }
 }
@@ -212,7 +243,7 @@
   min-height: 40px;
   padding: 10px 12px;
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   resize: none;
   font-size: 14px;
   line-height: 1.4;
@@ -231,7 +262,7 @@
   width: 40px;
   height: 40px;
   border: 0;
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   background: var(--navy-950);
   color: #fff;
   cursor: pointer;
@@ -525,14 +556,21 @@
   .chat-fab {
     right: 16px;
     bottom: 16px;
+  }
+
+  .chat-fab__botao {
     padding: 12px 16px;
   }
 
-  .chat {
+  .chat-moldura {
     inset: 0;
     width: 100%;
     height: 100%;
     height: 100dvh;
+  }
+
+  .chat-recorte,
+  .chat {
     border: 0;
     border-radius: 0;
   }
