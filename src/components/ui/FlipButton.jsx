@@ -5,6 +5,7 @@ import { useLayoutEffect, useRef, useState } from 'react'
 // JavaScript, motion/react (o mesmo pacote das outras animações) e CSS próprio, sem Tailwind.
 // textoAntes: o que aparece antes do clique; textoDepois: depois. cores aceita valores CSS, inclusive
 // variáveis (var(--navy-950)), resolvidas no próprio botão para seguir a paleta da marca aberta.
+// virarAoClicar={false}: o clique só dispara onClick (quando outra animação assume, como a do chat).
 const CORES_PADRAO = {
   antes: { fundo: '#ffffff', texto: 'var(--navy-950)' },
   depois: { fundo: 'var(--navy-950)', texto: '#ffffff' },
@@ -21,6 +22,7 @@ export function FlipButton({
   textoDepois = textoAntes,
   icone: Icone,
   cores = CORES_PADRAO,
+  virarAoClicar = true,
   onClick,
   className = '',
   style,
@@ -53,8 +55,8 @@ export function FlipButton({
       className={`flip-button ${className}`}
       style={{ transformPerspective: 800, ...style }}
       onClick={(evento) => {
-        setVirado((v) => !v)
-        onClick?.(evento, !virado)
+        if (virarAoClicar) setVirado((v) => !v)
+        onClick?.(evento, virarAoClicar ? !virado : virado)
       }}
       variants={variantes ?? undefined}
       initial={false}
