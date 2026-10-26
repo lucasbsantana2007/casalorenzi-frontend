@@ -992,3 +992,24 @@ button.seletor__gatilho:disabled {
   gap: 10px;
   margin-top: 8px;
 }
+
+/* ---------- FlipButton (components/ui/FlipButton.jsx) ----------
+   Fundo, cor e giro são animados pelo motion; aqui só forma e tipografia. */
+.flip-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.flip-button__conteudo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
