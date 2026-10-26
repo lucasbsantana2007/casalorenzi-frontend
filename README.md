@@ -58,6 +58,7 @@ senha de demonstração. Para um uso real, defina `VITE_MODO_DEMO=false` na Verc
 2. **Conta do cliente.** Pode ser criada no login (`/login/criar-conta`) ou no checkout, com nome, CPF, e-mail, celular e senha. Não há compra sem conta. O id do cliente é o CPF.
 3. **Login único em `/login`** (Iniciar sessão), para clientes e equipe. A Vulto tem o mesmo acesso com a identidade dela em `/vulto/login` (e `/vulto/login/criar-conta`, `/vulto/login/esqueci-senha`): mesma conta, e a equipe das duas marcas cai no mesmo painel de gestão. Depois de entrar, o cliente vai para o perfil (`/cliente`) e a equipe para a gestão (`/dashboard`), com os módulos do seu cargo. Quem tentou abrir uma página protegida volta para ela depois de entrar. O endereço antigo `/login/equipe` redireciona para `/login`.
 4. **"Sair"** encerra a sessão e volta para a página inicial.
+5. **Assistente do site.** Um botão "Assistente" no canto da vitrine (Casa Lorenzi e Vulto) e da área do cliente abre o chat (some no checkout). Ele busca peças no catálogo real, mostra a disponibilidade no site e em cada loja, lembra da conversa ("e no M?", "e na outra loja?"), consulta pontos Vulto+ e pedidos do cliente logado, mostra o botão "Adicionar à sacola" (a mesma sacola da página do produto; nada entra sem o clique) e abre um chamado com a equipe. A conversa fica no navegador (id e chave em `localStorage`) e recomeça quando a conta muda. A janela é carregada só ao abrir. Código em `src/components/assistente/` e `src/hooks/useAssistente.js`; backend e regras em `docs/assistente_ia.md` do repositório da API.
 
 Com `VITE_MODO_DEMO=true`, o login oferece acesso rápido de demonstração, com a equipe da marca da página: `/login` mostra a Administradora do grupo (Helena, as duas marcas) e a equipe da Casa Lorenzi (Administrador, Lojista e Operador); `/vulto/login`, a equipe da Vulto. A cliente aparece nas duas. Contas da equipe e clientes de demonstração entram com a senha `lorenzi2026`.
 
@@ -65,19 +66,21 @@ Os endereços antigos `/meus-pedidos` e `/meu-pedido` (acesso por e-mail + PIN, 
 
 | Perfil        | Módulos                                                                        |
 | ------------- | ------------------------------------------------------------------------------ |
-| Administrador | Dashboard, Estoque, Pedidos, Produtos, Transferências, Atendimento, Financeiro, Administração |
-| Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Pedidos, Atendimento       |
-| Operador      | Dashboard, Estoque, Pedidos, Transferências                                    |
+| Administrador | Dashboard, Estoque, Pedidos, Produtos, Transferências, Atendimento, Financeiro, Assistente IA, Administração |
+| Lojista       | Dashboard (já filtrado pela própria loja), Estoque, Pedidos, Atendimento, Assistente IA |
+| Operador      | Dashboard, Estoque, Pedidos, Transferências, Assistente IA                     |
+
+**Assistente IA** (`/inteligencia`, "Inteligência de Negócios"): perguntas em linguagem natural sobre vendas, estoque, transferências e Vulto+, respondidas com indicadores, tabelas e gráficos e com a fonte de cada número (consulta, período, filtros, definição, data dos dados). Abas Assistente, Alertas (das automações: resolver ou descartar) e Uso e custo da IA (só Administrador). Toda a equipe abre a tela, mas cada pergunta é conferida na API pelo cargo e pela marca: o Operador, por exemplo, não recebe dados financeiros.
 
 **Marca da equipe.** Cada funcionário trabalha com uma marca: Casa Lorenzi, Vulto ou, só para Administrador, o grupo (as duas). Quem é de uma marca não vê nem altera nada da outra (produtos, estoque, pedidos, transferências, atendimentos, dashboard, financeiro, funcionários, lojas e log); a API bloqueia, não só a tela. O painel usa a identidade da marca: marinho e o monograma na Casa Lorenzi, preto, a fonte e o laranja da Vulto. O Administrador do grupo vê as duas logos e um seletor Todas / Lorenzi / Vulto (`src/services/marcaPainel.js`, enviado à API no cabeçalho `X-Marca`), e só ele altera o frete, que vale para o site das duas. A área do cliente mostra as duas marcas (a conta é uma só). Contas de demonstração: Helena (grupo); Otávio (Administrador da Casa Lorenzi), Rafael (Lojista) e Diego (Operador), da Casa Lorenzi; Paula (Administradora da Vulto), Lia (Lojista da Vulto Pinheiros) e Bruno (Operador do CD Cajamar).
 
-Lojista e Operador veem os pedidos que a própria loja expede. O menu é uma lista simples, na mesma ordem para todos os cargos (Dashboard, Pedidos, Estoque, Transferências, Atendimento, Financeiro e Administração), e cada cargo vê só os módulos que pode acessar. **Estoque** reúne o cadastro de produtos e o estoque: abas Produtos (só Administrador; é a aba inicial dele), Posição atual, Posição em data e Movimentações. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
+Lojista e Operador veem os pedidos que a própria loja expede. O menu é uma lista simples, na mesma ordem para todos os cargos (Dashboard, Pedidos, Estoque, Transferências, Atendimento, Financeiro, Assistente IA e Administração), e cada cargo vê só os módulos que pode acessar. **Estoque** reúne o cadastro de produtos e o estoque: abas Produtos (só Administrador; é a aba inicial dele), Posição atual, Posição em data e Movimentações. As regras ficam em `src/utils/permissions.js`. O frontend esconde menus e bloqueia rotas, mas o backend deve validar as mesmas regras.
 
 **Público:** `/`, `/colecao/:genero`, `/produto/:id`, `/checkout`, `/pedido/confirmado/:numero`, `/lojas`, `/lorenzi` (história da marca), `/vulto`, `/vulto/loja`, `/vulto/lojas`, `/vulto/produto/:id`, `/login`, `/login/criar-conta`, `/login/esqueci-senha` e `/login/nova-senha`.
 
 **Área do cliente:** `/cliente` (perfil), `/cliente/pedidos`, `/cliente/solicitacoes`, `/cliente/solicitacoes/nova`, `/cliente/solicitacoes/:id`, `/cliente/conta` (configurações da conta: dados pessoais, senha e exclusão).
 
-**Painel interno:** `/dashboard`, `/estoque` (aba Produtos para o Administrador; os demais cargos vão para a posição atual), `/estoque/posicao` (posição atual por loja e SKU), `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`, `/administracao/funcionarios`, `/administracao/lojas`, `/administracao/frete`, `/administracao/log`. O endereço antigo `/produtos` leva para `/estoque`.
+**Painel interno:** `/dashboard`, `/estoque` (aba Produtos para o Administrador; os demais cargos vão para a posição atual), `/estoque/posicao` (posição atual por loja e SKU), `/estoque/:id` (detalhe + histórico), `/estoque/historico` (posição em uma data passada), `/estoque/movimentacoes`, `/pedidos`, `/pedidos/:id`, `/transferencias`, `/atendimento`, `/atendimento/:id`, `/financeiro`, `/inteligencia` (`?aba=alertas` ou `?aba=uso`), `/administracao/funcionarios`, `/administracao/lojas`, `/administracao/frete`, `/administracao/log`. O endereço antigo `/produtos` leva para `/estoque`.
 
 ## Estrutura
 
@@ -97,7 +100,8 @@ src/
   hooks/                 useAsync, useDebouncedValue, useSession, useSacola, useCadastros
   layouts/               StoreLayout (loja), AdminLayout + Sidebar (painel) e ClientLayout (área do cliente)
   components/ui/         PageHeader, StatCard, StatusBadge, DataTable, Modal, Tabs, estados...
-  components/<domínio>/  loja, home, auth (telas de acesso), produtos, estoque, atendimento, financeiro
+  components/<domínio>/  loja, home, auth (telas de acesso), produtos, estoque, atendimento, financeiro,
+                         assistente (chat do site) e copiloto (Assistente IA do painel)
   pages/                 loja pública e telas de acesso; pages/admin (painel, incl. administracao/) e pages/cliente
   styles/                tokens e CSS (base, componentes, layout, páginas, loja, checkout, login)
   utils/                 formatação, status, permissões, frete, CPF, margem, imagens, regras de estoque
