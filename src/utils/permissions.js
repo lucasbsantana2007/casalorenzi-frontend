@@ -17,6 +17,8 @@ const ACESSO = {
   atendimento: ['ADMINISTRADOR', 'LOJISTA'],
   financeiro: ['ADMINISTRADOR'],
   administracao: ['ADMINISTRADOR'],
+  // Inteligência de Negócios: toda a equipe abre a tela; cada consulta confere no backend o módulo do assunto
+  inteligencia: ['ADMINISTRADOR', 'LOJISTA', 'OPERADOR'],
 }
 
 export function podeAcessar(papel, modulo) {

@@ -12,6 +12,7 @@ import './styles/store.css'
 import './styles/checkout.css'
 import './styles/marcas.css'
 import './styles/painel-marcas.css'
+import './styles/assistente.css'
 
 // Arquivo da versão anterior que não existe mais (deploy novo com a aba aberta): recarrega uma vez
 window.addEventListener('vite:preloadError', (evento) => {

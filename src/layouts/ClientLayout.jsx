@@ -1,6 +1,7 @@
 import { LogOut } from 'lucide-react'
 import { useMemo } from 'react'
 import { Navigate, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { ChatWidget } from '../components/assistente/ChatWidget'
 import { StoreFooter } from '../components/home/StoreFooter'
 import { StoreHeader } from '../components/home/StoreHeader'
 import { GRUPO } from '../data/marcas'
@@ -55,6 +56,7 @@ export function ClientLayout() {
       </main>
 
       <StoreFooter marca={GRUPO} />
+      <ChatWidget marca="GRUPO" />
     </div>
   )
 }

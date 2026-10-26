@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { ChatWidget } from '../components/assistente/ChatWidget'
 import { BarraDeMarcas } from '../components/home/BarraDeMarcas'
 import { StoreFooter } from '../components/home/StoreFooter'
 import { StoreHeader } from '../components/home/StoreHeader'
@@ -31,6 +32,7 @@ export function StoreLayout() {
       <Outlet />
       <StoreFooter />
       <SacolaLateral />
+      <ChatWidget />
     </div>
   )
 }

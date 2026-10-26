@@ -1,4 +1,4 @@
-import { ArrowLeftRight, Headset, LayoutDashboard, Settings, Shirt, ShoppingBag, Wallet } from 'lucide-react'
+import { ArrowLeftRight, Headset, LayoutDashboard, Settings, Shirt, ShoppingBag, Sparkles, Wallet } from 'lucide-react'
 
 // Itens do menu interno, numa lista simples e nesta ordem para todos os cargos.
 // `modulo` liga cada item às regras de utils/permissions.js (cada cargo vê só o que pode acessar).
@@ -10,5 +10,6 @@ export const NAV_ITEMS = [
   { to: '/transferencias', label: 'Transferências', icon: ArrowLeftRight, modulo: 'transferencias' },
   { to: '/atendimento', label: 'Atendimento', icon: Headset, modulo: 'atendimento' },
   { to: '/financeiro', label: 'Financeiro', icon: Wallet, modulo: 'financeiro' },
+  { to: '/inteligencia', label: 'Assistente IA', icon: Sparkles, modulo: 'inteligencia' },
   { to: '/administracao', label: 'Administração', icon: Settings, modulo: 'administracao' },
 ]

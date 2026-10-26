@@ -128,6 +128,15 @@ export const router = createBrowserRouter(comTelaDeErro([
         ],
       },
       {
+        // Inteligência de Negócios — Assistente IA (copiloto, alertas e uso da IA), com gráficos sob demanda
+        path: 'inteligencia',
+        hydrateFallbackElement: <LoadingState />,
+        lazy: async () => {
+          const { InteligenciaPage } = await import('./pages/admin/InteligenciaPage')
+          return { element: protegida('inteligencia', <InteligenciaPage />) }
+        },
+      },
+      {
         // Carregada sob demanda: os gráficos (recharts) ficam fora do pacote principal
         path: 'financeiro',
         hydrateFallbackElement: <LoadingState />,
