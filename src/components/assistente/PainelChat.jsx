@@ -12,6 +12,31 @@ function TextoDaResposta({ valor }) {
 
 // Janela de conversa do assistente do site (carregada só quando o cliente abre o chat: as fotos e os
 // blocos não pesam no carregamento das páginas).
+// Enquanto a Lúcia responde (2 a 4 s com consulta): diz o que ela está fazendo, pelo assunto da pergunta, em vez
+// de só três pontinhos; se demorar, avisa que falta pouco
+const ASSUNTOS = [
+  [/pedido|rastreio|reembolso|estorno|devolu|cancel|ponto|lupe|extrato|solicita|e-?mail/i, 'Consultando a sua conta…'],
+  [/frete|cep|entrega/i, 'Calculando o frete…'],
+  [/loja|hor[aá]rio|abre|fecha|endere/i, 'Vendo as lojas…'],
+]
+
+function Procurando({ pergunta = '' }) {
+  const [demorou, setDemorou] = useState(false)
+  useEffect(() => {
+    const relogio = setTimeout(() => setDemorou(true), 4000)
+    return () => clearTimeout(relogio)
+  }, [])
+  const texto = demorou ? 'Só mais um instante…' : (ASSUNTOS.find(([padrao]) => padrao.test(pergunta))?.[1] ?? 'Procurando no catálogo…')
+  return (
+    <div className="chat-msg chat-msg--assistente chat-digitando" role="status" aria-label={`A Lúcia está respondendo: ${texto}`}>
+      <span />
+      <span />
+      <span />
+      <small className="chat-digitando__texto">{texto}</small>
+    </div>
+  )
+}
+
 export function PainelChat({ assistente, onFechar }) {
   const { mensagens, status, enviando, erro, enviar, repetir, novaConversa, confirmarSacola, desfazerSacola, concluirAcao, encaminhar, entrar, logado } = assistente
   const [texto, setTexto] = useState('')
@@ -85,13 +110,7 @@ export function PainelChat({ assistente, onFechar }) {
             </div>
           ) : null,
         )}
-        {enviando && (
-          <div className="chat-msg chat-msg--assistente chat-digitando" aria-label="A Lúcia está respondendo">
-            <span />
-            <span />
-            <span />
-          </div>
-        )}
+        {enviando && <Procurando pergunta={[...mensagens].reverse().find((m) => m.papel === 'USUARIO')?.texto} />}
         {erro && (
           <div className="chat-erro" role="alert">
             <CircleAlert size={16} aria-hidden="true" />

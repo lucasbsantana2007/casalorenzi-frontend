@@ -1,5 +1,5 @@
-import logo from '../assets/logo-casa-lorenzi.png'
-import logoClaro from '../assets/logo-casa-lorenzi-claro.png'
+import logo from '../assets/logo-casa-lorenzi.webp'
+import logoClaro from '../assets/logo-casa-lorenzi-claro.webp'
 
 // inverse: versão clara do logo, para fundos escuros (sidebar)
 export function BrandMark({ subtitle, inverse = false, size = 'md' }) {

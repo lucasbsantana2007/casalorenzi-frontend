@@ -1,6 +1,6 @@
 import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { ProductGrid } from '../../components/home/ProductGrid'
+import { ProductGrid, ProductGridSkeleton } from '../../components/home/ProductGrid'
 import { VideoLoop } from '../../components/ui/VideoLoop'
 import { temFoto } from '../../data/imagensProdutos'
 import { useAsync } from '../../hooks/useAsync'
@@ -12,7 +12,8 @@ const DESTAQUES = 8
 // Início da Vulto, no tom da Deus Ex Machina: um vídeo de oficina e estrada no topo, muito espaço,
 // títulos discretos e o produto em primeiro plano. Sacola, login e checkout são os da Casa Lorenzi.
 export function VultoHomePage() {
-  const produtos = useAsync(() => produtosService.listar({ ativo: true, marca: 'VULTO' }), []).data ?? []
+  const lista = useAsync(() => produtosService.listar({ ativo: true, marca: 'VULTO' }), [])
+  const produtos = lista.data ?? []
   const lojas = useLojas('VULTO').filter((loja) => loja.ativa !== false)
   // Novidades: as peças com foto primeiro, as cadastradas por último na frente
   const drop = [...produtos].sort((a, b) => Number(temFoto(b)) - Number(temFoto(a)) || b.id - a.id).slice(0, DESTAQUES)
@@ -31,7 +32,7 @@ export function VultoHomePage() {
         </Link>
       </section>
 
-      {drop.length > 0 && (
+      {(lista.loading || drop.length > 0) && (
         <section className="store-section">
           <div className="store-section__head">
             <h2 className="store-heading">Novidades</h2>
@@ -39,7 +40,11 @@ export function VultoHomePage() {
               Ver tudo
             </Link>
           </div>
-          <ProductGrid produtos={drop.slice(0, 4)} colunas={4} />
+          {lista.data === null ? (
+            <ProductGridSkeleton quantidade={4} colunas={4} />
+          ) : (
+            <ProductGrid produtos={drop.slice(0, 4)} colunas={4} />
+          )}
         </section>
       )}
 

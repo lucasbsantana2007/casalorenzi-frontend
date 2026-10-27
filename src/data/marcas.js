@@ -1,7 +1,7 @@
-import lorenzi from '../assets/marcas/lorenzi.png'
-import lorenziBranca from '../assets/marcas/lorenzi-branca.png'
-import vulto from '../assets/marcas/vulto.png'
-import vultoBranca from '../assets/marcas/vulto-branca.png'
+import lorenzi from '../assets/marcas/lorenzi.webp'
+import lorenziBranca from '../assets/marcas/lorenzi-branca.webp'
+import vulto from '../assets/marcas/vulto.webp'
+import vultoBranca from '../assets/marcas/vulto-branca.webp'
 
 // As duas marcas do grupo num site só, cada uma com a sua vitrine: a Casa Lorenzi no início (/) e a
 // Vulto em /vulto. Sacola, login, checkout e Lupe+ são compartilhados. `base` é o prefixo das rotas.
