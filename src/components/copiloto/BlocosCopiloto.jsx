@@ -166,7 +166,7 @@ export function BlocosCopiloto({ blocos, ultima, onPerguntar, desabilitado }) {
       case 'sugestoes':
         return ultima ? (
           <div key={i} className="cop-sugestoes">
-            {bloco.itens.map((texto) => (
+            {bloco.itens.slice(0, 3).map((texto) => (
               <button key={texto} type="button" className="cop-chip" onClick={() => onPerguntar(texto)} disabled={desabilitado}>
                 {texto}
               </button>

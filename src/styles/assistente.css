@@ -1072,3 +1072,64 @@
     align-items: stretch;
   }
 }
+
+/* Assistente IA (painel): janela de chat no mesmo estilo da Lúcia */
+.cop-chat {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: calc(100vh - 230px);
+  min-height: 520px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow-md);
+}
+
+.cop-chat__mensagens {
+  padding: 20px;
+  gap: 14px;
+}
+
+.cop-chat__entrada {
+  padding: 12px 14px;
+}
+
+.cop-inicio {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cop-inicio .chat-msg--assistente {
+  width: auto;
+  max-width: 80%;
+}
+
+.cop-msg {
+  align-self: flex-start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.cop-bolha {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  border-bottom-left-radius: 4px;
+  background: #fff;
+}
+
+.cop-chat .chat-msg--usuario {
+  max-width: 75%;
+}
+
+@media (max-width: 1100px) {
+  .cop-chat {
+    height: 75vh;
+  }
+}

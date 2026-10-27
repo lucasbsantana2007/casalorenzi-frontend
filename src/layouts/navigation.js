@@ -10,6 +10,6 @@ export const NAV_ITEMS = [
   { to: '/transferencias', label: 'Transferências', icon: ArrowLeftRight, modulo: 'transferencias' },
   { to: '/atendimento', label: 'Atendimento', icon: Headset, modulo: 'atendimento' },
   { to: '/financeiro', label: 'Financeiro', icon: Wallet, modulo: 'financeiro' },
-  { to: '/inteligencia', label: 'Assistente IA', icon: Sparkles, modulo: 'inteligencia' },
   { to: '/administracao', label: 'Administração', icon: Settings, modulo: 'administracao' },
+  { to: '/inteligencia', label: 'Assistente IA', icon: Sparkles, modulo: 'inteligencia' },
 ]
