@@ -54,13 +54,13 @@ export function ChatWidget({ marca: marcaFixa }) {
           >
             <FlipButton
               className="chat-fab__botao"
-              textoAntes="Assistente"
+              textoAntes="Márcia"
               icone={MessageCircle}
               virarAoClicar={false}
               onClick={abrir}
               onPointerEnter={carregarPainel}
               onFocus={carregarPainel}
-              aria-label="Abrir o assistente virtual"
+              aria-label="Abrir a Márcia, assistente virtual"
             />
           </motion.div>
         )}
@@ -68,7 +68,7 @@ export function ChatWidget({ marca: marcaFixa }) {
       <AnimatePresence>
         {aberto && (
           <Janela key="janela" origem={origem}>
-            <Suspense fallback={<div className="chat chat--abrindo" role="status">Abrindo o assistente…</div>}>
+            <Suspense fallback={<div className="chat chat--abrindo" role="status">Abrindo a Márcia…</div>}>
               <PainelChat assistente={assistente} onFechar={fechar} />
             </Suspense>
           </Janela>

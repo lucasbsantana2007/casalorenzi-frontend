@@ -40,17 +40,17 @@ export function PainelChat({ assistente, onFechar }) {
   const ultimaDoAssistente = [...mensagens].reverse().find((m) => m.papel === 'ASSISTENTE')?.id
 
   return (
-    <section className="chat" role="dialog" aria-label="Assistente virtual" ref={painelRef}>
+    <section className="chat" role="dialog" aria-label="Márcia, assistente virtual" ref={painelRef}>
       <header className="chat__topo">
         <div>
-          <h2 className="chat__titulo">Assistente</h2>
-          <p className="chat__subtitulo">Casa Lorenzi · Vulto</p>
+          <h2 className="chat__titulo">Márcia</h2>
+          <p className="chat__subtitulo">Assistente virtual · Casa Lorenzi · Vulto</p>
         </div>
         <div className="chat__acoes">
           <button type="button" className="chat__icone" onClick={novaConversa} title="Nova conversa" aria-label="Começar uma nova conversa" disabled={enviando}>
             <RotateCcw size={16} strokeWidth={1.6} />
           </button>
-          <button type="button" className="chat__icone" onClick={onFechar} aria-label="Fechar o assistente">
+          <button type="button" className="chat__icone" onClick={onFechar} aria-label="Fechar a Márcia">
             <X size={18} strokeWidth={1.6} />
           </button>
         </div>
@@ -72,7 +72,7 @@ export function PainelChat({ assistente, onFechar }) {
           ) : null,
         )}
         {enviando && (
-          <div className="chat-msg chat-msg--assistente chat-digitando" aria-label="O assistente está respondendo">
+          <div className="chat-msg chat-msg--assistente chat-digitando" aria-label="A Márcia está respondendo">
             <span />
             <span />
             <span />
