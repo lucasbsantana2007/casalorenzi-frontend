@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { MODO_DEMO } from '../../config/env'
 import { CLIENTE_DEMO, SENHA_DEMO } from '../../context/perfisDemo'
+import { useSession } from '../../hooks/useSession'
 import { imagemDoProduto } from '../../data/imagensProdutos'
 import { loginDaMarca, marcaDoCaminho } from '../../data/marcas'
+import { contaService } from '../../services/contaService'
 import { formatCurrency, formatDate, formatNumber } from '../../utils/format'
 
 // O que o assistente mostra além do texto. Tudo vem das consultas do backend (preço, estoque, pontos),
@@ -310,6 +312,166 @@ function Frete({ bloco }) {
   )
 }
 
+// ---------- Ações com confirmação (decisões 95 a 97) ----------
+// A Lúcia só prepara o cartão; a ação acontece aqui, pelas rotas da conta, quando o cliente confirma. A senha vai
+// direto para a conta, nunca para a conversa nem para o modelo.
+
+function mensagemDoErro(e, porStatus = {}) {
+  return porStatus[e?.status] ?? e?.message ?? 'Não consegui concluir agora. Tente de novo.'
+}
+
+function ConfirmarEmail({ bloco, mensagemId, onConcluir }) {
+  const { atualizarUsuario } = useSession()
+  const [senha, setSenha] = useState('')
+  const [estado, setEstado] = useState({ enviando: false, erro: null })
+  if (bloco.estado === 'CONCLUIDO') {
+    return (
+      <p className="chat-ok">
+        <Check size={14} aria-hidden="true" /> E-mail da conta trocado para {bloco.emailNovo}
+      </p>
+    )
+  }
+  const confirmar = async (e) => {
+    e.preventDefault()
+    if (!senha) return
+    setEstado({ enviando: true, erro: null })
+    try {
+      const atual = await contaService.obter()
+      const conta = await contaService.atualizar({ nome: atual.nome, telefone: atual.telefone, email: bloco.emailNovo, senhaAtual: senha })
+      atualizarUsuario({ email: conta.email })
+      onConcluir(mensagemId, 'EMAIL', conta.email)
+    } catch (erro) {
+      const porStatus = { 409: 'Esse e-mail já está em outra conta.', 422: 'Senha incorreta. Confira e tente de novo.' }
+      setEstado({ enviando: false, erro: mensagemDoErro(erro, porStatus) })
+    }
+  }
+  return (
+    <form className="chat-card chat-entrar" onSubmit={confirmar}>
+      <p className="chat-card__titulo">Trocar o e-mail da conta</p>
+      <p className="chat-sutil">
+        Novo e-mail: <strong>{bloco.emailNovo}</strong>
+      </p>
+      <label className="chat-campo">
+        <span>Sua senha atual</span>
+        <input type="password" value={senha} onChange={(e) => setSenha(e.target.value)} autoComplete="current-password" required />
+      </label>
+      {estado.erro && <p className="chat-erro-linha">{estado.erro}</p>}
+      <button type="submit" className="chat-botao" disabled={estado.enviando}>
+        {estado.enviando ? 'Trocando…' : 'Confirmar troca'}
+      </button>
+    </form>
+  )
+}
+
+function ConfirmarCancelamento({ bloco, mensagemId, onConcluir }) {
+  const [estado, setEstado] = useState({ enviando: false, erro: null, mantido: false })
+  if (bloco.estado === 'CONCLUIDO') {
+    return (
+      <p className="chat-ok">
+        <Check size={14} aria-hidden="true" /> {bloco.detalhe || `Pedido ${bloco.numero} cancelado`}
+      </p>
+    )
+  }
+  if (estado.mantido) return <p className="chat-sutil">Tudo bem, o pedido {bloco.numero} continua de pé.</p>
+  const confirmar = async () => {
+    setEstado({ enviando: true, erro: null, mantido: false })
+    try {
+      const r = await contaService.cancelarPedido(bloco.numero)
+      onConcluir(mensagemId, 'CANCELAMENTO', `Pedido ${r.numero} cancelado; estorno de ${formatCurrency(r.valorEstornado)}`)
+    } catch (erro) {
+      setEstado({ enviando: false, erro: mensagemDoErro(erro), mantido: false })
+    }
+  }
+  return (
+    <div className="chat-card">
+      <p className="chat-card__titulo">Cancelar o pedido {bloco.numero}</p>
+      <ul className="chat-lista">
+        {bloco.itens.map((item) => (
+          <li key={item}>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+      <p>
+        Total: <strong>{formatCurrency(bloco.total)}</strong>
+      </p>
+      <p className="chat-sutil">O pagamento é estornado e os pontos usados voltam para a sua conta.</p>
+      {estado.erro && <p className="chat-erro-linha">{estado.erro}</p>}
+      <div className="chat-acoes">
+        <button type="button" className="chat-botao chat-botao--perigo" onClick={confirmar} disabled={estado.enviando}>
+          {estado.enviando ? 'Cancelando…' : 'Cancelar pedido'}
+        </button>
+        <button type="button" className="chat-link" onClick={() => setEstado((s) => ({ ...s, mantido: true }))} disabled={estado.enviando}>
+          Manter pedido
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function ConfirmarDevolucao({ bloco, mensagemId, onConcluir }) {
+  const [marcadas, setMarcadas] = useState(() => new Set(bloco.pecas.length === 1 ? [bloco.pecas[0].itemPedidoId] : []))
+  const [motivo, setMotivo] = useState(bloco.motivo || '')
+  const [estado, setEstado] = useState({ enviando: false, erro: null })
+  if (bloco.estado === 'CONCLUIDO') {
+    return (
+      <div className="chat-card">
+        <p className="chat-ok">
+          <Check size={14} aria-hidden="true" /> Devolução pedida: solicitação {bloco.detalhe}
+        </p>
+        <p className="chat-sutil">A equipe confere a peça e faz o reembolso.</p>
+        <Link to="/cliente/solicitacoes" className="chat-link">
+          Acompanhar em Minhas solicitações
+        </Link>
+      </div>
+    )
+  }
+  const alternar = (id) =>
+    setMarcadas((atual) => {
+      const nova = new Set(atual)
+      if (nova.has(id)) nova.delete(id)
+      else nova.add(id)
+      return nova
+    })
+  const confirmar = async (e) => {
+    e.preventDefault()
+    const pecas = bloco.pecas.filter((p) => marcadas.has(p.itemPedidoId)).map((p) => ({ itemPedidoId: p.itemPedidoId, quantidade: p.quantidade }))
+    if (!pecas.length) return setEstado({ enviando: false, erro: 'Marque ao menos uma peça.' })
+    setEstado({ enviando: true, erro: null })
+    try {
+      const r = await contaService.pedirDevolucao(bloco.numero, { pecas, motivo })
+      onConcluir(mensagemId, 'DEVOLUCAO', r.protocolo)
+    } catch (erro) {
+      setEstado({ enviando: false, erro: mensagemDoErro(erro) })
+    }
+  }
+  return (
+    <form className="chat-card chat-entrar" onSubmit={confirmar}>
+      <p className="chat-card__titulo">Devolver peças do pedido {bloco.numero}</p>
+      <p className="chat-sutil">Dá para pedir até {bloco.prazoAte}.</p>
+      <ul className="chat-lista chat-escolhas">
+        {bloco.pecas.map((p) => (
+          <li key={p.itemPedidoId}>
+            <label>
+              <input type="checkbox" checked={marcadas.has(p.itemPedidoId)} onChange={() => alternar(p.itemPedidoId)} />{' '}
+              {p.nome} <small>{p.cor} · {p.tamanho} · {p.quantidade}x</small>
+            </label>
+            <span>{formatCurrency(p.preco)}</span>
+          </li>
+        ))}
+      </ul>
+      <label className="chat-campo">
+        <span>Motivo</span>
+        <input type="text" value={motivo} onChange={(e) => setMotivo(e.target.value)} maxLength={500} required />
+      </label>
+      {estado.erro && <p className="chat-erro-linha">{estado.erro}</p>}
+      <button type="submit" className="chat-botao" disabled={estado.enviando}>
+        {estado.enviando ? 'Enviando…' : 'Pedir devolução'}
+      </button>
+    </form>
+  )
+}
+
 // Peça pedida no chat (decisão 94): entra na sacola assim que a resposta aparece (estado ADICIONAR), uma vez só,
 // com Desfazer e Finalizar compra. PENDENTE é o botão das conversas antigas, de antes da sacola direta.
 function AcaoSacola({ bloco, mensagemId, ultima, onConfirmar, onDesfazer }) {
@@ -589,6 +751,12 @@ export function BlocosChat({ mensagem, ultima, acoes }) {
         return <Solicitacoes key={chave} bloco={bloco} />
       case 'frete':
         return <Frete key={chave} bloco={bloco} />
+      case 'confirmar_email':
+        return <ConfirmarEmail key={chave} bloco={bloco} mensagemId={mensagem.id} onConcluir={acoes.concluirAcao} />
+      case 'confirmar_cancelamento':
+        return <ConfirmarCancelamento key={chave} bloco={bloco} mensagemId={mensagem.id} onConcluir={acoes.concluirAcao} />
+      case 'confirmar_devolucao':
+        return <ConfirmarDevolucao key={chave} bloco={bloco} mensagemId={mensagem.id} onConcluir={acoes.concluirAcao} />
       case 'entrar':
         return <EntrarNoChat key={chave} mensagemId={mensagem.id} ultima={ultima} logado={acoes.logado} onEntrar={acoes.entrar} />
       case 'sugestoes':
