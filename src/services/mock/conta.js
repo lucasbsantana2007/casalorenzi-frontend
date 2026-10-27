@@ -78,3 +78,48 @@ export async function excluir({ senha }) {
   })
   return respond(null)
 }
+
+// "Avise-me quando chegar", sacola guardada e preferência de e-mails (na API real ficam no banco; aqui, na memória)
+const avisos = new Map()
+
+export function avisosEstoque() {
+  const cliente = clienteDaSessao()
+  return cliente ? respond({ variacaoIds: [...(avisos.get(cliente.id) ?? [])] }) : semSessao()
+}
+
+export function pedirAviso(variacaoId) {
+  const cliente = clienteDaSessao()
+  if (!cliente) return semSessao()
+  const lista = avisos.get(cliente.id) ?? new Set()
+  lista.add(variacaoId)
+  avisos.set(cliente.id, lista)
+  return respond({ variacaoIds: [...lista] })
+}
+
+export function cancelarAviso(variacaoId) {
+  const cliente = clienteDaSessao()
+  if (!cliente) return semSessao()
+  avisos.get(cliente.id)?.delete(variacaoId)
+  return respond(null)
+}
+
+// Sem lembrete por e-mail nos mocks: a sacola fica só no navegador
+export function sacola() {
+  return clienteDaSessao() ? respond({ itens: [] }) : semSessao()
+}
+
+export function salvarSacola() {
+  return clienteDaSessao() ? respond(null) : semSessao()
+}
+
+export function preferencias() {
+  const cliente = clienteDaSessao()
+  return cliente ? respond({ aceitaMarketing: Boolean(cliente.aceitaMarketing) }) : semSessao()
+}
+
+export function salvarPreferencias(aceitaMarketing) {
+  const cliente = clienteDaSessao()
+  if (!cliente) return semSessao()
+  cliente.aceitaMarketing = Boolean(aceitaMarketing)
+  return respond({ aceitaMarketing: cliente.aceitaMarketing })
+}

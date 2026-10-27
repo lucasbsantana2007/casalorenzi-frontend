@@ -17,6 +17,17 @@ export const contaService = USE_MOCKS
       trocarSenha: (dados) => api.put('/conta/senha', dados),
       // { senha } → sem corpo. Apaga os dados pessoais e encerra o acesso; pedidos e solicitações ficam anônimos
       excluir: (dados) => api.post('/conta/exclusao', dados),
+      // "Avise-me quando chegar" → { variacaoIds } com aviso pendente. Peça disponível: 409
+      avisosEstoque: () => api.get('/conta/avisos-estoque'),
+      pedirAviso: (variacaoId) => api.post('/conta/avisos-estoque', { variacaoId }),
+      cancelarAviso: (variacaoId) => api.delete(`/conta/avisos-estoque/${variacaoId}`),
+      // Cópia da sacola (lembrete de sacola abandonada e sacola em outro aparelho) → { itens }
+      // Em segundo plano: sessão vencida não leva ao login (a sacola continua no navegador)
+      sacola: () => api.get('/conta/sacola', undefined, { semRedirecionar: true }),
+      salvarSacola: (itens) => api.put('/conta/sacola', { itens }, { semRedirecionar: true }),
+      // E-mails de novidades e lembretes → { aceitaMarketing }
+      preferencias: () => api.get('/conta/preferencias'),
+      salvarPreferencias: (aceitaMarketing) => api.put('/conta/preferencias', { aceitaMarketing }),
       // Pedidos do próprio cliente (pela Lúcia, decisões 96 e 97). Cancelar: só em separação → { numero, status,
       // valorEstornado }; 409 se já saiu. Devolução: { pecas: [{ itemPedidoId, quantidade }], motivo } → { protocolo, link }
       cancelarPedido: (numero) => api.post(`/conta/pedidos/${encodeURIComponent(numero)}/cancelamento`, {}),

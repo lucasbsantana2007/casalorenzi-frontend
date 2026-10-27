@@ -32,7 +32,8 @@ function extractMessage(body, status) {
   return `A requisição falhou (HTTP ${status}).`
 }
 
-async function request(path, { method = 'GET', params, body, headers: extras } = {}) {
+// semRedirecionar: chamadas em segundo plano (ex.: cópia da sacola) não levam ao login quando a sessão venceu
+async function request(path, { method = 'GET', params, body, headers: extras, semRedirecionar = false } = {}) {
   const headers = { Accept: 'application/json', ...extras }
   const token = getToken()
   if (token) headers.Authorization = `Bearer ${token}`
@@ -54,7 +55,7 @@ async function request(path, { method = 'GET', params, body, headers: extras } =
 
   // Token vencido (o login vale 2 horas): encerra a sessão e volta ao login, que avisa e depois
   // devolve a pessoa para a página em que estava
-  if (response.status === 401 && token && !path.startsWith('/auth/login')) {
+  if (response.status === 401 && token && !semRedirecionar && !path.startsWith('/auth/login')) {
     limparSessao()
     const volta = encodeURIComponent(window.location.pathname + window.location.search)
     window.location.assign(`/login?sessao=expirada&volta=${volta}`)
@@ -72,7 +73,7 @@ async function request(path, { method = 'GET', params, body, headers: extras } =
 export const api = {
   get: (path, params, opcoes) => request(path, { params, ...opcoes }),
   post: (path, body, opcoes) => request(path, { method: 'POST', body, ...opcoes }),
-  put: (path, body) => request(path, { method: 'PUT', body }),
+  put: (path, body, opcoes) => request(path, { method: 'PUT', body, ...opcoes }),
   patch: (path, body) => request(path, { method: 'PATCH', body }),
   delete: (path) => request(path, { method: 'DELETE' }),
 }
