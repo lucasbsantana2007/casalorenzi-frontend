@@ -17,4 +17,8 @@ export const contaService = USE_MOCKS
       trocarSenha: (dados) => api.put('/conta/senha', dados),
       // { senha } → sem corpo. Apaga os dados pessoais e encerra o acesso; pedidos e solicitações ficam anônimos
       excluir: (dados) => api.post('/conta/exclusao', dados),
+      // Pedidos do próprio cliente (pela Lúcia, decisões 96 e 97). Cancelar: só em separação → { numero, status,
+      // valorEstornado }; 409 se já saiu. Devolução: { pecas: [{ itemPedidoId, quantidade }], motivo } → { protocolo, link }
+      cancelarPedido: (numero) => api.post(`/conta/pedidos/${encodeURIComponent(numero)}/cancelamento`, {}),
+      pedirDevolucao: (numero, dados) => api.post(`/conta/pedidos/${encodeURIComponent(numero)}/devolucao`, dados),
     }

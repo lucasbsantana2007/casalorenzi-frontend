@@ -11,7 +11,7 @@ const semApi = () =>
 const comChave = (chave) => ({ headers: chave ? { 'X-Conversa-Chave': chave } : {} })
 
 export const assistenteService = USE_MOCKS
-  ? { abrir: semApi, obter: semApi, enviar: semApi, registrarSacola: semApi, encaminhar: semApi, encerrar: semApi }
+  ? { abrir: semApi, obter: semApi, enviar: semApi, registrarSacola: semApi, registrarAcao: semApi, encaminhar: semApi, encerrar: semApi }
   : {
       // { id, chave, mensagens: [...] }
       abrir: (marca) => api.post('/assistente/conversas', { marca }),
@@ -21,6 +21,9 @@ export const assistenteService = USE_MOCKS
       // tipo: SACOLA_ADICIONADA (a peça entrou) ou SACOLA_REMOVIDA (o cliente tocou em Desfazer)
       registrarSacola: (id, chave, mensagemId, variacaoId, tipo = 'SACOLA_ADICIONADA') =>
         api.post(`/assistente/conversas/${id}/eventos`, { tipo, mensagemId, variacaoId }, comChave(chave)),
+      // O cliente confirmou no cartão e a conta fez a ação (EMAIL, CANCELAMENTO ou DEVOLUCAO): o cartão fica concluído
+      registrarAcao: (id, chave, mensagemId, acao, detalhe) =>
+        api.post(`/assistente/conversas/${id}/eventos`, { tipo: 'ACAO_CONCLUIDA', mensagemId, acao, detalhe }, comChave(chave)),
       // Abre um chamado de atendimento -> { atendimentoId, protocolo, link, whatsappUrl }. canal SITE exige login
       // de cliente; WHATSAPP não, e devolve o link wa.me com o protocolo
       encaminhar: (id, chave, motivo, canal = 'SITE') =>
