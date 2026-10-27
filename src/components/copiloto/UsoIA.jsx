@@ -10,7 +10,6 @@ import { StatCard } from '../ui/StatCard'
 
 // Só Administrador: uso dos assistentes e custo estimado (tokens informados pela API × tabela de preços).
 const dolar = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 })
-const MODOS = { LLM: 'Modelo (LLM)', REGRAS: 'Regras (sem LLM)', CONTINGENCIA: 'Contingência' }
 
 export function UsoIA() {
   const state = useAsync(() => copilotoService.uso(30), [])
@@ -18,9 +17,6 @@ export function UsoIA() {
     <AsyncContent state={state} isEmpty={() => false} loadingLabel="Carregando o uso da IA…">
       {(uso) => {
         const total = uso.chamadasAoModelo
-        const respostas = Object.entries(uso.respostasPorModo).flatMap(([tipo, modos]) =>
-          Object.entries(modos).map(([modo, qtd]) => ({ tipo, modo, qtd })),
-        )
         return (
           <div className="cop-uso">
             <div className="cop-uso__cards">
@@ -57,31 +53,6 @@ export function UsoIA() {
             </div>
 
             <div className="cop-uso__tabelas">
-              <div className="card">
-                <div className="card__header">
-                  <h2 className="card__title">Respostas por modo</h2>
-                </div>
-                <div className="table-wrap">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Assistente</th>
-                        <th scope="col">Modo</th>
-                        <th scope="col" className="align-right">Respostas</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {respostas.map((r) => (
-                        <tr key={`${r.tipo}-${r.modo}`}>
-                          <td>{r.tipo === 'CLIENTE' ? 'Site' : 'Copiloto'}</td>
-                          <td>{MODOS[r.modo] ?? r.modo}</td>
-                          <td className="align-right">{formatNumber(r.qtd)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
               <div className="card">
                 <div className="card__header">
                   <h2 className="card__title">Consultas (ferramentas)</h2>
