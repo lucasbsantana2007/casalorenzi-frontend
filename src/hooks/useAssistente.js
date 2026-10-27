@@ -149,19 +149,46 @@ export function useAssistente(marca) {
   }, [conversa, criar])
 
   // "Adicionar à sacola": a sacola é a mesma da página do produto; a conversa só registra o que aconteceu
+  const marcarSacola = useCallback((mensagemId, variacaoId, estado) => {
+    setMensagens((atual) =>
+      atual.map((m) =>
+        m.id !== mensagemId
+          ? m
+          : { ...m, blocos: m.blocos.map((b) => (b.tipo === 'acao_sacola' && b.item.variacaoId === variacaoId ? { ...b, estado } : b)) },
+      ),
+    )
+  }, [])
+
+  // Sacola pelo chat (decisão 94): a peça entra na hora e o cartão tem Desfazer. A sacola é a do navegador; a
+  // conversa só registra, para recarregar a página não colocar de novo. aplicadas evita colocar duas vezes a
+  // mesma peça da mesma resposta; quantidadeAntes guarda o que havia, para o Desfazer voltar exatamente ao que era.
+  const aplicadas = useRef(new Map())
   const confirmarSacola = useCallback(
-    (mensagemId, item) => {
-      sacola.adicionar({ ...item, quantidade: undefined })
-      setMensagens((atual) =>
-        atual.map((m) =>
-          m.id !== mensagemId
-            ? m
-            : { ...m, blocos: m.blocos.map((b) => (b.tipo === 'acao_sacola' && b.item.variacaoId === item.variacaoId ? { ...b, estado: 'CONFIRMADO' } : b)) },
-        ),
-      )
+    (mensagemId, item, { doChat = false } = {}) => {
+      const chave = `${mensagemId}:${item.variacaoId}`
+      if (aplicadas.current.has(chave)) return
+      const quantidadeAntes = sacola.itens.find((i) => i.variacaoId === item.variacaoId)?.quantidade ?? 0
+      aplicadas.current.set(chave, quantidadeAntes)
+      sacola.adicionar({ ...item, quantidade: undefined }, { abrir: !doChat })
+      marcarSacola(mensagemId, item.variacaoId, 'CONFIRMADO')
       if (conversa) assistenteService.registrarSacola(conversa.id, conversa.chave, mensagemId, item.variacaoId).catch(() => {})
     },
-    [conversa, sacola],
+    [conversa, sacola, marcarSacola],
+  )
+
+  const desfazerSacola = useCallback(
+    (mensagemId, item) => {
+      const chave = `${mensagemId}:${item.variacaoId}`
+      sacola.alterarQuantidade(item.variacaoId, aplicadas.current.get(chave) ?? 0)
+      aplicadas.current.delete(chave)
+      marcarSacola(mensagemId, item.variacaoId, 'DESFEITO')
+      if (conversa) {
+        assistenteService
+          .registrarSacola(conversa.id, conversa.chave, mensagemId, item.variacaoId, 'SACOLA_REMOVIDA')
+          .catch(() => {})
+      }
+    },
+    [conversa, sacola, marcarSacola],
   )
 
   // Abre um chamado com a equipe (SITE exige login de cliente; WHATSAPP não) e recarrega a conversa com a confirmação
@@ -210,6 +237,7 @@ export function useAssistente(marca) {
     repetir,
     novaConversa,
     confirmarSacola,
+    desfazerSacola,
     encaminhar,
     entrar,
     logado: isCliente,

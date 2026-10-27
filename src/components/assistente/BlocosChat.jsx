@@ -1,5 +1,5 @@
 import { Check, Clock, Headset, LogIn, MapPin, MessageCircle, Phone, ShoppingBag } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { MODO_DEMO } from '../../config/env'
 import { CLIENTE_DEMO, SENHA_DEMO } from '../../context/perfisDemo'
@@ -310,9 +310,13 @@ function Frete({ bloco }) {
   )
 }
 
-function AcaoSacola({ bloco, mensagemId, onConfirmar }) {
+// Peça pedida no chat (decisão 94): entra na sacola assim que a resposta aparece (estado ADICIONAR), uma vez só,
+// com Desfazer e Finalizar compra. PENDENTE é o botão das conversas antigas, de antes da sacola direta.
+function AcaoSacola({ bloco, mensagemId, ultima, onConfirmar, onDesfazer }) {
   const { item } = bloco
-  const confirmado = bloco.estado === 'CONFIRMADO'
+  useEffect(() => {
+    if (bloco.estado === 'ADICIONAR' && ultima) onConfirmar(mensagemId, item, { doChat: true })
+  }, [bloco.estado, ultima, mensagemId, item, onConfirmar])
   return (
     <div className="chat-card chat-acao">
       <img src={imagemDoProduto({ ...item, id: item.produtoId }, item.cor)} alt="" className="chat-acao__foto" />
@@ -322,10 +326,29 @@ function AcaoSacola({ bloco, mensagemId, onConfirmar }) {
           {item.cor} · {item.tamanho}
         </p>
         <p className="chat-produto__preco">{formatCurrency(item.preco)}</p>
-        {confirmado ? (
-          <p className="chat-ok">
-            <Check size={14} aria-hidden="true" /> Na sacola
-          </p>
+        {bloco.estado === 'CONFIRMADO' ? (
+          <>
+            <p className="chat-ok">
+              <Check size={14} aria-hidden="true" /> Na sacola
+            </p>
+            <div className="chat-acoes">
+              <Link to="/checkout" className="chat-botao">
+                <ShoppingBag size={14} aria-hidden="true" /> Finalizar compra
+              </Link>
+              <button type="button" className="chat-link" onClick={() => onDesfazer(mensagemId, item)}>
+                Desfazer
+              </button>
+            </div>
+          </>
+        ) : bloco.estado === 'DESFEITO' ? (
+          <>
+            <p className="chat-sutil">Tirei da sacola.</p>
+            <button type="button" className="chat-link" onClick={() => onConfirmar(mensagemId, item, { doChat: true })}>
+              Colocar de novo
+            </button>
+          </>
+        ) : bloco.estado === 'ADICIONAR' && ultima ? (
+          <p className="chat-sutil">Colocando na sacola…</p>
         ) : (
           <button type="button" className="chat-botao" onClick={() => onConfirmar(mensagemId, item)}>
             <ShoppingBag size={14} aria-hidden="true" /> Adicionar à sacola
@@ -542,7 +565,16 @@ export function BlocosChat({ mensagem, ultima, acoes }) {
       case 'pedidos':
         return <Pedidos key={chave} bloco={bloco} />
       case 'acao_sacola':
-        return <AcaoSacola key={chave} bloco={bloco} mensagemId={mensagem.id} onConfirmar={acoes.confirmarSacola} />
+        return (
+          <AcaoSacola
+            key={chave}
+            bloco={bloco}
+            mensagemId={mensagem.id}
+            ultima={ultima}
+            onConfirmar={acoes.confirmarSacola}
+            onDesfazer={acoes.desfazerSacola}
+          />
+        )
       case 'acao_atendimento':
         return <AcaoAtendimento key={chave} bloco={bloco} onEncaminhar={acoes.encaminhar} />
       case 'atendimento_aberto':
