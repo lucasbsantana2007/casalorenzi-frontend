@@ -2,6 +2,7 @@ import { Check, Clock, Headset, MapPin, Phone, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { imagemDoProduto } from '../../data/imagensProdutos'
+import { loginDaMarca, marcaDoCaminho } from '../../data/marcas'
 import { formatCurrency, formatDate, formatNumber } from '../../utils/format'
 
 // O que o assistente mostra além do texto. Tudo vem das consultas do backend (preço, estoque, pontos),
@@ -195,7 +196,7 @@ function AcaoAtendimento({ bloco, onEncaminhar }) {
     <div className="chat-card">
       <p className="chat-card__titulo">Atendimento</p>
       {bloco.precisaLogin ? (
-        <Link to="/login" state={{ from: pathname }} className="chat-botao">
+        <Link to={loginDaMarca(marcaDoCaminho(pathname))} state={{ from: pathname }} className="chat-botao">
           Entrar para falar com a equipe
         </Link>
       ) : estado.protocolo ? (

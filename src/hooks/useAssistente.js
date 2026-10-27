@@ -3,9 +3,13 @@ import { assistenteService } from '../services/assistenteService'
 import { useSacola } from './useSacola'
 import { useSession } from './useSession'
 
-// Conversa do assistente do site. Fica no navegador (id e chave) para continuar ao trocar de página; se a
-// conta muda (entrou ou saiu), começa outra, porque a conversa de um cliente só abre na conta dele.
+// Conversa do assistente do site. Fica no navegador (id e chave) para continuar ao trocar de página. Quem
+// entra na conta no meio da conversa continua nela: o backend passa a conversa sem dono para a conta (com a
+// chave certa). Sair da conta ou trocar de conta começa outra, porque a conversa de um cliente só abre na conta dele.
 const CHAVE = 'casalorenzi.assistente'
+
+// A conversa salva serve para quem está no navegador agora? A mesma conta, ou um visitante que acabou de entrar
+const continuaCom = (salvo, dono) => Boolean(salvo?.id) && (salvo.dono === dono || (salvo.dono == null && dono != null))
 
 function ler() {
   try {
@@ -58,11 +62,13 @@ export function useAssistente(marca) {
     setErro(null)
     try {
       const salvo = ler()
-      if (salvo?.id && salvo.dono === dono) {
+      if (continuaCom(salvo, dono)) {
         try {
           const dados = await assistenteService.obter(salvo.id, salvo.chave)
           if (dados.status !== 'ENCERRADA') {
-            setConversa(salvo)
+            const registro = { ...salvo, dono }
+            gravar(registro)
+            setConversa(registro)
             setMensagens(dados.mensagens)
             setStatus('pronta')
             return
