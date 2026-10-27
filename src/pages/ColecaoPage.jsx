@@ -73,7 +73,7 @@ export function Colecao({ nome, state, categoria = null }) {
           />
         }
       >
-        {(lista) => <ProductGrid produtos={lista} colunas={3} />}
+        {(lista) => <ProductGrid produtos={lista} colunas={3} noTopo />}
       </AsyncContent>
     </main>
   )
