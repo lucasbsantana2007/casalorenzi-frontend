@@ -31,8 +31,9 @@ export function SacolaProvider({ children }) {
   const abrir = useCallback(() => setAberta(true), [])
   const fechar = useCallback(() => setAberta(false), [])
 
-  const adicionar = useCallback((item) => {
-    setAberta(true)
+  // abrir: false quando a peça vem do chat (a sacola lateral cobriria a conversa)
+  const adicionar = useCallback((item, { abrir: abrirSacola = true } = {}) => {
+    if (abrirSacola) setAberta(true)
     setItens((atual) => {
       const existente = atual.find((i) => i.variacaoId === item.variacaoId)
       if (!existente) return [...atual, { ...item, quantidade: 1 }]
