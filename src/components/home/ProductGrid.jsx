@@ -27,3 +27,20 @@ export function ProductGrid({ produtos, colunas = 3 }) {
     </ul>
   )
 }
+
+// Enquanto a lista chega: cards cinza no mesmo formato, para a página não pular quando as peças entram
+export function ProductGridSkeleton({ quantidade = 4, colunas = 3 }) {
+  return (
+    <ul className={`product-grid product-grid--${colunas}`} aria-busy="true" aria-label="Carregando peças">
+      {Array.from({ length: quantidade }, (_, i) => (
+        <li key={i}>
+          <div className="product-card product-card--esqueleto" aria-hidden="true">
+            <div className="product-card__image" />
+            <span className="esqueleto-linha" />
+            <span className="esqueleto-linha esqueleto-linha--curta" />
+          </div>
+        </li>
+      ))}
+    </ul>
+  )
+}

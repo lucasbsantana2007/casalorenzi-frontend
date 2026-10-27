@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { ProductGrid } from '../components/home/ProductGrid'
+import { ProductGrid, ProductGridSkeleton } from '../components/home/ProductGrid'
 import { FiltrosColecao } from '../components/loja/FiltrosColecao'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { EmptyState } from '../components/ui/EmptyState'
@@ -59,6 +59,7 @@ export function Colecao({ nome, state, categoria = null }) {
 
       <AsyncContent
         state={{ ...state, data: state.data && produtos }}
+        carregando={<ProductGridSkeleton quantidade={6} colunas={3} />}
         empty={
           <EmptyState
             title="Nenhuma peça nesta seleção"

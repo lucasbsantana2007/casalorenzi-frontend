@@ -485,6 +485,41 @@
   object-fit: cover;
 }
 
+/* Esqueleto da grade enquanto as peças carregam: brilho suave, parado para quem pede menos movimento */
+.product-card--esqueleto .product-card__image,
+.esqueleto-linha {
+  background: linear-gradient(90deg, #efebe4 25%, #f7f4ef 50%, #efebe4 75%);
+  background-size: 200% 100%;
+  animation: esqueleto-brilho 1.4s ease-in-out infinite;
+}
+
+.esqueleto-linha {
+  display: block;
+  width: 60%;
+  height: 12px;
+  margin-top: 6px;
+}
+
+.esqueleto-linha--curta {
+  width: 30%;
+}
+
+@keyframes esqueleto-brilho {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .product-card--esqueleto .product-card__image,
+  .esqueleto-linha {
+    animation: none;
+  }
+}
+
 .product-card h3 {
   font-family: var(--store-font);
   font-size: 15px;
