@@ -1,5 +1,5 @@
-import { CircleCheck, KeyRound, Pencil, Trash2, UserRound } from 'lucide-react'
-import { useState } from 'react'
+import { CircleCheck, KeyRound, Mail, Pencil, Trash2, UserRound } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { Field } from '../../components/ui/Field'
@@ -14,7 +14,7 @@ import { formatDate } from '../../utils/format'
 const SENHA_MINIMA = 8
 const EMAIL_VALIDO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-// Configurações da conta do cliente: dados pessoais, senha e exclusão da conta
+// Configurações da conta do cliente: dados pessoais, senha, e-mails de novidades e exclusão da conta
 export function ContaPage() {
   const state = useAsync(() => contaService.obter(), [])
 
@@ -30,6 +30,7 @@ export function ContaPage() {
           <div className="account-sections">
             <DadosPessoais conta={conta} onSalvo={state.setData} />
             <Senha />
+            <EmailsNovidades />
             <ExcluirConta />
           </div>
         )}
@@ -271,6 +272,62 @@ function Senha() {
 }
 
 // ---------- Exclusão ----------
+
+// ---------- E-mails de novidades (consentimento de marketing, LGPD) ----------
+
+// Lembrete de sacola e outros e-mails que não são do pedido só saem com o "sim" do cliente (decisão 100).
+// Os e-mails do pedido, da senha, dos pontos e o "Avise-me" pedido na peça não dependem desta opção.
+function EmailsNovidades() {
+  const [aceita, setAceita] = useState(null)
+  const [salvando, setSalvando] = useState(false)
+  const [erro, setErro] = useState(null)
+
+  useEffect(() => {
+    let ativo = true
+    contaService
+      .preferencias()
+      .then((r) => ativo && setAceita(r.aceitaMarketing))
+      .catch((e) => ativo && setErro(e))
+    return () => {
+      ativo = false
+    }
+  }, [])
+
+  async function alternar() {
+    setErro(null)
+    setSalvando(true)
+    try {
+      setAceita((await contaService.salvarPreferencias(!aceita)).aceitaMarketing)
+    } catch (e) {
+      setErro(e)
+    } finally {
+      setSalvando(false)
+    }
+  }
+
+  return (
+    <section className="account-card" aria-labelledby="conta-emails">
+      <header className="account-card__header">
+        <Mail size={20} strokeWidth={1.5} aria-hidden="true" />
+        <div>
+          <h2 id="conta-emails">E-mails de novidades</h2>
+          <p>
+            {aceita
+              ? 'Você recebe lembretes da sacola e novidades da Casa Lorenzi e da Vulto.'
+              : 'Receba um lembrete quando deixar peças na sacola e as novidades das marcas.'}{' '}
+            Os e-mails dos seus pedidos chegam de qualquer forma.
+          </p>
+        </div>
+        {aceita !== null && (
+          <button type="button" className="btn btn-secondary btn-sm" onClick={alternar} disabled={salvando} aria-pressed={aceita}>
+            {aceita ? 'Não quero mais' : 'Quero receber'}
+          </button>
+        )}
+      </header>
+      <FormError error={erro} />
+    </section>
+  )
+}
 
 function ExcluirConta() {
   const [aberto, setAberto] = useState(false)

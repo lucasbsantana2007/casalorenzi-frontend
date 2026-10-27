@@ -1,13 +1,15 @@
 import { Minus, Plus } from 'lucide-react'
-import { useId, useLayoutEffect, useRef, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
+import { Link, Navigate, useLocation, useParams } from 'react-router-dom'
 import { AsyncContent } from '../components/ui/AsyncContent'
 import { Select } from '../components/ui/Select'
 import { fotosDoProduto } from '../data/imagensProdutos'
-import { caminhoDoProduto, inicioDaMarca, marcaDoProduto } from '../data/marcas'
+import { caminhoDoProduto, inicioDaMarca, loginDaMarca, marcaDoProduto } from '../data/marcas'
 import { useMarca } from '../hooks/useMarca'
 import { useAsync } from '../hooks/useAsync'
 import { useSacola } from '../hooks/useSacola'
+import { useSession } from '../hooks/useSession'
+import { contaService } from '../services/contaService'
 import { produtosService } from '../services/produtosService'
 import { formatCurrency } from '../utils/format'
 import { NotFoundPage } from './NotFoundPage'
@@ -119,6 +121,84 @@ export function ProdutoPage() {
   )
 }
 
+// "Avise-me quando chegar" (decisão 99): a peça esgotada (cor e tamanho) avisa por e-mail quando voltar ao site
+function AviseMe({ variacaoId, produto }) {
+  const { isCliente, isEquipe } = useSession()
+  const { pathname } = useLocation()
+  const [pendentes, setPendentes] = useState(null)
+  const [enviando, setEnviando] = useState(false)
+  const [erro, setErro] = useState(null)
+
+  useEffect(() => {
+    if (!isCliente) return undefined
+    let ativo = true
+    contaService
+      .avisosEstoque()
+      .then((r) => ativo && setPendentes(r.variacaoIds))
+      .catch(() => ativo && setPendentes([]))
+    return () => {
+      ativo = false
+    }
+  }, [isCliente])
+
+  if (isEquipe) return <span className="pdp__cta pdp__cta--off">Esgotado</span>
+  if (!isCliente) {
+    return (
+      <>
+        <Link className="pdp__cta pdp__cta--aviso" to={loginDaMarca(marcaDoProduto(produto))} state={{ from: pathname }}>
+          Entre para ser avisado(a)
+        </Link>
+        <p className="pdp__aviso-nota">Esgotado neste tamanho. Avisamos por e-mail quando voltar.</p>
+      </>
+    )
+  }
+
+  const pedido = pendentes?.includes(variacaoId)
+  const alternar = async () => {
+    setEnviando(true)
+    setErro(null)
+    try {
+      if (pedido) {
+        await contaService.cancelarAviso(variacaoId)
+        setPendentes((atual) => atual.filter((id) => id !== variacaoId))
+      } else {
+        setPendentes((await contaService.pedirAviso(variacaoId)).variacaoIds)
+      }
+    } catch (e) {
+      setErro(e.message)
+    } finally {
+      setEnviando(false)
+    }
+  }
+
+  return (
+    <>
+      {pedido ? (
+        <span className="pdp__cta pdp__cta--off" role="status">
+          Vamos te avisar por e-mail
+        </span>
+      ) : (
+        <button type="button" className="pdp__cta pdp__cta--aviso" onClick={alternar} disabled={enviando || pendentes === null}>
+          Avise-me quando chegar
+        </button>
+      )}
+      <p className="pdp__aviso-nota">
+        {erro ??
+          (pedido ? (
+            <>
+              Esgotado neste tamanho.{' '}
+              <button type="button" className="pdp__aviso-link" onClick={alternar} disabled={enviando}>
+                Cancelar aviso
+              </button>
+            </>
+          ) : (
+            'Esgotado neste tamanho. Mandamos um e-mail quando voltar.'
+          ))}
+      </p>
+    </>
+  )
+}
+
 function Produto({ produto }) {
   const { adicionar } = useSacola()
   const cores = unicos(produto.variacoes.map((v) => v.cor))
@@ -206,7 +286,7 @@ function Produto({ produto }) {
             >
               <option value="">Selecione o tamanho</option>
               {daCor.map((v) => (
-                <option key={v.id} value={v.tamanho} disabled={livre(v) <= 0}>
+                <option key={v.id} value={v.tamanho}>
                   {v.tamanho}
                   {livre(v) <= 0 ? ' · esgotado' : ''}
                 </option>
@@ -215,12 +295,17 @@ function Produto({ produto }) {
           </label>
         </div>
 
-        {esgotado ? (
-          <span className="pdp__cta pdp__cta--off">Esgotado nesta cor</span>
+        {variacao && livre(variacao) <= 0 ? (
+          <AviseMe variacaoId={variacao.id} produto={produto} />
         ) : variacao ? (
           <button type="button" className="pdp__cta" onClick={adicionarNaSacola}>
             Adicionar à sacola
           </button>
+        ) : esgotado ? (
+          <>
+            <span className="pdp__cta pdp__cta--off">Esgotado nesta cor</span>
+            <p className="pdp__aviso-nota">Escolha o tamanho para ser avisado(a) quando voltar.</p>
+          </>
         ) : (
           <span className="pdp__cta pdp__cta--off" aria-disabled="true">
             Selecione um tamanho
