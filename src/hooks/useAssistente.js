@@ -37,6 +37,9 @@ function mensagemDeErro(erro) {
   return erro.message || 'Não consegui responder agora.'
 }
 
+// Cartão de cada ação confirmada pelo cliente (decisões 95 a 97)
+const BLOCO_DA_ACAO = { EMAIL: 'confirmar_email', CANCELAMENTO: 'confirmar_cancelamento', DEVOLUCAO: 'confirmar_devolucao' }
+
 export function useAssistente(marca) {
   const { usuario, isCliente, login } = useSession()
   const sacola = useSacola()
@@ -191,6 +194,22 @@ export function useAssistente(marca) {
     [conversa, sacola, marcarSacola],
   )
 
+  // Ação confirmada no cartão (e-mail, cancelamento, devolução; decisões 95 a 97): a rota da conta já fez a ação;
+  // aqui o cartão vira concluído e a conversa registra, para a Lúcia não oferecer de novo
+  const concluirAcao = useCallback(
+    (mensagemId, acao, detalhe) => {
+      setMensagens((atual) =>
+        atual.map((m) =>
+          m.id !== mensagemId
+            ? m
+            : { ...m, blocos: m.blocos.map((b) => (b.tipo === BLOCO_DA_ACAO[acao] ? { ...b, estado: 'CONCLUIDO', detalhe } : b)) },
+        ),
+      )
+      if (conversa) assistenteService.registrarAcao(conversa.id, conversa.chave, mensagemId, acao, detalhe).catch(() => {})
+    },
+    [conversa],
+  )
+
   // Abre um chamado com a equipe (SITE exige login de cliente; WHATSAPP não) e recarrega a conversa com a confirmação
   const encaminhar = useCallback(
     async (motivo, canal = 'SITE') => {
@@ -238,6 +257,7 @@ export function useAssistente(marca) {
     novaConversa,
     confirmarSacola,
     desfazerSacola,
+    concluirAcao,
     encaminhar,
     entrar,
     logado: isCliente,

@@ -452,6 +452,19 @@
   gap: 6px 14px;
 }
 
+/* Cancelar pedido: a única ação do chat que desfaz uma compra */
+.chat-botao--perigo {
+  background: var(--danger);
+}
+
+/* Peças para marcar na devolução */
+.chat-escolhas label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
 .chat-acoes {
   display: flex;
   flex-wrap: wrap;
