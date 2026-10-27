@@ -16,7 +16,7 @@ const semSessao = () => fail('Entre na sua conta de cliente para continuar.', 40
 
 const contaView = (c) => ({ id: c.id, nome: c.nome, email: c.email, cpf: c.id, telefone: c.telefone ?? '', clienteDesde: c.clienteDesde ?? null })
 
-// Helo do cliente logado: { saldo, valorEmReais, categoria, bonus, aVencer, extrato, regras }
+// Lupe+ do cliente logado: { saldo, valorEmReais, categoria, bonus, aVencer, extrato, regras }
 export function pontos() {
   const cliente = clienteDaSessao()
   return cliente ? respond(resumo(cliente.id)) : semSessao()

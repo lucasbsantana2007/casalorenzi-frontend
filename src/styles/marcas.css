@@ -483,7 +483,7 @@ a.product-card--duas-fotos:hover .product-card__costas {
   color: var(--vulto-sinal);
 }
 
-/* Helo: faixa off-white, centralizada, com muito ar */
+/* Lupe+: faixa off-white, centralizada, com muito ar */
 .vulto-mais {
   display: grid;
   justify-items: center;

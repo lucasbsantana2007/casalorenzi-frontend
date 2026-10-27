@@ -109,7 +109,7 @@ function Lojas({ itens }) {
 function Pontos({ bloco }) {
   return (
     <div className="chat-card">
-      <p className="chat-card__titulo">Helo</p>
+      <p className="chat-card__titulo">Lupe+</p>
       <p className="chat-pontos">
         <strong>{formatNumber(bloco.saldo)}</strong> pontos <span>({formatCurrency(bloco.valorEmReais)} em desconto)</span>
       </p>

@@ -15,7 +15,7 @@ export const clienteService = USE_MOCKS
       // anexo: { nome, tipo, conteudoBase64 } — uma foto JPG/PNG/WebP de até 2 MB, já reduzida no navegador
       abrirSolicitacao: (dados) => api.post('/atendimentos', dados),
       listarPedidos: (clienteId) => api.get(`/clientes/${clienteId}/pedidos`),
-      // Helo: mesmo formato de GET /conta/pontos (equipe de atendimento ou o próprio cliente)
+      // Lupe+: mesmo formato de GET /conta/pontos (equipe de atendimento ou o próprio cliente)
       obterPontos: (clienteId) => api.get(`/clientes/${clienteId}/pontos`),
       consultarPedido: (clienteId, numero) => api.get(`/clientes/${clienteId}/pedidos/${encodeURIComponent(numero)}`),
     }

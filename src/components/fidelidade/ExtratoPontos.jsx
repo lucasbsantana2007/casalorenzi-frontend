@@ -1,7 +1,7 @@
 import { formatCurrency, formatDateTime } from '../../utils/format'
 import { TIPOS_MOVIMENTO } from '../../utils/fidelidade'
 
-// Extrato do Helo, mais recente primeiro. limite: quantos movimentos mostrar (painel mostra menos)
+// Extrato do Lupe+, mais recente primeiro. limite: quantos movimentos mostrar (painel mostra menos)
 export function ExtratoPontos({ extrato, limite }) {
   const lista = limite ? extrato.slice(0, limite) : extrato
   if (!lista.length) return <p className="muted">Nenhuma movimentação de pontos ainda.</p>

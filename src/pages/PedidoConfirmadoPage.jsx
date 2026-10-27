@@ -24,7 +24,7 @@ export function PedidoConfirmadoPage() {
         </p>
         {pedido?.pontosGanhos > 0 && (
           <p className="order-hero__note">
-            Esta compra rendeu <strong>{formatarPontos(pedido.pontosGanhos)} Helo</strong>. <Link to="/cliente/pontos">Ver meus pontos</Link>
+            Esta compra rendeu <strong>{formatarPontos(pedido.pontosGanhos)} Lupe+</strong>. <Link to="/cliente/pontos">Ver meus pontos</Link>
           </p>
         )}
       </div>

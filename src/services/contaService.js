@@ -6,7 +6,7 @@ import * as mock from './mock/conta'
 export const contaService = USE_MOCKS
   ? mock
   : {
-      // Helo → { saldo, valorEmReais, categoria, bonus, aVencer: [{ data, pontos }], extrato, regras }
+      // Lupe+ → { saldo, valorEmReais, categoria, bonus, aVencer: [{ data, pontos }], extrato, regras }
       pontos: () => api.get('/conta/pontos'),
       // → { id, nome, email, cpf, telefone, clienteDesde }
       obter: () => api.get('/conta'),
