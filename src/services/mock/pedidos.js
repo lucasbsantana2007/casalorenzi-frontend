@@ -154,7 +154,7 @@ export function finalizarCompra(dados) {
   if (!['PIX', 'CARTAO'].includes(metodo)) return fail('Escolha a forma de pagamento.', 422)
   const parcelas = metodo === 'CARTAO' ? Math.min(Math.max(Number(dados.pagamento.parcelas) || 1, 1), PARCELAS_MAX) : 1
 
-  // Resgate Vulto+: confere saldo e regras antes de gravar
+  // Resgate Helo: confere saldo e regras antes de gravar
   let desconto = 0
   try {
     desconto = fidelidade.conferirResgate(cliente.id, subtotal, Number(dados.pontos) || 0)
@@ -263,7 +263,7 @@ export function atualizar(id, { lojaId, status, codigoRastreio, usuarioId }) {
       cancelarTransferenciasPendentes(pedido.id)
       pedido.status = status
       if (pedido.pagamento) pedido.pagamento = { ...pedido.pagamento, status: 'ESTORNADO' }
-      // Vulto+: a compra cancelada perde os pontos ganhos e devolve os usados nela
+      // Helo: a compra cancelada perde os pontos ganhos e devolve os usados nela
       fidelidade.cancelarCompra(pedido)
       registrar(pedido, status, usuarioId, 'Pagamento estornado')
       descricao = `Cancelou o pedido ${pedido.numero} e estornou o pagamento`

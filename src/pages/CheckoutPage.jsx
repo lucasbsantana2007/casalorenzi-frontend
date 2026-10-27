@@ -54,7 +54,7 @@ export function CheckoutPage() {
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
   const condicoesFrete = useCondicoesFrete()
-  // Vulto+ do cliente logado (saldo para o resgate e a categoria para o bônus)
+  // Helo do cliente logado (saldo para o resgate e a categoria para o bônus)
   const vulto = useAsync(() => (isCliente ? contaService.pontos() : Promise.resolve(null)), [isCliente, usuario?.id]).data
   const [pontosUsar, setPontosUsar] = useState(0)
   // CEP completo preenche rua, bairro, cidade e estado (ViaCEP); null | 'buscando' | 'nao-encontrado' | 'falhou'
@@ -391,7 +391,7 @@ export function CheckoutPage() {
           </div>
           {pontosAplicados > 0 && (
             <div className="co-totals__desconto">
-              <dt>Pontos Vulto+ ({pontosAplicados.toLocaleString('pt-BR')})</dt>
+              <dt>Pontos Helo ({pontosAplicados.toLocaleString('pt-BR')})</dt>
               <dd>− {formatCurrency(descontoPontos)}</dd>
             </div>
           )}
@@ -402,7 +402,7 @@ export function CheckoutPage() {
         </dl>
         {pontosAGanhar > 0 && (
           <p className="co-step__hint co-ganho">
-            Esta compra rende {formatarPontos(pontosAGanhar)} Vulto+{vulto?.bonus ? ` (bônus ${vulto.categoria} +${vulto.bonus}%)` : ''}.
+            Esta compra rende {formatarPontos(pontosAGanhar)} Helo{vulto?.bonus ? ` (bônus ${vulto.categoria} +${vulto.bonus}%)` : ''}.
           </p>
         )}
         {condicoesFrete && subtotal < condicoesFrete.gratisMinimo && (
@@ -416,17 +416,17 @@ export function CheckoutPage() {
   )
 }
 
-// Uso dos pontos Vulto+ no pagamento: só para cliente logado, de 100 em 100, em compras a partir de R$ 500 em produtos
+// Uso dos pontos Helo no pagamento: só para cliente logado, de 100 em 100, em compras a partir de R$ 500 em produtos
 function ResgateVultoMais({ saldo, subtotal, maximo, valor, onChange }) {
   let aviso = null
-  if (saldo < RESGATE_MULTIPLO) aviso = `Você tem ${formatarPontos(saldo)} Vulto+. A partir de ${RESGATE_MULTIPLO} dá para usar como desconto.`
+  if (saldo < RESGATE_MULTIPLO) aviso = `Você tem ${formatarPontos(saldo)} Helo. A partir de ${RESGATE_MULTIPLO} dá para usar como desconto.`
   else if (!podeResgatar(subtotal))
-    aviso = `Você tem ${formatarPontos(saldo)} Vulto+ (${formatCurrency(valorEmReais(saldo))}). Dá para usar em compras a partir de ${formatCurrency(COMPRA_MINIMA_RESGATE)} em produtos: faltam ${formatCurrency(COMPRA_MINIMA_RESGATE - subtotal)}.`
+    aviso = `Você tem ${formatarPontos(saldo)} Helo (${formatCurrency(valorEmReais(saldo))}). Dá para usar em compras a partir de ${formatCurrency(COMPRA_MINIMA_RESGATE)} em produtos: faltam ${formatCurrency(COMPRA_MINIMA_RESGATE - subtotal)}.`
 
   return (
     <div className="co-pontos">
       <div className="co-pontos__topo">
-        <strong>Pontos Vulto+</strong>
+        <strong>Pontos Helo</strong>
         <span>{formatarPontos(saldo)} · {formatCurrency(valorEmReais(saldo))}</span>
       </div>
       {aviso ? (

@@ -4,7 +4,7 @@ import vulto from '../assets/marcas/vulto.png'
 import vultoBranca from '../assets/marcas/vulto-branca.png'
 
 // As duas marcas do grupo num site só, cada uma com a sua vitrine: a Casa Lorenzi no início (/) e a
-// Vulto em /vulto. Sacola, login, checkout e Vulto+ são compartilhados. `base` é o prefixo das rotas.
+// Vulto em /vulto. Sacola, login, checkout e Helo são compartilhados. `base` é o prefixo das rotas.
 export const MARCAS = {
   LORENZI: {
     id: 'LORENZI',
@@ -31,7 +31,7 @@ export const MARCAS = {
     nav: [
       { to: '/vulto/loja', label: 'Loja' },
       { to: '/vulto/lojas', label: 'Lojas' },
-      { to: '/cliente/pontos', label: 'Vulto+' },
+      { to: '/cliente/pontos', label: 'Helo' },
       { to: '/', label: 'Lorenzi' },
     ],
     rodape: 'Pinheiros · Eldorado · Savassi · Batel · site e app',
@@ -52,7 +52,7 @@ export const GRUPO = {
     { to: '/', label: 'Casa Lorenzi' },
     { to: '/vulto', label: 'Vulto' },
   ],
-  rodape: 'Uma conta, duas marcas, os mesmos pontos Vulto+',
+  rodape: 'Uma conta, duas marcas, os mesmos pontos Helo',
 }
 
 const ehVulto = (caminho) => caminho === '/vulto' || caminho.startsWith('/vulto/')
