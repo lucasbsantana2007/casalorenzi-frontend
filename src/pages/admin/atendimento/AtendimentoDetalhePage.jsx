@@ -192,14 +192,14 @@ function Detalhe({ atendimento, onUpdate }) {
   )
 }
 
-// Vulto+ do cliente para a equipe: saldo, categoria e os últimos movimentos (o cliente não precisa informar nada)
+// Helo do cliente para a equipe: saldo, categoria e os últimos movimentos (o cliente não precisa informar nada)
 function PontosDoCliente({ cpf }) {
   const pontos = useAsync(() => clienteService.obterPontos(cpf), [cpf]).data
   if (!pontos) return null
   return (
     <div className="card">
       <div className="card__header">
-        <h2 className="card__title">Pontos Vulto+</h2>
+        <h2 className="card__title">Pontos Helo</h2>
       </div>
       <div className="card__body stack-sm">
         <CartaoVultoMais pontos={pontos} compacto />

@@ -3,7 +3,7 @@ import { formatarPontos, proximaCategoria } from '../../utils/fidelidade'
 
 const LIMITES = { Bronze: [1, 1500], Prata: [1501, 5000], Ouro: [5001, 9999] }
 
-// Resumo do Vulto+: categoria, saldo, valor em reais, progresso até a próxima categoria e próximos vencimentos.
+// Resumo do Helo: categoria, saldo, valor em reais, progresso até a próxima categoria e próximos vencimentos.
 // `pontos` é a resposta de GET /conta/pontos ou /clientes/{cpf}/pontos. compacto: sem vencimentos (cards do painel)
 export function CartaoVultoMais({ pontos, compacto = false }) {
   const proxima = proximaCategoria(pontos.saldo)
@@ -13,7 +13,7 @@ export function CartaoVultoMais({ pontos, compacto = false }) {
   return (
     <div className={`vulto-card ${pontos.categoria ? `vulto-card--${pontos.categoria.toLowerCase()}` : ''}`}>
       <div className="vulto-card__topo">
-        <span className="vulto-card__marca">Vulto+</span>
+        <span className="vulto-card__marca">Helo</span>
         <span className="vulto-card__categoria">{pontos.categoria ?? 'Sem categoria'}</span>
       </div>
       <div className="vulto-card__saldo">

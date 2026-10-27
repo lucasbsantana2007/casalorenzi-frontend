@@ -5,7 +5,7 @@ import { useAsync } from '../../hooks/useAsync'
 import { contaService } from '../../services/contaService'
 import { formatCurrency } from '../../utils/format'
 
-// Vulto+ na área do cliente: saldo, categoria, como ganhar e usar, e o extrato
+// Helo na área do cliente: saldo, categoria, como ganhar e usar, e o extrato
 export function PontosPage() {
   const state = useAsync(() => contaService.pontos(), [])
 
@@ -13,7 +13,7 @@ export function PontosPage() {
     <>
       <div>
         <p className="eyebrow">Programa de pontos</p>
-        <h1 className="client-title">Vulto+</h1>
+        <h1 className="client-title">Helo</h1>
         <p className="muted">Compras na Casa Lorenzi e na Vulto ganham pontos, que viram desconto no site.</p>
       </div>
       <AsyncContent state={state}>

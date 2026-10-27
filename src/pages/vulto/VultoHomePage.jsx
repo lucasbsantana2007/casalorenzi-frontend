@@ -49,7 +49,7 @@ export function VultoHomePage() {
           <section className="vulto-faixa" aria-label="Lojas Vulto">
             <VideoLoop nome="vulto" />
             <p className="vulto-rotulo">Pinheiros · Eldorado · Savassi · Batel</p>
-            <p className="vulto-faixa__texto">Nas lojas, no site e no app, com os mesmos pontos Vulto+.</p>
+            <p className="vulto-faixa__texto">Nas lojas, no site e no app, com os mesmos pontos Helo.</p>
             <Link to="/vulto/lojas" className="vulto-link">
               Ver lojas <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />
             </Link>
@@ -77,7 +77,7 @@ export function VultoHomePage() {
 
       <section className="vulto-mais" aria-labelledby="vulto-mais-titulo">
         <p className="vulto-rotulo">Programa de pontos</p>
-        <h2 id="vulto-mais-titulo">Vulto+</h2>
+        <h2 id="vulto-mais-titulo">Helo</h2>
         <p>R$ 1 vira 1 ponto nas lojas e 2 no site e no app. A cada 100 pontos, R$ 5 de desconto, na Vulto e na Casa Lorenzi.</p>
         <Link to="/cliente/pontos" className="vulto-link">
           Meus pontos <ArrowRight size={15} strokeWidth={1.5} aria-hidden="true" />

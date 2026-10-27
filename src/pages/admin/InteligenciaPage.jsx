@@ -14,7 +14,7 @@ import { formatDateTime } from '../../utils/format'
 const novoId = () => (globalThis.crypto?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`)
 
 // Inteligência de Negócios — Assistente IA: perguntas em linguagem natural sobre vendas, estoque, transferências
-// e Vulto+, respondidas com consultas controladas (somente leitura) e as regras oficiais da plataforma.
+// e Helo, respondidas com consultas controladas (somente leitura) e as regras oficiais da plataforma.
 export function InteligenciaPage() {
   const { pode } = useSession()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -29,7 +29,7 @@ export function InteligenciaPage() {
       <PageHeader
         eyebrow="Inteligência de Negócios"
         title="Assistente IA"
-        description="Pergunte sobre vendas, estoque, transferências e Vulto+. Cada número vem de uma consulta aos dados reais, com o período, os filtros e a definição usados."
+        description="Pergunte sobre vendas, estoque, transferências e Helo. Cada número vem de uma consulta aos dados reais, com o período, os filtros e a definição usados."
       />
       <Tabs items={abas} value={aba} onChange={(valor) => setSearchParams(valor === 'assistente' ? {} : { aba: valor }, { replace: true })} label="Seções" />
       <div className="cop-conteudo">
@@ -121,7 +121,7 @@ function Copiloto() {
             </p>
             {sugestoes.data && (
               <p className="cop-sutil">
-                Seu perfil consulta: {[sugestoes.data.permissoes.vendas && 'vendas e Vulto+', sugestoes.data.permissoes.estoque && 'estoque', sugestoes.data.permissoes.transferencias && 'transferências'].filter(Boolean).join(', ')}.
+                Seu perfil consulta: {[sugestoes.data.permissoes.vendas && 'vendas e Helo', sugestoes.data.permissoes.estoque && 'estoque', sugestoes.data.permissoes.transferencias && 'transferências'].filter(Boolean).join(', ')}.
                 {sugestoes.data.modoIA === 'REGRAS' && ' Modo atual: regras (sem modelo de linguagem configurado).'}
               </p>
             )}
