@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom'
 import { inicioDaMarca, loginDaMarca } from '../../data/marcas'
 import { useMarca } from '../../hooks/useMarca'
 import { VideoLoop } from '../ui/VideoLoop'
-import agua1000 from '../../assets/login/agua-1000.jpg'
-import agua1800 from '../../assets/login/agua-1800.jpg'
+import agua1000 from '../../assets/login/agua-1000.webp'
+import agua1800 from '../../assets/login/agua-1800.webp'
 
 const TELA_GRANDE = '(min-width: 1024px)'
 

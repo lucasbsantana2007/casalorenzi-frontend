@@ -1,12 +1,12 @@
-import batel from '../assets/lojas-vulto/batel.jpg'
-import eldorado from '../assets/lojas-vulto/eldorado.jpg'
-import pinheiros from '../assets/lojas-vulto/pinheiros.jpg'
-import savassi from '../assets/lojas-vulto/savassi.jpg'
-import belvedere from '../assets/lojas/belvedere.jpg'
-import lagoNorte from '../assets/lojas/lago-norte.jpg'
-import leblon from '../assets/lojas/leblon.jpg'
-import oscarFreire from '../assets/lojas/oscar-freire.jpg'
-import patioBatel from '../assets/lojas/patio-batel.jpg'
+import batel from '../assets/lojas-vulto/batel.webp'
+import eldorado from '../assets/lojas-vulto/eldorado.webp'
+import pinheiros from '../assets/lojas-vulto/pinheiros.webp'
+import savassi from '../assets/lojas-vulto/savassi.webp'
+import belvedere from '../assets/lojas/belvedere.webp'
+import lagoNorte from '../assets/lojas/lago-norte.webp'
+import leblon from '../assets/lojas/leblon.webp'
+import oscarFreire from '../assets/lojas/oscar-freire.webp'
+import patioBatel from '../assets/lojas/patio-batel.webp'
 
 // Foto da fachada de cada loja na página Lojas, pelo id da loja (renomear não perde a foto).
 // Loja nova sem foto aqui aparece sem imagem até ganhar uma (na API real: loja.fotoUrl).
