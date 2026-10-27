@@ -7,7 +7,7 @@ const LIMITE = 800
 // Janela de conversa do assistente do site (carregada só quando o cliente abre o chat: as fotos e os
 // blocos não pesam no carregamento das páginas).
 export function PainelChat({ assistente, onFechar }) {
-  const { mensagens, status, enviando, erro, enviar, repetir, novaConversa, confirmarSacola, encaminhar } = assistente
+  const { mensagens, status, enviando, erro, enviar, repetir, novaConversa, confirmarSacola, encaminhar, entrar, logado } = assistente
   const [texto, setTexto] = useState('')
   const fimRef = useRef(null)
   const campoRef = useRef(null)
@@ -36,6 +36,8 @@ export function PainelChat({ assistente, onFechar }) {
     escolherProduto: (p) => mandar(`Quero a ${p.nome}`, { tipo: 'FOCAR_PRODUTO', produtoId: p.produtoId }),
     confirmarSacola,
     encaminhar,
+    entrar,
+    logado,
   }
   const ultimaDoAssistente = [...mensagens].reverse().find((m) => m.papel === 'ASSISTENTE')?.id
 

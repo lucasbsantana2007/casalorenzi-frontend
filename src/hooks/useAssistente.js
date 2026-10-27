@@ -38,7 +38,7 @@ function mensagemDeErro(erro) {
 }
 
 export function useAssistente(marca) {
-  const { usuario, isCliente } = useSession()
+  const { usuario, isCliente, login } = useSession()
   const sacola = useSacola()
   const dono = isCliente ? usuario.id : null
   const [conversa, setConversa] = useState(null)
@@ -47,6 +47,8 @@ export function useAssistente(marca) {
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
   const iniciada = useRef(false)
+  // Pergunta que pediu login no chat: é enviada de novo assim que a conversa volta já com a conta
+  const pendente = useRef(null)
 
   const criar = useCallback(async () => {
     const nova = await assistenteService.abrir(marca)
@@ -174,5 +176,42 @@ export function useAssistente(marca) {
     [conversa],
   )
 
-  return { mensagens, status, enviando, erro, abrirPainel, enviar, repetir, novaConversa, confirmarSacola, encaminhar, logado: isCliente }
+  // Login dentro do chat: a senha vai direto para o login do site (useSession), nunca para a conversa. A
+  // pergunta que pediu o login (a última do cliente antes do bloco) é respondida logo depois, na mesma conversa.
+  const entrar = useCallback(
+    async (credenciais, mensagemId) => {
+      const posicao = mensagens.findIndex((m) => m.id === mensagemId)
+      const anteriores = posicao >= 0 ? mensagens.slice(0, posicao) : mensagens
+      pendente.current = [...anteriores].reverse().find((m) => m.papel === 'USUARIO')?.texto ?? null
+      try {
+        await login({ ...credenciais, manterConectado: true, somenteCliente: true })
+      } catch (e) {
+        pendente.current = null
+        throw e
+      }
+    },
+    [mensagens, login],
+  )
+
+  useEffect(() => {
+    if (!pendente.current || !dono || status !== 'pronta' || enviando || conversa?.dono !== dono) return
+    const pergunta = pendente.current
+    pendente.current = null
+    enviar(pergunta)
+  }, [dono, status, enviando, conversa, enviar])
+
+  return {
+    mensagens,
+    status,
+    enviando,
+    erro,
+    abrirPainel,
+    enviar,
+    repetir,
+    novaConversa,
+    confirmarSacola,
+    encaminhar,
+    entrar,
+    logado: isCliente,
+  }
 }

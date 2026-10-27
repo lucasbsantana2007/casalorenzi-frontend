@@ -1,6 +1,8 @@
-import { Check, Clock, Headset, MapPin, MessageCircle, Phone, ShoppingBag } from 'lucide-react'
+import { Check, Clock, Headset, LogIn, MapPin, MessageCircle, Phone, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { MODO_DEMO } from '../../config/env'
+import { CLIENTE_DEMO, SENHA_DEMO } from '../../context/perfisDemo'
 import { imagemDoProduto } from '../../data/imagensProdutos'
 import { loginDaMarca, marcaDoCaminho } from '../../data/marcas'
 import { formatCurrency, formatDate, formatNumber } from '../../utils/format'
@@ -280,6 +282,85 @@ function AtendimentoAberto({ bloco }) {
   )
 }
 
+const EQUIPE_NO_CHAT = 'Esta é uma conta da equipe. No chat, entre com uma conta de cliente.'
+
+// Login dentro do chat, quando a pergunta precisa da conta (pontos, pedidos). Os dados vão direto para o login
+// do site, nunca para a conversa; depois de entrar, a pergunta é respondida sem sair do chat.
+function EntrarNoChat({ mensagemId, ultima, logado, onEntrar }) {
+  const { pathname } = useLocation()
+  const marca = marcaDoCaminho(pathname)
+  const [dados, setDados] = useState({ email: '', senha: '' })
+  const [estado, setEstado] = useState({ entrando: false, erro: null })
+  if (logado) {
+    return (
+      <p className="chat-ok">
+        <Check size={14} aria-hidden="true" /> Você entrou na sua conta
+      </p>
+    )
+  }
+  if (!ultima) return null
+  const entrar = async (credenciais) => {
+    setEstado({ entrando: true, erro: null })
+    try {
+      await onEntrar(credenciais, mensagemId)
+    } catch (e) {
+      const equipe = e.message?.startsWith('Esta é uma conta da equipe')
+      setEstado({ entrando: false, erro: equipe ? EQUIPE_NO_CHAT : e.message || 'Não consegui entrar agora.' })
+    }
+  }
+  const enviar = (e) => {
+    e.preventDefault()
+    if (dados.email.trim() && dados.senha) entrar({ email: dados.email.trim(), senha: dados.senha })
+  }
+  return (
+    <form className="chat-card chat-entrar" onSubmit={enviar}>
+      <p className="chat-card__titulo">Entrar na sua conta</p>
+      <label className="chat-campo">
+        <span>E-mail ou CPF</span>
+        <input
+          type="text"
+          value={dados.email}
+          onChange={(e) => setDados((d) => ({ ...d, email: e.target.value }))}
+          autoComplete="username"
+          required
+        />
+      </label>
+      <label className="chat-campo">
+        <span>Senha</span>
+        <input
+          type="password"
+          value={dados.senha}
+          onChange={(e) => setDados((d) => ({ ...d, senha: e.target.value }))}
+          autoComplete="current-password"
+          required
+        />
+      </label>
+      {estado.erro && <p className="chat-erro-linha">{estado.erro}</p>}
+      <button type="submit" className="chat-botao" disabled={estado.entrando}>
+        <LogIn size={14} aria-hidden="true" /> {estado.entrando ? 'Entrando…' : 'Entrar'}
+      </button>
+      <p className="chat-sutil chat-entrar__links">
+        <Link to={loginDaMarca(marca, '/criar-conta')} state={{ from: pathname }} className="chat-link">
+          Criar conta
+        </Link>
+        <Link to={loginDaMarca(marca, '/esqueci-senha')} className="chat-link">
+          Esqueci a senha
+        </Link>
+        {MODO_DEMO && (
+          <button
+            type="button"
+            className="chat-link"
+            disabled={estado.entrando}
+            onClick={() => entrar({ email: CLIENTE_DEMO.email, senha: SENHA_DEMO })}
+          >
+            Entrar como cliente de demonstração
+          </button>
+        )}
+      </p>
+    </form>
+  )
+}
+
 function Sugestoes({ itens, onEnviar, desabilitado }) {
   return (
     <div className="chat-sugestoes">
@@ -312,6 +393,8 @@ export function BlocosChat({ mensagem, ultima, acoes }) {
         return <AcaoAtendimento key={chave} bloco={bloco} onEncaminhar={acoes.encaminhar} />
       case 'atendimento_aberto':
         return <AtendimentoAberto key={chave} bloco={bloco} />
+      case 'entrar':
+        return <EntrarNoChat key={chave} mensagemId={mensagem.id} ultima={ultima} logado={acoes.logado} onEntrar={acoes.entrar} />
       case 'sugestoes':
         return ultima ? <Sugestoes key={chave} itens={bloco.itens} onEnviar={acoes.enviar} desabilitado={acoes.enviando} /> : null
       default:
