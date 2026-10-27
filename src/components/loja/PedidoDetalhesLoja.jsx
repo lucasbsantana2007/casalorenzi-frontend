@@ -52,7 +52,7 @@ export function PedidoDetalhesLoja({ pedido }) {
         </div>
         {pedido.desconto > 0 && (
           <div className="co-totals__desconto">
-            <dt>Pontos Helo</dt>
+            <dt>Pontos Lupe+</dt>
             <dd>− {formatCurrency(pedido.desconto)}</dd>
           </div>
         )}

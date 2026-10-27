@@ -32,7 +32,7 @@ export function ClienteHomePage() {
       </section>
 
       {pontos && (
-        <Link to="/cliente/pontos" className="vulto-home" aria-label="Ver o extrato Helo">
+        <Link to="/cliente/pontos" className="vulto-home" aria-label="Ver o extrato Lupe+">
           <CartaoVultoMais pontos={pontos} compacto />
         </Link>
       )}

@@ -11,7 +11,7 @@ const LINKS = [
   { to: '/cliente', label: 'Minha conta', end: true },
   { to: '/cliente/solicitacoes', label: 'Solicitações' },
   { to: '/cliente/pedidos', label: 'Pedidos' },
-  { to: '/cliente/pontos', label: 'Helo' },
+  { to: '/cliente/pontos', label: 'Lupe+' },
   { to: '/cliente/conta', label: 'Configurações' },
 ]
 
@@ -25,7 +25,7 @@ export function ClientLayout() {
   const from = `${location.pathname}${location.search}`
   const redirectState = useMemo(() => ({ from }), [from])
 
-  // Os pontos Helo nasceram na Vulto (antes Vulto+): sem sessão, pedem o login com a identidade dela
+  // Os pontos Lupe+ nasceram na Vulto (antes Vulto+): sem sessão, pedem o login com a identidade dela
   // (depois de entrar, volta para /cliente/pontos)
   const login = location.pathname.startsWith('/cliente/pontos') ? '/vulto/login' : '/login'
   if (!isCliente) return <Navigate to={login} replace state={redirectState} />

@@ -26,13 +26,13 @@ function PainelVulto() {
   return (
     <div className="acesso__vulto">
       <VideoLoop nome="vulto" />
-      <p className="acesso__vulto-selo">Helo · site · app · lojas</p>
+      <p className="acesso__vulto-selo">Lupe+ · site · app · lojas</p>
       <p className="acesso__vulto-titulo">
         Uma conta.
         <br />
         Duas marcas.
       </p>
-      <p className="acesso__vulto-texto">A mesma conta vale na Vulto e na Casa Lorenzi, com os mesmos pontos Helo.</p>
+      <p className="acesso__vulto-texto">A mesma conta vale na Vulto e na Casa Lorenzi, com os mesmos pontos Lupe+.</p>
     </div>
   )
 }

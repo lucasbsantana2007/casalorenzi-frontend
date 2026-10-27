@@ -64,7 +64,7 @@ export function LoginPage() {
   return (
     <LayoutAcesso
       titulo="Entrar"
-      subtitulo={vulto ? 'Seus pedidos, trocas e pontos Helo.' : 'Acompanhe seus pedidos, trocas e solicitações.'}
+      subtitulo={vulto ? 'Seus pedidos, trocas e pontos Lupe+.' : 'Acompanhe seus pedidos, trocas e solicitações.'}
       voltar={{ to: inicioDaMarca(marca), label: 'Página inicial' }}
     >
       {contaExcluida && (

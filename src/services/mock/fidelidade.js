@@ -14,7 +14,7 @@ import {
 import { ApiError } from '../api'
 import { byId, db, nextId } from './db'
 
-// Helo nos dados de demonstração: mesmo contrato e mesmas regras do backend (use_cases/fidelidade.py).
+// Lupe+ nos dados de demonstração: mesmo contrato e mesmas regras do backend (use_cases/fidelidade.py).
 // O saldo nunca é editado: cada mudança é um movimento com o saldo resultante, que nunca fica negativo.
 
 const DIA = 86400000
@@ -48,7 +48,7 @@ if (!db.movimentosPontos) {
         venceEm: venceEm(quando),
         pedidoId: null,
         valorDesconto: null,
-        obs: 'Saldo do Helo migrado da Vulto',
+        obs: 'Saldo do Lupe+ migrado da Vulto',
         criadoEm: quando,
       })
     }
@@ -159,14 +159,14 @@ const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL
 export function conferirResgate(clienteId, valorProdutos, pontos) {
   if (!pontos) return 0
   if (pontos < 0 || pontos % RESGATE_MULTIPLO) {
-    throw new ApiError(`Use os pontos Helo a partir de ${RESGATE_MULTIPLO} e em múltiplos de ${RESGATE_MULTIPLO}.`, { status: 422 })
+    throw new ApiError(`Use os pontos Lupe+ a partir de ${RESGATE_MULTIPLO} e em múltiplos de ${RESGATE_MULTIPLO}.`, { status: 422 })
   }
   if (!podeResgatar(valorProdutos)) {
-    throw new ApiError(`Para usar pontos Helo, a compra precisa ter pelo menos ${brl(COMPRA_MINIMA_RESGATE)} em produtos (sem o frete).`, { status: 422 })
+    throw new ApiError(`Para usar pontos Lupe+, a compra precisa ter pelo menos ${brl(COMPRA_MINIMA_RESGATE)} em produtos (sem o frete).`, { status: 422 })
   }
   vencer(clienteId)
   const saldo = saldoDe(clienteId)
-  if (pontos > saldo) throw new ApiError(`Saldo Helo insuficiente: você tem ${saldo} pontos.`, { status: 422 })
+  if (pontos > saldo) throw new ApiError(`Saldo Lupe+ insuficiente: você tem ${saldo} pontos.`, { status: 422 })
   const maximo = maximoResgatavel(saldo, valorProdutos)
   if (pontos > maximo) throw new ApiError(`Nesta compra dá para usar no máximo ${maximo} pontos (o desconto não passa do valor dos produtos).`, { status: 422 })
   return valorEmReais(pontos)

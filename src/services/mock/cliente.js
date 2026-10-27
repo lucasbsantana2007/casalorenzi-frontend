@@ -79,7 +79,7 @@ export function consultarPedido(clienteId, numero) {
   return pedido ? respond(pedidoView(pedido)) : fail('Não encontramos um pedido com esse número.', 404)
 }
 
-// Helo do cliente (equipe de atendimento ou o próprio cliente)
+// Lupe+ do cliente (equipe de atendimento ou o próprio cliente)
 export function obterPontos(clienteId) {
   return clientePorId(clienteId) ? respond(resumo(clienteId)) : fail('Cliente não encontrado.', 404)
 }
