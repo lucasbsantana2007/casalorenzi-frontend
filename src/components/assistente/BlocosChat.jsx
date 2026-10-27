@@ -1,4 +1,4 @@
-import { Check, Clock, Headset, MapPin, Phone, ShoppingBag } from 'lucide-react'
+import { Check, Clock, Headset, MapPin, MessageCircle, Phone, ShoppingBag } from 'lucide-react'
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { imagemDoProduto } from '../../data/imagensProdutos'
@@ -182,31 +182,69 @@ function AcaoSacola({ bloco, mensagemId, onConfirmar }) {
 
 function AcaoAtendimento({ bloco, onEncaminhar }) {
   const { pathname } = useLocation()
-  const [estado, setEstado] = useState({ enviando: false, erro: null, protocolo: null })
+  // enviando: null, 'SITE' ou 'WHATSAPP'
+  const [estado, setEstado] = useState({ enviando: null, erro: null, protocolo: null, whatsappUrl: null })
   const abrir = async () => {
-    setEstado({ enviando: true, erro: null, protocolo: null })
+    setEstado({ enviando: 'SITE', erro: null, protocolo: null, whatsappUrl: null })
     try {
       const r = await onEncaminhar(bloco.motivo)
-      setEstado({ enviando: false, erro: null, protocolo: r?.protocolo })
+      setEstado({ enviando: null, erro: null, protocolo: r?.protocolo, whatsappUrl: null })
     } catch (e) {
-      setEstado({ enviando: false, erro: e.message, protocolo: null })
+      setEstado({ enviando: null, erro: e.message, protocolo: null, whatsappUrl: null })
+    }
+  }
+  // O chamado nasce com o resumo da conversa e o WhatsApp abre com o protocolo já escrito. A aba é aberta
+  // no próprio clique: o navegador bloqueia janela aberta depois de esperar a resposta da API.
+  const whatsapp = async () => {
+    const janela = window.open('', '_blank')
+    setEstado({ enviando: 'WHATSAPP', erro: null, protocolo: null, whatsappUrl: null })
+    try {
+      const r = await onEncaminhar(bloco.motivo, 'WHATSAPP')
+      if (janela) {
+        janela.opener = null
+        janela.location.href = r.whatsappUrl
+      }
+      setEstado({ enviando: null, erro: null, protocolo: r.protocolo, whatsappUrl: r.whatsappUrl })
+    } catch (e) {
+      janela?.close()
+      setEstado({ enviando: null, erro: e.message, protocolo: null, whatsappUrl: null })
     }
   }
   return (
     <div className="chat-card">
       <p className="chat-card__titulo">Atendimento</p>
-      {bloco.precisaLogin ? (
-        <Link to={loginDaMarca(marcaDoCaminho(pathname))} state={{ from: pathname }} className="chat-botao">
-          Entrar para falar com a equipe
-        </Link>
-      ) : estado.protocolo ? (
-        <p className="chat-ok">
-          <Check size={14} aria-hidden="true" /> Solicitação {estado.protocolo} aberta
-        </p>
+      {estado.protocolo ? (
+        <>
+          <p className="chat-ok">
+            <Check size={14} aria-hidden="true" /> {estado.whatsappUrl ? 'Protocolo' : 'Solicitação'} {estado.protocolo} aberta
+          </p>
+          {estado.whatsappUrl && (
+            <a href={estado.whatsappUrl} target="_blank" rel="noreferrer" className="chat-link">
+              Abrir o WhatsApp de novo
+            </a>
+          )}
+        </>
       ) : (
-        <button type="button" className="chat-botao" onClick={abrir} disabled={estado.enviando}>
-          <Headset size={14} aria-hidden="true" /> {estado.enviando ? 'Abrindo…' : 'Falar com a equipe'}
-        </button>
+        <div className="chat-acoes">
+          {bloco.whatsapp && (
+            <button type="button" className="chat-botao chat-botao--whatsapp" onClick={whatsapp} disabled={Boolean(estado.enviando)}>
+              <MessageCircle size={14} aria-hidden="true" /> {estado.enviando === 'WHATSAPP' ? 'Abrindo…' : 'Continuar no WhatsApp'}
+            </button>
+          )}
+          {bloco.precisaLogin ? (
+            <Link
+              to={loginDaMarca(marcaDoCaminho(pathname))}
+              state={{ from: pathname }}
+              className={bloco.whatsapp ? 'chat-link' : 'chat-botao'}
+            >
+              Entrar para falar com a equipe
+            </Link>
+          ) : (
+            <button type="button" className="chat-botao" onClick={abrir} disabled={Boolean(estado.enviando)}>
+              <Headset size={14} aria-hidden="true" /> {estado.enviando === 'SITE' ? 'Abrindo…' : 'Falar com a equipe'}
+            </button>
+          )}
+        </div>
       )}
       {estado.erro && <p className="chat-erro-linha">{estado.erro}</p>}
       {bloco.telefones?.length > 0 && (
@@ -226,11 +264,18 @@ function AtendimentoAberto({ bloco }) {
   return (
     <div className="chat-card">
       <p className="chat-ok">
-        <Check size={14} aria-hidden="true" /> Solicitação {bloco.protocolo}
+        <Check size={14} aria-hidden="true" /> {bloco.whatsappUrl ? 'Protocolo' : 'Solicitação'} {bloco.protocolo}
       </p>
-      <Link to={bloco.link} className="chat-link">
-        Acompanhar a solicitação
-      </Link>
+      {bloco.whatsappUrl && (
+        <a href={bloco.whatsappUrl} target="_blank" rel="noreferrer" className="chat-botao chat-botao--whatsapp">
+          <MessageCircle size={14} aria-hidden="true" /> Abrir o WhatsApp
+        </a>
+      )}
+      {bloco.link && (
+        <Link to={bloco.link} className="chat-link">
+          Acompanhar a solicitação
+        </Link>
+      )}
     </div>
   )
 }
