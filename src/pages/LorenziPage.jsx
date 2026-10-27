@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import camisaria from '../assets/colecao/camisaria.jpg'
-import oscarFreire from '../assets/lojas/oscar-freire.jpg'
+import camisaria from '../assets/colecao/camisaria.webp'
+import oscarFreire from '../assets/lojas/oscar-freire.webp'
 
 // Texto de demonstração: história fictícia da Casa Lorenzi (marca do case do trainee).
 // Trocar pelo texto oficial quando a marca enviar.
