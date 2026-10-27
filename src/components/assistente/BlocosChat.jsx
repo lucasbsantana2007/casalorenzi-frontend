@@ -156,6 +156,160 @@ function Pedidos({ bloco }) {
   )
 }
 
+// Tarefas da conta (decisão 93): detalhe do pedido, reembolsos, extrato, solicitações e frete por CEP
+
+function PedidoDetalhe({ bloco }) {
+  return (
+    <div className="chat-card">
+      <p className="chat-card__titulo">
+        Pedido {bloco.numero} <span className="chat-situacao">{bloco.statusRotulo}</span>
+      </p>
+      <p className="chat-sutil">{formatDate(bloco.data)}</p>
+      <ul className="chat-lista">
+        {bloco.itens.map((item, i) => (
+          <li key={`${item.nome}-${i}`}>
+            <span>
+              {item.nome} <small>{item.cor} · {item.tamanho} · {item.quantidade}x</small>
+            </span>
+            <span>{formatCurrency(item.preco)}</span>
+          </li>
+        ))}
+      </ul>
+      {bloco.frete && <p className="chat-sutil">Frete: {bloco.frete}</p>}
+      {bloco.desconto > 0 && <p className="chat-sutil">Desconto: {formatCurrency(bloco.desconto)}</p>}
+      <p>
+        Total: <strong>{formatCurrency(bloco.total)}</strong>
+        {bloco.pagamento && <small> · {bloco.pagamento}</small>}
+      </p>
+      {bloco.rastreio && <p className="chat-sutil">Rastreio: {bloco.rastreio}</p>}
+      {bloco.devolucoes?.length > 0 && (
+        <p className="chat-sutil">
+          Devoluções: {bloco.devolucoes.map((d) => `${d.peca} (${d.valor}, ${d.data})`).join(' · ')}
+        </p>
+      )}
+      <Link to={bloco.link} className="chat-link">
+        Ver meus pedidos
+      </Link>
+    </div>
+  )
+}
+
+function Reembolsos({ bloco }) {
+  const vazio = !bloco.emAnalise?.length && !bloco.estornos?.length && !bloco.devolucoes?.length
+  return (
+    <div className="chat-card">
+      <p className="chat-card__titulo">Reembolsos e devoluções</p>
+      {vazio && <p className="chat-sutil">Nada em andamento na sua conta.</p>}
+      {bloco.emAnalise?.length > 0 && (
+        <ul className="chat-lista">
+          {bloco.emAnalise.map((a) => (
+            <li key={a.protocolo}>
+              <span>
+                {a.assunto} <small>{a.protocolo}{a.pedido ? ` · pedido ${a.pedido}` : ''}</small>
+              </span>
+              <span className="chat-situacao chat-situacao--alerta">{a.situacao}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      {(bloco.estornos?.length > 0 || bloco.devolucoes?.length > 0) && (
+        <ul className="chat-lista">
+          {bloco.estornos?.map((e) => (
+            <li key={`e-${e.pedido}`}>
+              <span>
+                Estorno do pedido {e.pedido} <small>{e.data}</small>
+              </span>
+              <span className="chat-situacao chat-situacao--ok">{e.valor}</span>
+            </li>
+          ))}
+          {bloco.devolucoes?.map((d, i) => (
+            <li key={`d-${d.pedido}-${i}`}>
+              <span>
+                Devolução · {d.peca} <small>pedido {d.pedido} · {d.data}</small>
+              </span>
+              <span className="chat-situacao chat-situacao--ok">{d.valor}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link to={bloco.link} className="chat-link">
+        Ver minhas solicitações
+      </Link>
+    </div>
+  )
+}
+
+function Extrato({ bloco }) {
+  return (
+    <div className="chat-card">
+      <p className="chat-card__titulo">Extrato Lupe+</p>
+      <p className="chat-pontos">
+        Saldo: <strong>{formatNumber(bloco.saldo)}</strong> pontos
+      </p>
+      {bloco.itens.length === 0 ? (
+        <p className="chat-sutil">Ainda não há movimentos.</p>
+      ) : (
+        <ul className="chat-lista">
+          {bloco.itens.map((mov, i) => (
+            <li key={`${mov.data}-${i}`}>
+              <span>
+                {mov.tipo} <small>{formatDate(mov.data)}</small>
+              </span>
+              <span className={`chat-situacao chat-situacao--${mov.pontos > 0 ? 'ok' : 'off'}`}>
+                {mov.pontos > 0 ? '+' : ''}
+                {formatNumber(mov.pontos)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Link to={bloco.link} className="chat-link">
+        Ver o extrato completo
+      </Link>
+    </div>
+  )
+}
+
+function Solicitacoes({ bloco }) {
+  return (
+    <div className="chat-card">
+      <p className="chat-card__titulo">Suas solicitações</p>
+      <ul className="chat-lista">
+        {bloco.itens.map((s) => (
+          <li key={s.protocolo}>
+            <span>
+              <Link to={s.link} className="chat-link">
+                {s.protocolo}
+              </Link>{' '}
+              <small>{s.assunto}{s.pedido ? ` · pedido ${s.pedido}` : ''}</small>
+            </span>
+            <span className="chat-situacao">{s.situacao}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function Frete({ bloco }) {
+  return (
+    <div className="chat-card">
+      <p className="chat-card__titulo">Frete para {bloco.cep}</p>
+      <ul className="chat-lista">
+        {bloco.opcoes.map((o) => (
+          <li key={o.tipo}>
+            <span>
+              {o.tipo} <small>{o.prazo}</small>
+            </span>
+            <span>{o.valor}</span>
+          </li>
+        ))}
+      </ul>
+      {bloco.freteGratisAPartirDe && <p className="chat-sutil">Frete grátis a partir de {bloco.freteGratisAPartirDe} em produtos.</p>}
+    </div>
+  )
+}
+
 function AcaoSacola({ bloco, mensagemId, onConfirmar }) {
   const { item } = bloco
   const confirmado = bloco.estado === 'CONFIRMADO'
@@ -393,6 +547,16 @@ export function BlocosChat({ mensagem, ultima, acoes }) {
         return <AcaoAtendimento key={chave} bloco={bloco} onEncaminhar={acoes.encaminhar} />
       case 'atendimento_aberto':
         return <AtendimentoAberto key={chave} bloco={bloco} />
+      case 'pedido_detalhe':
+        return <PedidoDetalhe key={chave} bloco={bloco} />
+      case 'reembolsos':
+        return <Reembolsos key={chave} bloco={bloco} />
+      case 'extrato':
+        return <Extrato key={chave} bloco={bloco} />
+      case 'solicitacoes':
+        return <Solicitacoes key={chave} bloco={bloco} />
+      case 'frete':
+        return <Frete key={chave} bloco={bloco} />
       case 'entrar':
         return <EntrarNoChat key={chave} mensagemId={mensagem.id} ultima={ultima} logado={acoes.logado} onEntrar={acoes.entrar} />
       case 'sugestoes':
