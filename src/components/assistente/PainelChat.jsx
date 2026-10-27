@@ -4,6 +4,12 @@ import { BlocosChat } from './BlocosChat'
 
 const LIMITE = 800
 
+// O modelo às vezes marca negrito com **: vira <strong>, em vez de asteriscos na tela. O resto continua texto
+// puro (o React escapa tudo, então nada do texto vira HTML).
+function TextoDaResposta({ valor }) {
+  return valor.split(/\*\*(.+?)\*\*/g).map((parte, i) => (i % 2 ? <strong key={i}>{parte}</strong> : parte))
+}
+
 // Janela de conversa do assistente do site (carregada só quando o cliente abre o chat: as fotos e os
 // blocos não pesam no carregamento das páginas).
 export function PainelChat({ assistente, onFechar }) {
@@ -67,7 +73,11 @@ export function PainelChat({ assistente, onFechar }) {
             </div>
           ) : m.papel === 'ASSISTENTE' ? (
             <div key={m.id} className="chat-msg chat-msg--assistente">
-              {m.texto && <p>{m.texto}</p>}
+              {m.texto && (
+                <p>
+                  <TextoDaResposta valor={m.texto} />
+                </p>
+              )}
               {m.modo === 'CONTINGENCIA' && <p className="chat-sutil">Resposta automática: o assistente inteligente está indisponível agora.</p>}
               <BlocosChat mensagem={m} ultima={m.id === ultimaDoAssistente} acoes={acoes} />
             </div>
