@@ -4,18 +4,25 @@ import { caminhoDoProduto } from '../../data/marcas'
 import { formatCurrency } from '../../utils/format'
 
 // Grade de produtos no estilo editorial: foto, nome em caixa alta e preço.
-// Peça da Vulto: passar o mouse mostra a peça vestida (ou as costas).
-export function ProductGrid({ produtos, colunas = 3 }) {
+// Peça da Vulto: passar o mouse mostra a peça vestida (ou as costas). noTopo: a grade é o primeiro conteúdo da
+// página (vitrine), então a primeira linha carrega logo e a primeira foto tem prioridade (é o LCP).
+export function ProductGrid({ produtos, colunas = 3, noTopo = false }) {
   return (
     <ul className={`product-grid product-grid--${colunas}`}>
-      {produtos.map((produto) => {
+      {produtos.map((produto, indice) => {
+        const visivel = noTopo && indice < colunas
         const frente = imagemDoProduto(produto)
         const costas = fotoAlternativa(produto)
         return (
           <li key={produto.id}>
             <Link to={caminhoDoProduto(produto)} className={`product-card ${costas ? 'product-card--duas-fotos' : ''}`}>
               <div className="product-card__image">
-                <img src={frente} alt={produto.nome} loading="lazy" />
+                <img
+                  src={frente}
+                  alt={produto.nome}
+                  loading={visivel ? 'eager' : 'lazy'}
+                  fetchPriority={noTopo && indice === 0 ? 'high' : undefined}
+                />
                 {costas && <img src={costas} alt="" aria-hidden="true" loading="lazy" className="product-card__costas" />}
               </div>
               <h3>{produto.nome}</h3>
