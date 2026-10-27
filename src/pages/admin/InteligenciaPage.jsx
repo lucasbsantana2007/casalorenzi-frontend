@@ -50,7 +50,8 @@ function Copiloto() {
   const fimRef = useRef(null)
 
   useEffect(() => {
-    fimRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' })
+    const lista = fimRef.current?.parentElement
+    lista?.scrollTo({ top: lista.scrollHeight, behavior: 'smooth' })
   }, [mensagens.length, enviando])
 
   const perguntar = useCallback(
@@ -110,66 +111,89 @@ function Copiloto() {
   const exemplos = sugestoes.data?.sugestoes ?? []
   const ultima = [...mensagens].reverse().find((m) => m.papel === 'ASSISTENTE')?.id
   const vazio = mensagens.filter((m) => m.papel === 'USUARIO').length === 0
+  const perm = sugestoes.data?.permissoes
+  const permissoes = perm
+    ? [perm.vendas && 'vendas e Lupe+', perm.estoque && 'estoque', perm.transferencias && 'transferências'].filter(Boolean).join(', ')
+    : ''
 
   return (
     <div className="cop">
-      <section className="cop__conversa" aria-label="Conversa com o assistente">
-        {vazio && (
-          <div className="card cop-boas-vindas">
-            <p>
-              Faça uma pergunta em linguagem natural. Eu consulto os dados da plataforma (somente leitura) com as regras oficiais: o faturamento é o mesmo da tela Financeiro.
+      <section className="cop-chat" aria-label="Conversa com o assistente">
+        <header className="chat__topo">
+          <div>
+            <h2 className="chat__titulo">Assistente IA</h2>
+            <p className="chat__subtitulo">
+              {sugestoes.data?.modoIA === 'REGRAS' ? 'Modo regras · ' : ''}Dados reais da plataforma · somente leitura
             </p>
-            {sugestoes.data && (
-              <p className="cop-sutil">
-                Seu perfil consulta: {[sugestoes.data.permissoes.vendas && 'vendas e Lupe+', sugestoes.data.permissoes.estoque && 'estoque', sugestoes.data.permissoes.transferencias && 'transferências'].filter(Boolean).join(', ')}.
-                {sugestoes.data.modoIA === 'REGRAS' && ' Modo atual: regras (sem modelo de linguagem configurado).'}
-              </p>
-            )}
-            <div className="cop-sugestoes">
-              {exemplos.map((s) => (
-                <button key={s} type="button" className="cop-chip" onClick={() => perguntar(s)} disabled={enviando}>
-                  {s}
-                </button>
-              ))}
-            </div>
           </div>
-        )}
+          <div className="chat__acoes">
+            <button type="button" className="chat__icone" onClick={nova} title="Nova conversa" aria-label="Começar uma nova conversa" disabled={enviando}>
+              <MessageSquarePlus size={17} strokeWidth={1.7} />
+            </button>
+          </div>
+        </header>
 
-        {mensagens.map((m) =>
-          m.papel === 'USUARIO' ? (
-            <div key={m.id} className="cop-pergunta">
-              <p>{m.texto}</p>
-            </div>
-          ) : (
-            <article key={m.id} className="card cop-resposta">
-              <div className="cop-resposta__texto">
-                <TextoResposta texto={m.texto} />
-                {m.modo === 'CONTINGENCIA' && <p className="cop-sutil">Resposta automática: o modelo de linguagem não respondeu e as regras assumiram.</p>}
+        <div className="chat__mensagens cop-chat__mensagens" aria-live="polite">
+          {vazio && (
+            <div className="cop-inicio">
+              <div className="chat-msg chat-msg--assistente">
+                <p>
+                  Olá! Pergunte sobre {permissoes || 'os dados da plataforma'}. Respondo com os números reais, com o mesmo faturamento da tela Financeiro.
+                </p>
               </div>
-              <BlocosCopiloto blocos={m.blocos} ultima={m.id === ultima} onPerguntar={perguntar} desabilitado={enviando} />
-            </article>
-          ),
-        )}
+              {exemplos.length > 0 && (
+                <div className="cop-sugestoes">
+                  {exemplos.slice(0, 4).map((s) => (
+                    <button key={s} type="button" className="cop-chip" onClick={() => perguntar(s)} disabled={enviando}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-        {enviando && (
-          <div className="card cop-resposta cop-resposta--carregando" role="status">
-            <span className="spinner" aria-hidden="true" /> Consultando os dados…
-          </div>
-        )}
-        {erro && (
-          <div className="cop-erro" role="alert">
-            <CircleAlert size={16} aria-hidden="true" /> {erro.mensagem}
-            {erro.texto && (
-              <button type="button" className="btn btn-ghost btn-sm" onClick={() => perguntar(erro.texto)}>
-                Tentar de novo
-              </button>
-            )}
-          </div>
-        )}
-        <div ref={fimRef} />
+          {mensagens.map((m) =>
+            m.papel === 'USUARIO' ? (
+              <div key={m.id} className="chat-msg chat-msg--usuario">
+                <p>{m.texto}</p>
+              </div>
+            ) : (
+              <div key={m.id} className="cop-msg">
+                <div className="cop-bolha">
+                  <div className="cop-resposta__texto">
+                    <TextoResposta texto={m.texto} />
+                    {m.modo === 'CONTINGENCIA' && <p className="cop-sutil">Resposta automática: o modelo de linguagem não respondeu e as regras assumiram.</p>}
+                  </div>
+                  <BlocosCopiloto blocos={m.blocos} ultima={m.id === ultima} onPerguntar={perguntar} desabilitado={enviando} />
+                </div>
+              </div>
+            ),
+          )}
+
+          {enviando && (
+            <div className="chat-msg chat-msg--assistente chat-digitando" role="status" aria-label="Consultando os dados">
+              <span />
+              <span />
+              <span />
+            </div>
+          )}
+          {erro && (
+            <div className="chat-erro" role="alert">
+              <CircleAlert size={16} aria-hidden="true" />
+              <span>{erro.mensagem}</span>
+              {erro.texto && (
+                <button type="button" className="chat-link chat-link--forte" onClick={() => perguntar(erro.texto)}>
+                  Tentar de novo
+                </button>
+              )}
+            </div>
+          )}
+          <div ref={fimRef} />
+        </div>
 
         <form
-          className="cop-entrada"
+          className="chat__entrada cop-chat__entrada"
           onSubmit={(e) => {
             e.preventDefault()
             perguntar()
@@ -184,12 +208,12 @@ function Copiloto() {
                 perguntar()
               }
             }}
-            rows={2}
-            placeholder="Ex.: Qual loja teve o maior faturamento em setembro?"
+            rows={1}
+            placeholder="Ex.: Qual loja faturou mais em setembro?"
             aria-label="Sua pergunta"
           />
-          <button type="submit" className="btn btn-primary" disabled={!texto.trim() || enviando}>
-            <Send size={15} aria-hidden="true" /> Perguntar
+          <button type="submit" className="chat__enviar" disabled={!texto.trim() || enviando} aria-label="Enviar">
+            <Send size={16} strokeWidth={1.8} />
           </button>
         </form>
       </section>
@@ -216,20 +240,6 @@ function Copiloto() {
             {historico.data?.length === 0 && <li className="cop-sutil">Nenhuma conversa ainda.</li>}
           </ul>
         </div>
-        {!vazio && exemplos.length > 0 && (
-          <div className="card">
-            <div className="card__header">
-              <h2 className="card__title">Perguntas de exemplo</h2>
-            </div>
-            <div className="cop-sugestoes cop-sugestoes--coluna">
-              {exemplos.slice(0, 8).map((s) => (
-                <button key={s} type="button" className="cop-chip" onClick={() => perguntar(s)} disabled={enviando}>
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </aside>
     </div>
   )
