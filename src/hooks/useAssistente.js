@@ -162,11 +162,11 @@ export function useAssistente(marca) {
     [conversa, sacola],
   )
 
-  // Abre um chamado com a equipe (exige login de cliente) e recarrega a conversa com a confirmação
+  // Abre um chamado com a equipe (SITE exige login de cliente; WHATSAPP não) e recarrega a conversa com a confirmação
   const encaminhar = useCallback(
-    async (motivo) => {
+    async (motivo, canal = 'SITE') => {
       if (!conversa) return null
-      const resultado = await assistenteService.encaminhar(conversa.id, conversa.chave, motivo)
+      const resultado = await assistenteService.encaminhar(conversa.id, conversa.chave, motivo, canal)
       const dados = await assistenteService.obter(conversa.id, conversa.chave)
       setMensagens(dados.mensagens)
       return resultado

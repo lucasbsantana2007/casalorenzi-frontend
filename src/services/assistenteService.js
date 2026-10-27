@@ -20,7 +20,9 @@ export const assistenteService = USE_MOCKS
       enviar: (id, chave, dados) => api.post(`/assistente/conversas/${id}/mensagens`, dados, comChave(chave)),
       registrarSacola: (id, chave, mensagemId, variacaoId) =>
         api.post(`/assistente/conversas/${id}/eventos`, { tipo: 'SACOLA_ADICIONADA', mensagemId, variacaoId }, comChave(chave)),
-      // Abre um chamado de atendimento (exige login de cliente) -> { atendimentoId, protocolo, link }
-      encaminhar: (id, chave, motivo) => api.post(`/assistente/conversas/${id}/atendimento`, { motivo }, comChave(chave)),
+      // Abre um chamado de atendimento -> { atendimentoId, protocolo, link, whatsappUrl }. canal SITE exige login
+      // de cliente; WHATSAPP não, e devolve o link wa.me com o protocolo
+      encaminhar: (id, chave, motivo, canal = 'SITE') =>
+        api.post(`/assistente/conversas/${id}/atendimento`, { motivo, canal }, comChave(chave)),
       encerrar: (id, chave) => api.post(`/assistente/conversas/${id}/encerrar`, {}, comChave(chave)),
     }

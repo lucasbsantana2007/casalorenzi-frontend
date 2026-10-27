@@ -413,6 +413,19 @@
   cursor: wait;
 }
 
+/* Continuar no WhatsApp: o verde de sucesso da paleta, para lembrar o WhatsApp sem sair da identidade */
+.chat-botao--whatsapp {
+  background: var(--success);
+  text-decoration: none;
+}
+
+.chat-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
 .chat-ok {
   display: inline-flex;
   align-items: center;
