@@ -23,8 +23,13 @@ export function InteligenciaPage() {
   const abas = [
     { value: 'assistente', label: 'Assistente' },
     { value: 'alertas', label: 'Alertas' },
-    { value: 'conectar', label: 'Conectar ao Claude' },
-    ...(pode('administracao') ? [{ value: 'uso', label: 'Uso e custo da IA' }] : []),
+    // A cúpula de informação da liderança (decisão 109): só Administrador conecta o copiloto ao Claude
+    ...(pode('administracao')
+      ? [
+          { value: 'conectar', label: 'Conectar ao Claude' },
+          { value: 'uso', label: 'Uso e custo da IA' },
+        ]
+      : []),
   ]
   return (
     <>
@@ -37,7 +42,7 @@ export function InteligenciaPage() {
       <div className="cop-conteudo">
         {aba === 'alertas' ? (
           <AlertasPainel />
-        ) : aba === 'conectar' ? (
+        ) : aba === 'conectar' && pode('administracao') ? (
           <ConectarClaude />
         ) : aba === 'uso' && pode('administracao') ? (
           <UsoIA />
