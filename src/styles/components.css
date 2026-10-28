@@ -600,8 +600,11 @@ button.seletor__gatilho:disabled {
 .tabs {
   display: flex;
   gap: 4px;
-  border-bottom: 1px solid var(--border);
+  /* A linha de baixo fica dentro da barra (sombra interna) e a aba ativa não passa dela: nada sobra para rolar
+     na vertical, então o gesto do trackpad em cima das abas rola a página. Para os lados, rola no celular */
+  box-shadow: inset 0 -1px 0 var(--border);
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .tabs__item {
@@ -609,7 +612,6 @@ button.seletor__gatilho:disabled {
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  margin-bottom: -1px;
   background: none;
   border: 0;
   border-bottom: 2px solid transparent;
