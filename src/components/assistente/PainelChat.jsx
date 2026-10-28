@@ -1,5 +1,5 @@
-import { CircleAlert, RotateCcw, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { ChevronDown, CircleAlert, RotateCcw, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react'
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BlocosChat } from './BlocosChat'
 
 const LIMITE = 800
@@ -118,13 +118,50 @@ export function PainelChat({ assistente, onFechar }) {
     logado,
   } = assistente
   const [texto, setTexto] = useState('')
-  const fimRef = useRef(null)
   const campoRef = useRef(null)
   const painelRef = useRef(null)
+  const listaRef = useRef(null)
+  const novaRef = useRef(null)
+  // Última mensagem já mostrada: o que chega depois dela é novo (null = a conversa ainda não abriu)
+  const ultimaVista = useRef(null)
+  // Resposta longa que acabou de chegar: a marca "Nova resposta" vai antes dela e o chat para no começo dela
+  const [novaId, setNovaId] = useState(null)
+  const [longeDoFim, setLongeDoFim] = useState(false)
 
-  useEffect(() => {
-    fimRef.current?.scrollIntoView({ block: 'end' })
-  }, [mensagens.length, enviando, erro])
+  const irParaOFim = (suave = false) => {
+    const lista = listaRef.current
+    lista?.scrollTo({ top: lista.scrollHeight, behavior: suave ? 'smooth' : 'auto' })
+  }
+
+  // Como no WhatsApp: a pergunta e o "digitando" levam ao fim; a resposta nova é lida a partir do começo
+  useLayoutEffect(() => {
+    const ultima = mensagens.at(-1)
+    const chegouResposta =
+      ultimaVista.current !== null && ultima?.papel === 'ASSISTENTE' && ultima.id !== ultimaVista.current && !enviando
+    if (ultima) ultimaVista.current = ultima.id
+    if (chegouResposta) setNovaId(ultima.id)
+    else irParaOFim()
+  }, [mensagens, enviando, erro])
+
+  // Depois que a marca aparece: resposta que não cabe na tela para no começo; a que cabe, vai até o fim (sem marca)
+  useLayoutEffect(() => {
+    const lista = listaRef.current
+    const marca = novaRef.current
+    if (!novaId || !lista || !marca) return
+    const resposta = marca.nextElementSibling
+    const altura = marca.offsetHeight + (resposta?.offsetHeight ?? 0) + 16
+    if (altura <= lista.clientHeight) {
+      setNovaId(null)
+      irParaOFim()
+    } else {
+      lista.scrollTop = marca.offsetTop - 8
+    }
+  }, [novaId])
+
+  const aoRolar = () => {
+    const lista = listaRef.current
+    if (lista) setLongeDoFim(lista.scrollHeight - lista.scrollTop - lista.clientHeight > 120)
+  }
 
   useEffect(() => {
     campoRef.current?.focus()
@@ -135,6 +172,7 @@ export function PainelChat({ assistente, onFechar }) {
 
   const mandar = (valor = texto, acao) => {
     if (!valor.trim() || enviando) return
+    setNovaId(null)
     enviar(valor, acao)
     setTexto('')
   }
@@ -169,7 +207,7 @@ export function PainelChat({ assistente, onFechar }) {
         </div>
       </header>
 
-      <div className="chat__mensagens" aria-live="polite">
+      <div className="chat__mensagens" aria-live="polite" ref={listaRef} onScroll={aoRolar}>
         {status === 'carregando' && <p className="chat-sutil chat__centro">Abrindo a conversa…</p>}
         {mensagens.map((m) =>
           m.papel === 'USUARIO' ? (
@@ -177,16 +215,23 @@ export function PainelChat({ assistente, onFechar }) {
               <p>{m.texto}</p>
             </div>
           ) : m.papel === 'ASSISTENTE' ? (
-            <div key={m.id} className="chat-msg chat-msg--assistente">
-              {m.texto && (
-                <p>
-                  <TextoDaResposta valor={m.texto} />
+            <Fragment key={m.id}>
+              {m.id === novaId && (
+                <p className="chat-nova" ref={novaRef} role="status">
+                  <span>Nova resposta</span>
                 </p>
               )}
-              {m.modo === 'CONTINGENCIA' && <p className="chat-sutil">Resposta automática: o assistente inteligente está indisponível agora.</p>}
-              <BlocosChat mensagem={m} ultima={m.id === ultimaDoAssistente} acoes={acoes} />
-              {m.id === ultimaDoAssistente && m.avaliavel && !enviando && <AvaliarResposta key={m.id} mensagem={m} avaliar={avaliar} />}
-            </div>
+              <div className="chat-msg chat-msg--assistente">
+                {m.texto && (
+                  <p>
+                    <TextoDaResposta valor={m.texto} />
+                  </p>
+                )}
+                {m.modo === 'CONTINGENCIA' && <p className="chat-sutil">Resposta automática: o assistente inteligente está indisponível agora.</p>}
+                <BlocosChat mensagem={m} ultima={m.id === ultimaDoAssistente} acoes={acoes} />
+                {m.id === ultimaDoAssistente && m.avaliavel && !enviando && <AvaliarResposta key={m.id} mensagem={m} avaliar={avaliar} />}
+              </div>
+            </Fragment>
           ) : null,
         )}
         {enviando && <Procurando pergunta={[...mensagens].reverse().find((m) => m.papel === 'USUARIO')?.texto} />}
@@ -199,7 +244,11 @@ export function PainelChat({ assistente, onFechar }) {
             </button>
           </div>
         )}
-        <div ref={fimRef} />
+        {longeDoFim && (
+          <button type="button" className="chat-ir-fim" onClick={() => irParaOFim(true)} aria-label="Ir para o fim da conversa">
+            <ChevronDown size={18} strokeWidth={1.8} />
+          </button>
+        )}
       </div>
 
       <form
