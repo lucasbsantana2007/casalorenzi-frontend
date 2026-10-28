@@ -1,5 +1,5 @@
 import { CircleAlert, MessageSquarePlus, Send } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AlertasPainel } from '../../components/copiloto/AlertasPainel'
 import { BlocosCopiloto, TextoResposta } from '../../components/copiloto/BlocosCopiloto'
@@ -50,6 +50,38 @@ export function InteligenciaPage() {
   )
 }
 
+// A janela do chat ocupa o que sobra da tela abaixo das abas: a página não rola, então o cabeçalho e as abas
+// ficam parados (as mensagens rolam dentro da janela). No celular, vale a altura do CSS.
+const MARGEM_INFERIOR = 16
+const ALTURA_MINIMA = 420
+
+function useAlturaQueCabe() {
+  const ref = useRef(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    if (!el) return undefined
+    const ajustar = () => {
+      if (window.innerWidth <= 1100) {
+        el.style.height = ''
+        return
+      }
+      const topo = el.getBoundingClientRect().top + window.scrollY
+      let altura = window.innerHeight - topo - MARGEM_INFERIOR
+      el.style.height = `${Math.max(ALTURA_MINIMA, altura)}px`
+      // O que ainda sobra de rolagem (o espaço embaixo do painel) sai da janela do chat
+      const sobra = document.documentElement.scrollHeight - window.innerHeight
+      if (sobra > 0) {
+        altura -= sobra
+        el.style.height = `${Math.max(ALTURA_MINIMA, altura)}px`
+      }
+    }
+    ajustar()
+    window.addEventListener('resize', ajustar)
+    return () => window.removeEventListener('resize', ajustar)
+  }, [])
+  return ref
+}
+
 function Copiloto() {
   const sugestoes = useAsync(() => copilotoService.sugestoes(), [])
   const historico = useAsync(() => copilotoService.conversas(), [])
@@ -59,6 +91,7 @@ function Copiloto() {
   const [enviando, setEnviando] = useState(false)
   const [erro, setErro] = useState(null)
   const fimRef = useRef(null)
+  const janelaRef = useAlturaQueCabe()
 
   useEffect(() => {
     const lista = fimRef.current?.parentElement
@@ -138,7 +171,7 @@ function Copiloto() {
 
   return (
     <div className="cop">
-      <section className="cop-chat" aria-label="Conversa com o assistente">
+      <section ref={janelaRef} className="cop-chat" aria-label="Conversa com o assistente">
         <header className="chat__topo">
           <div>
             <h2 className="chat__titulo">Assistente IA</h2>
