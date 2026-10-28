@@ -156,8 +156,8 @@ export function PainelChat({ assistente, onFechar }) {
     <section className="chat" role="dialog" aria-label="Lúcia, assistente virtual" ref={painelRef}>
       <header className="chat__topo">
         <div>
-          <h2 className="chat__titulo">Lúcia</h2>
-          <p className="chat__subtitulo">Assistente virtual · Casa Lorenzi · Vulto</p>
+          <h2 className="chat__titulo">Assistente Lucia</h2>
+          <p className="chat__subtitulo">Casa Lorenzi · Vulto</p>
         </div>
         <div className="chat__acoes">
           <button type="button" className="chat__icone" onClick={novaConversa} title="Nova conversa" aria-label="Começar uma nova conversa" disabled={enviando}>

@@ -54,7 +54,7 @@ export function ChatWidget({ marca: marcaFixa }) {
           >
             <FlipButton
               className="chat-fab__botao"
-              textoAntes="Lúcia"
+              textoAntes="Assistente Lucia"
               icone={MessageCircle}
               virarAoClicar={false}
               onClick={abrir}
