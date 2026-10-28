@@ -123,6 +123,56 @@
   overflow-y: auto;
   background: var(--surface-muted);
   overscroll-behavior: contain;
+  /* Referência das posições da marca "Nova resposta" (offsetTop) */
+  position: relative;
+}
+
+/* Como no WhatsApp: a marca antes de uma resposta longa e o botão para ir ao fim */
+.chat-nova {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.chat-nova::before,
+.chat-nova::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.chat-nova span {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid var(--border);
+}
+
+.chat-ir-fim {
+  position: sticky;
+  bottom: 4px;
+  align-self: flex-end;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin-top: -36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--navy-950);
+  box-shadow: 0 4px 12px rgba(12, 22, 40, 0.15);
+  cursor: pointer;
+}
+
+.chat-ir-fim:hover {
+  background: var(--surface-muted);
 }
 
 .chat__centro {
