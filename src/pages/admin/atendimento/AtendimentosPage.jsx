@@ -8,7 +8,7 @@ import { PageHeader } from '../../../components/ui/PageHeader'
 import { SearchInput } from '../../../components/ui/SearchInput'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
-import { Tabs } from '../../../components/ui/Tabs'
+import { NavTabs, Tabs } from '../../../components/ui/Tabs'
 import { useAsync } from '../../../hooks/useAsync'
 import { useEquipe } from '../../../hooks/useCadastros'
 import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
@@ -17,6 +17,7 @@ import { atendimentoService } from '../../../services/atendimentoService'
 import { cadastrosService } from '../../../services/cadastrosService'
 import { formatDate, formatRelative } from '../../../utils/format'
 import { etapaDoAtendimento, ETAPAS_ATENDIMENTO } from '../../../utils/status'
+import { SECOES_ATENDIMENTO } from './LupeClientesPage'
 
 const PREFIXO_AUTOR = { CLIENTE: '', ATENDENTE: 'Equipe: ', SISTEMA: 'Sistema: ' }
 
@@ -100,6 +101,7 @@ export function AtendimentosPage() {
   return (
     <>
       <PageHeader eyebrow="Relacionamento" title="Atendimento" description="Solicitações de clientes de todas as lojas, com histórico completo de conversas." />
+      <NavTabs items={SECOES_ATENDIMENTO} label="Seções do atendimento" />
 
       <Tabs items={tabs} value={aba} onChange={setAba} label="Status do atendimento" />
 
