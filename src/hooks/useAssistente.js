@@ -210,6 +210,17 @@ export function useAssistente(marca) {
     [conversa],
   )
 
+  // "Ajudou?" (decisão 104): a nota aparece na hora; se a chamada falhar, a conversa segue (a nota é só um retorno)
+  const avaliar = useCallback(
+    (mensagemId, nota, comentario) => {
+      setMensagens((atual) => atual.map((m) => (m.id === mensagemId ? { ...m, avaliacao: nota } : m)))
+      if (conversa) {
+        assistenteService.avaliar(conversa.id, conversa.chave, mensagemId, nota, comentario || undefined).catch(() => {})
+      }
+    },
+    [conversa],
+  )
+
   // Abre um chamado com a equipe (SITE exige login de cliente; WHATSAPP não) e recarrega a conversa com a confirmação
   const encaminhar = useCallback(
     async (motivo, canal = 'SITE') => {
@@ -258,6 +269,7 @@ export function useAssistente(marca) {
     confirmarSacola,
     desfazerSacola,
     concluirAcao,
+    avaliar,
     encaminhar,
     entrar,
     logado: isCliente,

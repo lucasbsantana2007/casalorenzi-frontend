@@ -1,4 +1,4 @@
-import { CircleAlert, RotateCcw, Send, X } from 'lucide-react'
+import { CircleAlert, RotateCcw, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { BlocosChat } from './BlocosChat'
 
@@ -8,6 +8,69 @@ const LIMITE = 800
 // puro (o React escapa tudo, então nada do texto vira HTML).
 function TextoDaResposta({ valor }) {
   return valor.split(/\*\*(.+?)\*\*/g).map((parte, i) => (i % 2 ? <strong key={i}>{parte}</strong> : parte))
+}
+
+// "Ajudou?" na última resposta da Lúcia (decisão 104). No "não ajudou", pergunta o que faltou (opcional): é o que a
+// equipe lê no Uso da IA para melhorar as respostas
+function AvaliarResposta({ mensagem, avaliar }) {
+  const [etapa, setEtapa] = useState(mensagem.avaliacao ? 'oculta' : 'perguntar') // perguntar | comentar | obrigada | oculta
+  const [comentario, setComentario] = useState('')
+  if (etapa === 'oculta') return null
+  if (etapa === 'obrigada') return <p className="chat-sutil chat-avaliacao">Obrigada pelo retorno!</p>
+  if (etapa === 'comentar') {
+    return (
+      <form
+        className="chat-avaliacao chat-avaliacao--comentario"
+        onSubmit={(e) => {
+          e.preventDefault()
+          if (comentario.trim()) avaliar(mensagem.id, 'NAO_AJUDOU', comentario.trim())
+          setEtapa('obrigada')
+        }}
+      >
+        <label className="chat-sutil" htmlFor={`faltou-${mensagem.id}`}>
+          O que faltou nesta resposta? (opcional)
+        </label>
+        <textarea id={`faltou-${mensagem.id}`} rows={2} value={comentario} onChange={(e) => setComentario(e.target.value.slice(0, 500))} />
+        <div className="chat-avaliacao__acoes">
+          <button type="submit" className="chat-link chat-link--forte">
+            Enviar
+          </button>
+          <button type="button" className="chat-link" onClick={() => setEtapa('obrigada')}>
+            Pular
+          </button>
+        </div>
+      </form>
+    )
+  }
+  return (
+    <div className="chat-avaliacao" role="group" aria-label="Esta resposta ajudou?">
+      <span className="chat-sutil">Ajudou?</span>
+      <button
+        type="button"
+        className="chat-avaliacao__botao"
+        title="Ajudou"
+        aria-label="Ajudou"
+        onClick={() => {
+          avaliar(mensagem.id, 'AJUDOU')
+          setEtapa('obrigada')
+        }}
+      >
+        <ThumbsUp size={14} strokeWidth={1.8} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        className="chat-avaliacao__botao"
+        title="Não ajudou"
+        aria-label="Não ajudou"
+        onClick={() => {
+          avaliar(mensagem.id, 'NAO_AJUDOU')
+          setEtapa('comentar')
+        }}
+      >
+        <ThumbsDown size={14} strokeWidth={1.8} aria-hidden="true" />
+      </button>
+    </div>
+  )
 }
 
 // Janela de conversa do assistente do site (carregada só quando o cliente abre o chat: as fotos e os
@@ -38,7 +101,22 @@ function Procurando({ pergunta = '' }) {
 }
 
 export function PainelChat({ assistente, onFechar }) {
-  const { mensagens, status, enviando, erro, enviar, repetir, novaConversa, confirmarSacola, desfazerSacola, concluirAcao, encaminhar, entrar, logado } = assistente
+  const {
+    mensagens,
+    status,
+    enviando,
+    erro,
+    enviar,
+    repetir,
+    novaConversa,
+    confirmarSacola,
+    desfazerSacola,
+    concluirAcao,
+    avaliar,
+    encaminhar,
+    entrar,
+    logado,
+  } = assistente
   const [texto, setTexto] = useState('')
   const fimRef = useRef(null)
   const campoRef = useRef(null)
@@ -107,6 +185,7 @@ export function PainelChat({ assistente, onFechar }) {
               )}
               {m.modo === 'CONTINGENCIA' && <p className="chat-sutil">Resposta automática: o assistente inteligente está indisponível agora.</p>}
               <BlocosChat mensagem={m} ultima={m.id === ultimaDoAssistente} acoes={acoes} />
+              {m.id === ultimaDoAssistente && m.avaliavel && !enviando && <AvaliarResposta key={m.id} mensagem={m} avaliar={avaliar} />}
             </div>
           ) : null,
         )}
