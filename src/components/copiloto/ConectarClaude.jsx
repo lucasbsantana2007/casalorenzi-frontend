@@ -9,8 +9,9 @@ import { EmptyState } from '../ui/EmptyState'
 import { FormError } from '../ui/FormError'
 import { StatusBadge } from '../ui/StatusBadge'
 
-// Conectar ao Claude (decisão 106, backend: src/routers/mcp.py e docs/mcp.md): o copiloto dentro do Claude Code,
+// Conectar ao Claude (decisões 106 e 114, backend: src/routers/mcp.py e docs/mcp.md): o copiloto dentro do Claude Code,
 // do Claude Desktop ou do n8n, pelo servidor MCP. Cada pessoa cria os próprios tokens; o token aparece uma vez.
+// No claude.ai, a conexão é pelo login do painel (OAuth), sem token.
 export const URL_MCP = `${API_URL}/conector-mcp`
 
 const SITUACAO = {
@@ -147,6 +148,33 @@ function LinhaToken({ token, onRevogar, revogando }) {
   )
 }
 
+// No claude.ai não há token para colar: o app pede o login do painel (OAuth, decisão 114, docs/mcp.md)
+function ConectarNoClaudeAi() {
+  return (
+    <div className="card">
+      <div className="card__header">
+        <h2 className="card__title">No claude.ai, sem token</h2>
+      </div>
+      <div className="card__body stack-sm">
+        <ol className="cop-mcp__passos">
+          <li>
+            No claude.ai, abra <strong>Configurações &gt; Conectores &gt; Adicionar conector personalizado</strong>.
+          </li>
+          <li>Dê um nome (ex.: Casa Lorenzi) e cole o endereço abaixo. Deixe client ID e segredo em branco.</li>
+          <li>
+            Clique em <strong>Conectar</strong>, entre com o e-mail e a senha deste painel e clique em <strong>Entrar e autorizar</strong>.
+          </li>
+        </ol>
+        <div className="cop-mcp__codigo">
+          <code>{URL_MCP}</code>
+          <Copiar texto={URL_MCP} rotulo="Copiar endereço" />
+        </div>
+        <p className="cop-sutil">A conexão aparece na lista abaixo como &quot;Claude (login)&quot; e se revoga por aqui, como um token.</p>
+      </div>
+    </div>
+  )
+}
+
 export function ConectarClaude() {
   const tokens = useAsync(() => copilotoService.tokensMcp(), [])
   const [nome, setNome] = useState('')
@@ -217,6 +245,8 @@ export function ConectarClaude() {
       </div>
 
       {criado && <TokenCriado criado={criado} onFechar={() => setCriado(null)} />}
+
+      <ConectarNoClaudeAi />
 
       <div className="card">
         <div className="card__header">

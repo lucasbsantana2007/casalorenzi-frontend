@@ -1138,6 +1138,16 @@
   background: var(--success-bg);
 }
 
+.cop-mcp__passos {
+  margin: 0;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
+.cop-mcp__passos li + li {
+  margin-top: 4px;
+}
+
 .cop-mcp__codigo {
   display: flex;
   align-items: center;
