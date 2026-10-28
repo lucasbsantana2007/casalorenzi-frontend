@@ -10,8 +10,8 @@ import { FormError } from '../ui/FormError'
 import { StatusBadge } from '../ui/StatusBadge'
 
 // Conectar ao Claude (decisões 106 e 109, backend: src/routers/mcp.py e docs/mcp.md): o copiloto dentro do Claude
-// Code, do Claude Desktop ou do n8n, pelo servidor MCP. Só a liderança (Administradores); cada um cria os próprios
-// tokens, e o token aparece uma vez.
+// Code, do Claude Desktop ou do n8n, pelo servidor MCP. Só o Administrador do grupo (decisão 110); o token aparece
+// uma vez.
 export const URL_MCP = `${API_URL}/conector-mcp`
 
 const SITUACAO = {
@@ -193,9 +193,9 @@ export function ConectarClaude() {
         </div>
         <div className="card__body stack-sm">
           <p>
-            Exclusivo da liderança (Administradores). Pergunte sobre vendas, estoque, transferências e Lupe+ no Claude Code, no Claude Desktop ou
-            num agente do n8n, junto com o resto do seu trabalho. O servidor usa as mesmas consultas do copiloto: só leitura, só a marca que você vê e
-            nenhum dado de cliente (pedidos, pontos ou devoluções).
+            Exclusivo do Administrador do grupo, que vê as duas marcas. Pergunte sobre vendas, estoque, transferências e Lupe+ no Claude Code, no Claude Desktop ou
+            num agente do n8n, junto com o resto do seu trabalho. O servidor usa as mesmas consultas do copiloto: só leitura e nenhum dado de cliente
+            (pedidos, pontos ou devoluções).
           </p>
           <p className="cop-sutil">
             Endereço do servidor MCP: <code>{URL_MCP}</code>. Fora do painel, quem escreve a resposta é o Claude do app: os valores vêm prontos
