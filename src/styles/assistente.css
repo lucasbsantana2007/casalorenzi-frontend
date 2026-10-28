@@ -1289,3 +1289,20 @@
     height: 75vh;
   }
 }
+
+/* Sugestões da mensagem de boas-vindas do Assistente IA: menores, para não competir com a pergunta */
+.cop-inicio .cop-sugestoes {
+  gap: 6px;
+}
+
+.cop-inicio .cop-chip {
+  padding: 4px 10px;
+  font-size: 12px;
+  /* Borda tracejada e sem fundo: a mensagem do Olá é o balão branco; as sugestões são só atalhos */
+  border-style: dashed;
+  background: transparent;
+}
+
+.cop-inicio .cop-chip:hover:not(:disabled) {
+  border-style: solid;
+}
