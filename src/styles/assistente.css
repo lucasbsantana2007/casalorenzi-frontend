@@ -727,11 +727,43 @@
     padding: 12px 16px;
   }
 
+  /* Tela cheia que segue a área visível acima do teclado (variáveis definidas no ChatWidget) */
   .chat-moldura {
-    inset: 0;
+    top: var(--tela-topo, 0px);
+    right: auto;
+    bottom: auto;
+    left: 0;
     width: 100%;
     height: 100%;
-    height: 100dvh;
+    height: var(--tela-altura, 100dvh);
+    filter: none;
+  }
+
+  /* Com o chat aberto, a página de trás não rola nem aparece pelas bordas */
+  html.chat-aberto-celular,
+  html.chat-aberto-celular body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
+
+  .chat__mensagens {
+    overscroll-behavior: contain;
+  }
+
+  /* 16px: abaixo disso o Safari do iPhone dá zoom no campo ao tocar e a tela sai do lugar */
+  .chat__entrada textarea {
+    font-size: 16px;
+  }
+
+  /* O texto de exemplo fica numa linha só (com reticências), para o campo não nascer com duas linhas */
+  .chat__entrada textarea::placeholder {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .chat__entrada {
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
   }
 
   .chat-recorte,
