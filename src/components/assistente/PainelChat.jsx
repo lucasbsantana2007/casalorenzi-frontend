@@ -269,7 +269,7 @@ export function PainelChat({ assistente, onFechar }) {
             }
           }}
           rows={1}
-          placeholder="Pergunte sobre peças, lojas ou seus pontos"
+          placeholder="Escreva sua pergunta"
           aria-label="Sua mensagem"
           disabled={status !== 'pronta'}
         />
