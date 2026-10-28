@@ -2123,3 +2123,45 @@ a.ticket-list__item:hover {
   font-weight: 400;
   color: var(--text-muted);
 }
+
+/* Atendimento > Lupe+ (decisão 120) */
+.lupe-resumo {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 20px 0 4px;
+}
+
+@media (max-width: 760px) {
+  .lupe-resumo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.badge--lupe-bronze {
+  background: #f4e6d8;
+  color: #7a4a1e;
+}
+
+.badge--lupe-prata {
+  background: #eceef2;
+  color: #4a5160;
+}
+
+.badge--lupe-ouro {
+  background: #f8eecb;
+  color: #7a5c0c;
+}
+
+.badge--lupe-vip {
+  background: var(--navy-900);
+  color: #fff;
+}
+
+.badge--lupe-nenhuma {
+  background: var(--surface-muted);
+  color: var(--text-muted);
+}
+
+/* As seções do Atendimento (Solicitações | Lupe+) ficam acima das abas de status */
+.tabs + .tabs {
+  margin-top: 8px;
+}
