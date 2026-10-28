@@ -9,9 +9,9 @@ import { EmptyState } from '../ui/EmptyState'
 import { FormError } from '../ui/FormError'
 import { StatusBadge } from '../ui/StatusBadge'
 
-// Conectar ao Claude (decisões 106 e 109, backend: src/routers/mcp.py e docs/mcp.md): o copiloto dentro do Claude
-// Code, do Claude Desktop ou do n8n, pelo servidor MCP. Só o Administrador do grupo (decisão 110); o token aparece
-// uma vez.
+// Conectar ao Claude (decisões 106, 114 e 115, backend: src/routers/mcp.py e docs/mcp.md): o copiloto dentro do Claude Code,
+// do Claude Desktop ou do n8n, pelo servidor MCP. Cada pessoa cria os próprios tokens; o token aparece uma vez.
+// No claude.ai, a conexão é pelo login do painel (OAuth), sem token.
 export const URL_MCP = `${API_URL}/conector-mcp`
 
 const SITUACAO = {
@@ -116,9 +116,7 @@ function LinhaToken({ token, onRevogar, revogando }) {
     <tr>
       <td>
         <strong>{token.nome}</strong>
-        <div className="cop-sutil">
-          <code>{token.prefixo}…</code>
-        </div>
+        <div className="cop-sutil">{token.prefixo === 'oauth' ? 'Conectado pelo login (claude.ai)' : <code>{token.prefixo}…</code>}</div>
       </td>
       <td>
         <StatusBadge tone={situacao.tone} label={situacao.label} />
@@ -145,6 +143,33 @@ function LinhaToken({ token, onRevogar, revogando }) {
           ))}
       </td>
     </tr>
+  )
+}
+
+// No claude.ai não há token para colar: o app pede o login do painel (OAuth, decisão 114, docs/mcp.md)
+function ConectarNoClaudeAi() {
+  return (
+    <div className="card">
+      <div className="card__header">
+        <h2 className="card__title">No claude.ai, sem token</h2>
+      </div>
+      <div className="card__body stack-sm">
+        <ol className="cop-mcp__passos">
+          <li>
+            No claude.ai, abra <strong>Configurações &gt; Conectores &gt; Adicionar conector personalizado</strong>.
+          </li>
+          <li>Dê um nome (ex.: Casa Lorenzi) e cole o endereço abaixo. Deixe client ID e segredo em branco.</li>
+          <li>
+            Clique em <strong>Conectar</strong>, entre com o e-mail e a senha deste painel e clique em <strong>Entrar e autorizar</strong>.
+          </li>
+        </ol>
+        <div className="cop-mcp__codigo">
+          <code>{URL_MCP}</code>
+          <Copiar texto={URL_MCP} rotulo="Copiar endereço" />
+        </div>
+        <p className="cop-sutil">A conexão aparece na lista abaixo como &quot;Claude (login)&quot; e se revoga por aqui, como um token.</p>
+      </div>
+    </div>
   )
 }
 
@@ -193,7 +218,7 @@ export function ConectarClaude() {
         </div>
         <div className="card__body stack-sm">
           <p>
-            Exclusivo do Administrador do grupo, que vê as duas marcas. Pergunte sobre vendas, estoque, transferências e Lupe+ no Claude Code, no Claude Desktop ou
+            Para toda a equipe, cada um com as permissões do próprio perfil e da sua marca. Pergunte sobre vendas, estoque, transferências e Lupe+ no Claude Code, no Claude Desktop ou
             num agente do n8n, junto com o resto do seu trabalho. O servidor usa as mesmas consultas do copiloto: só leitura e nenhum dado de cliente
             (pedidos, pontos ou devoluções).
           </p>
@@ -218,6 +243,8 @@ export function ConectarClaude() {
       </div>
 
       {criado && <TokenCriado criado={criado} onFechar={() => setCriado(null)} />}
+
+      <ConectarNoClaudeAi />
 
       <div className="card">
         <div className="card__header">

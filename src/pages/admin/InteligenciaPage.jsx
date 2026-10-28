@@ -17,15 +17,14 @@ const novoId = () => (globalThis.crypto?.randomUUID ? crypto.randomUUID() : `${D
 // Inteligência de Negócios — Assistente IA: perguntas em linguagem natural sobre vendas, estoque, transferências
 // e Lupe+, respondidas com consultas controladas (somente leitura) e as regras oficiais da plataforma.
 export function InteligenciaPage() {
-  const { pode, usuario } = useSession()
-  // O MCP é do Administrador do grupo, o que vê as duas marcas (decisão 110)
-  const doGrupo = pode('administracao') && usuario?.marca === 'GRUPO'
+  const { pode } = useSession()
   const [searchParams, setSearchParams] = useSearchParams()
   const aba = searchParams.get('aba') ?? 'assistente'
   const abas = [
     { value: 'assistente', label: 'Assistente' },
     { value: 'alertas', label: 'Alertas' },
-    ...(doGrupo ? [{ value: 'conectar', label: 'Conectar ao Claude' }] : []),
+    // O MCP é de toda a equipe, cada um com as próprias permissões (decisão 115)
+    { value: 'conectar', label: 'Conectar ao Claude' },
     ...(pode('administracao') ? [{ value: 'uso', label: 'Uso e custo da IA' }] : []),
   ]
   return (
@@ -39,7 +38,7 @@ export function InteligenciaPage() {
       <div className="cop-conteudo">
         {aba === 'alertas' ? (
           <AlertasPainel />
-        ) : aba === 'conectar' && doGrupo ? (
+        ) : aba === 'conectar' ? (
           <ConectarClaude />
         ) : aba === 'uso' && pode('administracao') ? (
           <UsoIA />
