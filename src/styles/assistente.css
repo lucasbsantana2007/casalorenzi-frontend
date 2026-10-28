@@ -1096,6 +1096,26 @@
   gap: 12px;
 }
 
+.cop-uso__comentarios {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cop-uso__comentarios li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.cop-uso__comentarios li:first-child {
+  border-top: 0;
+}
+
 .cop-uso__tabelas {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));

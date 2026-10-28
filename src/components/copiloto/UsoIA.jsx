@@ -11,6 +11,77 @@ import { StatCard } from '../ui/StatCard'
 // Só Administrador: uso dos assistentes e custo estimado (tokens informados pela API × tabela de preços).
 const dolar = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 })
 
+const pct = (parte, total) => (total ? `${Math.round((parte / total) * 100)}%` : '—')
+
+// Qualidade das respostas (decisões 101, 102 e 104): números conferidos antes de sair, falhas e ofertas da equipe,
+// e o que os clientes acharam
+function QualidadeIA({ qualidade }) {
+  const lucia = qualidade.CLIENTE
+  const copiloto = qualidade.GERENCIAL
+  if (!lucia && !copiloto) {
+    return (
+      <div className="card">
+        <div className="card__body">
+          <EmptyState title="Ainda sem respostas para medir" description="A qualidade aparece assim que a Lúcia ou o copiloto responderem com o modelo." />
+        </div>
+      </div>
+    )
+  }
+  const conferidas = (q) => q.verificacao.CONFERIDA + q.verificacao.REESCRITA + q.verificacao.SUBSTITUIDA
+  return (
+    <>
+      {lucia && (
+        <div className="cop-uso__cards">
+          <StatCard
+            label="Lúcia: respostas conferidas"
+            value={formatNumber(conferidas(lucia))}
+            hint={`${formatNumber(lucia.comNumeros)} com números · ${formatNumber(lucia.verificacao.REESCRITA)} refeitas · ${formatNumber(lucia.verificacao.SUBSTITUIDA)} trocadas pelo texto das consultas`}
+          />
+          <StatCard
+            label="Lúcia: falhas"
+            value={formatNumber(lucia.falhas)}
+            hint={`${formatNumber(lucia.ofereceuPessoa)} vezes ofereceu a equipe · ${formatNumber(lucia.sinaisDoCliente.FRUSTRACAO)} clientes frustrados · ${formatNumber(lucia.sinaisDoCliente.REPETICAO)} perguntas repetidas`}
+          />
+          <StatCard
+            label="Clientes: ajudou?"
+            value={pct(lucia.avaliacoes.ajudou, lucia.avaliacoes.ajudou + lucia.avaliacoes.naoAjudou)}
+            hint={`${formatNumber(lucia.avaliacoes.ajudou)} ajudou · ${formatNumber(lucia.avaliacoes.naoAjudou)} não ajudou`}
+          />
+          {copiloto && (
+            <StatCard
+              label="Copiloto: respostas conferidas"
+              value={formatNumber(conferidas(copiloto))}
+              hint={`${formatNumber(copiloto.verificacao.REESCRITA)} refeitas · ${formatNumber(copiloto.verificacao.SUBSTITUIDA)} trocadas`}
+            />
+          )}
+        </div>
+      )}
+      {lucia?.comentarios.length > 0 && (
+        <div className="card">
+          <div className="card__header">
+            <div>
+              <h2 className="card__title">O que faltou, segundo os clientes</h2>
+              <p className="card__subtitle">Os últimos comentários de “não ajudou”, com a pergunta que a Lúcia respondeu</p>
+            </div>
+          </div>
+          <div className="card__body">
+            <ul className="cop-uso__comentarios">
+              {lucia.comentarios.map((c) => (
+                <li key={`${c.em}-${c.pergunta}`}>
+                  <strong>{c.comentario}</strong>
+                  <span className="cop-sutil">
+                    Pergunta: “{c.pergunta}” · {new Date(c.em).toLocaleDateString('pt-BR')}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function UsoIA() {
   const state = useAsync(() => copilotoService.uso(30), [])
   return (
@@ -25,6 +96,8 @@ export function UsoIA() {
               <StatCard label="Tokens (entrada / saída)" value={`${formatNumber(total.entrada)} / ${formatNumber(total.saida)}`} hint={`${formatNumber(total.cacheLeitura)} lidos do cache`} />
               <StatCard label="Custo estimado (30 dias)" value={dolar.format(total.custo)} hint={`Latência média ${formatNumber(uso.latenciaMediaMs)} ms`} />
             </div>
+
+            <QualidadeIA qualidade={uso.qualidade ?? {}} />
 
             <div className="card">
               <div className="card__header">
