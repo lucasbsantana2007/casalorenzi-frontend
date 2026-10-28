@@ -116,9 +116,7 @@ function LinhaToken({ token, onRevogar, revogando }) {
     <tr>
       <td>
         <strong>{token.nome}</strong>
-        <div className="cop-sutil">
-          <code>{token.prefixo}…</code>
-        </div>
+        <div className="cop-sutil">{token.prefixo === 'oauth' ? 'Conectado pelo login (claude.ai)' : <code>{token.prefixo}…</code>}</div>
       </td>
       <td>
         <StatusBadge tone={situacao.tone} label={situacao.label} />
