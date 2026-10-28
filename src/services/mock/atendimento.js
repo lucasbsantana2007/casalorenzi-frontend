@@ -1,4 +1,5 @@
 import { ATENDIMENTO_ABERTO } from '../../utils/status'
+import { resumo } from './fidelidade'
 import { anexoView, autorResumo, byId, clientePorId, db, fail, matches, nextId, noEscopo, respond, usuarioResumo, variacaoView } from './db'
 
 function pedidoView(pedido) {
@@ -116,4 +117,35 @@ export function enviarMensagem(id, { conteudo, autorId, autorTipo }) {
   if (autorTipo === 'CLIENTE' && atendimento.status === 'AGUARDANDO_CLIENTE') atendimento.status = 'EM_ANDAMENTO'
   atendimento.atualizadoEm = Date.now()
   return respond(atendimentoView(atendimento, { detalhado: true }))
+}
+
+// Aba Lupe+: os clientes com pontos válidos (na API real, o mesmo cálculo da ficha do cliente)
+export function pontosDosClientes({ busca, categoria, ordem = 'saldo' } = {}) {
+  const termo = String(busca ?? '').trim().toLowerCase()
+  const itens = db.clientes
+    .filter((c) => !c.excluido)
+    .map((c) => {
+      const r = resumo(c.id)
+      return {
+        id: c.id,
+        nome: c.nome,
+        email: c.email,
+        saldo: r.saldo,
+        valorEmReais: r.valorEmReais,
+        categoria: r.categoria,
+        proximoVencimento: r.aVencer[0] ?? null,
+      }
+    })
+    .filter((i) => i.saldo > 0)
+    .filter((i) => !termo || i.nome.toLowerCase().includes(termo) || (i.email ?? '').toLowerCase().includes(termo) || String(i.id).includes(termo))
+    .filter((i) => !categoria || i.categoria === categoria)
+    .sort((a, b) =>
+      ordem === 'nome'
+        ? a.nome.localeCompare(b.nome)
+        : ordem === 'vencimento'
+          ? (a.proximoVencimento?.data ?? '9999').localeCompare(b.proximoVencimento?.data ?? '9999')
+          : b.saldo - a.saldo,
+    )
+  const pontos = itens.reduce((s, i) => s + i.saldo, 0)
+  return respond({ referencia: new Date().toISOString().slice(0, 10), clientes: itens.length, pontos, valorEmReais: pontos * 0.05, itens })
 }
