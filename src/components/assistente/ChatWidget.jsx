@@ -78,6 +78,42 @@ export function ChatWidget({ marca: marcaFixa }) {
   )
 }
 
+const CELULAR = '(max-width: 640px)'
+
+// No celular a janela ocupa a tela inteira. Quando o teclado abre, o Safari do iPhone não encolhe a página:
+// ele a desloca, e a janela fixa ficava desencaixada, com o site aparecendo por trás. Aqui a janela segue a área
+// que de fato está visível (visualViewport) e a página de trás fica travada enquanto o chat está aberto.
+function useTelaVisivelNoCelular(ref) {
+  useLayoutEffect(() => {
+    const vv = window.visualViewport
+    const midia = window.matchMedia(CELULAR)
+    const raiz = document.documentElement
+    const ajustar = () => {
+      const el = ref.current
+      if (!el) return
+      const celular = midia.matches
+      raiz.classList.toggle('chat-aberto-celular', celular)
+      if (!celular || !vv) {
+        el.style.removeProperty('--tela-topo')
+        el.style.removeProperty('--tela-altura')
+        return
+      }
+      el.style.setProperty('--tela-topo', `${vv.offsetTop}px`)
+      el.style.setProperty('--tela-altura', `${vv.height}px`)
+    }
+    ajustar()
+    vv?.addEventListener('resize', ajustar)
+    vv?.addEventListener('scroll', ajustar)
+    midia.addEventListener('change', ajustar)
+    return () => {
+      vv?.removeEventListener('resize', ajustar)
+      vv?.removeEventListener('scroll', ajustar)
+      midia.removeEventListener('change', ajustar)
+      raiz.classList.remove('chat-aberto-celular')
+    }
+  }, [ref])
+}
+
 // Recorta a janela no formato da pílula do botão e anima o recorte até a janela inteira (e o inverso ao
 // fechar). O conteúdo não é esticado: só a área visível cresce.
 function Janela({ origem, children }) {
@@ -116,8 +152,11 @@ function Janela({ origem, children }) {
     return () => animacao.stop()
   }, [presente, formas, reduzir, remover])
 
+  const molduraRef = useRef(null)
+  useTelaVisivelNoCelular(molduraRef)
+
   return (
-    <div className="chat-moldura">
+    <div ref={molduraRef} className="chat-moldura">
       <div ref={recorteRef} className="chat-recorte">
         {children}
       </div>
