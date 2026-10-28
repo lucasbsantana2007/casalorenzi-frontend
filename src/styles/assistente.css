@@ -739,6 +739,19 @@
     filter: none;
   }
 
+  /* Fundo que continua abaixo do chat: no Safari do iPhone a barra do endereço e a das setas ficam
+     transparentes sobre o teclado, e sem isso o site aparecia por trás delas */
+  .chat-moldura::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #fff;
+    pointer-events: none;
+  }
+
   /* Com o chat aberto, a página de trás não rola nem aparece pelas bordas */
   html.chat-aberto-celular,
   html.chat-aberto-celular body {
