@@ -163,6 +163,21 @@ export function PainelChat({ assistente, onFechar }) {
     if (lista) setLongeDoFim(lista.scrollHeight - lista.scrollTop - lista.clientHeight > 120)
   }
 
+  // Quando a área da conversa encolhe (o teclado do celular abriu), a parte de baixo continua à vista,
+  // como no WhatsApp: o que estava logo acima do campo segue logo acima do campo
+  useEffect(() => {
+    const lista = listaRef.current
+    if (!lista || typeof ResizeObserver === 'undefined') return
+    let altura = lista.clientHeight
+    const observador = new ResizeObserver(() => {
+      const nova = lista.clientHeight
+      if (nova < altura) lista.scrollTop += altura - nova
+      altura = nova
+    })
+    observador.observe(lista)
+    return () => observador.disconnect()
+  }, [])
+
   useEffect(() => {
     campoRef.current?.focus()
     const aoTeclar = (e) => e.key === 'Escape' && onFechar()
