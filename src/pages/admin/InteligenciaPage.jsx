@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AlertasPainel } from '../../components/copiloto/AlertasPainel'
 import { BlocosCopiloto, TextoResposta } from '../../components/copiloto/BlocosCopiloto'
+import { ConectarClaude } from '../../components/copiloto/ConectarClaude'
 import { UsoIA } from '../../components/copiloto/UsoIA'
 import { PageHeader } from '../../components/ui/PageHeader'
 import { Tabs } from '../../components/ui/Tabs'
@@ -22,6 +23,7 @@ export function InteligenciaPage() {
   const abas = [
     { value: 'assistente', label: 'Assistente' },
     { value: 'alertas', label: 'Alertas' },
+    { value: 'conectar', label: 'Conectar ao Claude' },
     ...(pode('administracao') ? [{ value: 'uso', label: 'Uso e custo da IA' }] : []),
   ]
   return (
@@ -33,7 +35,15 @@ export function InteligenciaPage() {
       />
       <Tabs items={abas} value={aba} onChange={(valor) => setSearchParams(valor === 'assistente' ? {} : { aba: valor }, { replace: true })} label="Seções" />
       <div className="cop-conteudo">
-        {aba === 'alertas' ? <AlertasPainel /> : aba === 'uso' && pode('administracao') ? <UsoIA /> : <Copiloto />}
+        {aba === 'alertas' ? (
+          <AlertasPainel />
+        ) : aba === 'conectar' ? (
+          <ConectarClaude />
+        ) : aba === 'uso' && pode('administracao') ? (
+          <UsoIA />
+        ) : (
+          <Copiloto />
+        )}
       </div>
     </>
   )

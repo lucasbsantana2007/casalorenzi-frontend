@@ -18,6 +18,9 @@ export const copilotoService = USE_MOCKS
       alertas: semApi,
       atualizarAlerta: semApi,
       executarAutomacoes: semApi,
+      tokensMcp: semApi,
+      criarTokenMcp: semApi,
+      revogarTokenMcp: semApi,
     }
   : {
       sugestoes: () => api.get('/copiloto/sugestoes'),
@@ -34,4 +37,9 @@ export const copilotoService = USE_MOCKS
       atualizarAlerta: (id, status) => api.patch(`/alertas/${id}`, { status }),
       // Só Administrador: roda todas as automações agora
       executarAutomacoes: () => api.post('/automacoes/todas/executar', {}),
+      // Conectar ao Claude (servidor MCP, decisão 106): os tokens da pessoa logada
+      tokensMcp: () => api.get('/mcp/tokens'),
+      // -> { ...token, token } (o texto do token só vem nesta resposta)
+      criarTokenMcp: (nome) => api.post('/mcp/tokens', { nome }),
+      revogarTokenMcp: (id) => api.delete(`/mcp/tokens/${id}`),
     }
