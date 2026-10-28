@@ -4,7 +4,7 @@ import * as mock from './mock/atendimento'
 
 // Painel interno de atendimento.
 export const atendimentoService = USE_MOCKS
-  ? { listar: mock.listar, obter: mock.obter, atualizar: mock.atualizar, enviarMensagem: mock.enviarMensagem }
+  ? { listar: mock.listar, obter: mock.obter, atualizar: mock.atualizar, enviarMensagem: mock.enviarMensagem, pontosDosClientes: mock.pontosDosClientes }
   : {
       // filtros: { busca, tipoSolicitacaoId, responsavelId ('nenhum' = sem responsável), lojaId }
       listar: (filtros) => api.get('/atendimentos', filtros),
@@ -13,4 +13,7 @@ export const atendimentoService = USE_MOCKS
       atualizar: (id, dados) => api.patch(`/atendimentos/${id}`, dados),
       // { conteudo, autorId, autorTipo: 'ATENDENTE' | 'CLIENTE' }
       enviarMensagem: (id, dados) => api.post(`/atendimentos/${id}/mensagens`, dados),
+      // Aba Lupe+ (decisão 120): { busca, categoria, ordem: 'saldo' | 'nome' | 'vencimento' }
+      // → { referencia, clientes, pontos, valorEmReais, itens: [{ id, nome, email, saldo, valorEmReais, categoria, proximoVencimento }] }
+      pontosDosClientes: (filtros) => api.get('/lupe/clientes', filtros),
     }
