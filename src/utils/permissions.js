@@ -16,6 +16,8 @@ const ACESSO = {
   transferencias: ['ADMINISTRADOR', 'OPERADOR'],
   atendimento: ['ADMINISTRADOR', 'LOJISTA'],
   financeiro: ['ADMINISTRADOR'],
+  // Números do Lupe+ no Assistente IA (decisão 118): o lojista vê, sem ver faturamento
+  fidelidade: ['ADMINISTRADOR', 'LOJISTA'],
   administracao: ['ADMINISTRADOR'],
   // Inteligência de Negócios: toda a equipe abre a tela; cada consulta confere no backend o módulo do assunto
   inteligencia: ['ADMINISTRADOR', 'LOJISTA', 'OPERADOR'],

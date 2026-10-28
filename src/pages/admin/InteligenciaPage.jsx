@@ -124,7 +124,16 @@ function Copiloto() {
   const vazio = mensagens.filter((m) => m.papel === 'USUARIO').length === 0
   const perm = sugestoes.data?.permissoes
   const permissoes = perm
-    ? [perm.vendas && 'vendas e Lupe+', perm.estoque && 'estoque', perm.transferencias && 'transferências'].filter(Boolean).join(', ')
+    ? [
+        perm.vendas && 'vendas',
+        perm.fidelidade && 'Lupe+',
+        perm.pedidos && 'pedidos',
+        perm.atendimento && 'atendimentos',
+        perm.estoque && 'estoque',
+        perm.transferencias && 'transferências',
+      ]
+        .filter(Boolean)
+        .join(', ')
     : ''
 
   return (
@@ -149,7 +158,8 @@ function Copiloto() {
             <div className="cop-inicio">
               <div className="chat-msg chat-msg--assistente">
                 <p>
-                  Olá! Pergunte sobre {permissoes || 'os dados da plataforma'}. Respondo com os números reais, com o mesmo faturamento da tela Financeiro.
+                  Olá! Pergunte sobre {permissoes || 'os dados da plataforma'}.{' '}
+                  {perm?.vendas ? 'Respondo com os números reais, com o mesmo faturamento da tela Financeiro.' : 'Respondo com os dados reais da plataforma.'}
                 </p>
               </div>
               {exemplos.length > 0 && (
