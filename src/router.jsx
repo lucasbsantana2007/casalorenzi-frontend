@@ -8,6 +8,7 @@ import { ClientLayout } from './layouts/ClientLayout'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { AtendimentoDetalhePage } from './pages/admin/atendimento/AtendimentoDetalhePage'
 import { AtendimentosPage } from './pages/admin/atendimento/AtendimentosPage'
+import { LupeClientesPage } from './pages/admin/atendimento/LupeClientesPage'
 import { AdministracaoPage } from './pages/admin/administracao/AdministracaoPage'
 import { FretePage } from './pages/admin/administracao/FretePage'
 import { FuncionariosPage } from './pages/admin/administracao/FuncionariosPage'
@@ -114,6 +115,7 @@ export const router = createBrowserRouter(comTelaDeErro([
       { path: 'produtos', element: <Navigate to="/estoque" replace /> },
       { path: 'transferencias', element: protegida('transferencias', <TransferenciasPage />) },
       { path: 'atendimento', element: protegida('atendimento', <AtendimentosPage />) },
+      { path: 'atendimento/lupe', element: protegida('atendimento', <LupeClientesPage />) },
       { path: 'atendimento/:id', element: protegida('atendimento', <AtendimentoDetalhePage />) },
       {
         // Central administrativa: só Administrador
