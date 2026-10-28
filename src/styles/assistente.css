@@ -701,17 +701,19 @@
   gap: 6px;
 }
 
+/* Mesmo visual das sugestões do Assistente IA do painel: pequenas, tracejadas e sem fundo, para não competir com a mensagem */
 .chat-chip {
-  padding: 6px 11px;
-  border: 1px solid var(--border-strong);
+  padding: 4px 10px;
+  border: 1px dashed var(--border-strong);
   border-radius: 999px;
-  background: #fff;
+  background: transparent;
   color: var(--navy-900);
   font-size: 12px;
   cursor: pointer;
 }
 
 .chat-chip:hover:not(:disabled) {
+  border-style: solid;
   border-color: var(--navy-700);
 }
 
