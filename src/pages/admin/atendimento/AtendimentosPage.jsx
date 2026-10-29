@@ -10,6 +10,7 @@ import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { NavTabs, Tabs } from '../../../components/ui/Tabs'
 import { useAsync } from '../../../hooks/useAsync'
+import { useAtualizacaoAutomatica } from '../../../hooks/useAtualizacaoAutomatica'
 import { useEquipe } from '../../../hooks/useCadastros'
 import { useDebouncedValue } from '../../../hooks/useDebouncedValue'
 import { useSession } from '../../../hooks/useSession'
@@ -102,6 +103,12 @@ export function AtendimentosPage() {
   const state = useAsync(
     () => atendimentoService.listar({ busca: buscaDebounced, tipoSolicitacaoId: tipoId, responsavelId }),
     [buscaDebounced, tipoId, responsavelId],
+  )
+  // Chamados novos, mensagens e atrasos aparecem sozinhos, sem recarregar a página
+  useAtualizacaoAutomatica(
+    () => atendimentoService.listar({ busca: buscaDebounced, tipoSolicitacaoId: tipoId, responsavelId }),
+    state.setData,
+    { intervaloMs: 15000, ativo: Boolean(state.data) },
   )
 
   const todos = state.data ?? []
