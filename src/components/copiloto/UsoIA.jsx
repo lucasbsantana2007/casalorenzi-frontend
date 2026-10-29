@@ -8,6 +8,14 @@ import { StatCard } from '../ui/StatCard'
 // Só Administrador: uso dos assistentes e custo estimado (tokens informados pela API × tabela de preços).
 const dolar = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 })
 
+// "claude-haiku-5-5" vira "Claude Haiku 5.5"
+const nomeDoModelo = (id = '') =>
+  id
+    .replace(/-(\d+)-(\d+)$/, ' $1.$2')
+    .split('-')
+    .map((parte) => parte.charAt(0).toUpperCase() + parte.slice(1))
+    .join(' ')
+
 const pct = (parte, total) => (total ? `${Math.round((parte / total) * 100)}%` : '—')
 
 // Qualidade das respostas (decisões 101, 102 e 104): números conferidos antes de sair, falhas e ofertas da equipe,
@@ -88,7 +96,11 @@ export function UsoIA() {
         return (
           <div className="cop-uso">
             <div className="cop-uso__cards">
-              <StatCard label="Modo atual" value={uso.modoIA === 'LLM' ? 'Modelo de linguagem' : 'Regras (sem chave)'} hint={uso.modoIA === 'LLM' ? uso.modelo : 'Defina ANTHROPIC_API_KEY no backend'} />
+              <StatCard
+                label="Modo atual"
+                value={uso.modoIA === 'LLM' ? nomeDoModelo(uso.modelo) : 'Regras (sem chave)'}
+                hint={uso.modoIA === 'LLM' ? 'Modelo de linguagem' : 'Defina ANTHROPIC_API_KEY no backend'}
+              />
               <StatCard label="Chamadas ao modelo (30 dias)" value={formatNumber(total.chamadas)} hint={`${formatNumber(total.erros)} com erro · ${formatNumber(total.recusas)} recusadas`} />
               <StatCard label="Tokens (entrada / saída)" value={`${formatNumber(total.entrada)} / ${formatNumber(total.saida)}`} hint={`${formatNumber(total.cacheLeitura)} lidos do cache`} />
               <StatCard label="Custo estimado (30 dias)" value={dolar.format(total.custo)} hint={`Latência média ${formatNumber(uso.latenciaMediaMs)} ms`} />
