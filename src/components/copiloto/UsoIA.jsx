@@ -99,7 +99,7 @@ export function UsoIA() {
               <StatCard
                 label="Modo atual"
                 value={uso.modoIA === 'LLM' ? nomeDoModelo(uso.modelo) : 'Regras (sem chave)'}
-                hint={uso.modoIA === 'LLM' ? 'Modelo de linguagem' : 'Defina ANTHROPIC_API_KEY no backend'}
+                hint={uso.modoIA === 'LLM' ? 'LLM' : 'Defina ANTHROPIC_API_KEY no backend'}
               />
               <StatCard label="Chamadas ao modelo (30 dias)" value={formatNumber(total.chamadas)} hint={`${formatNumber(total.erros)} com erro · ${formatNumber(total.recusas)} recusadas`} />
               <StatCard label="Tokens (entrada / saída)" value={`${formatNumber(total.entrada)} / ${formatNumber(total.saida)}`} hint={`${formatNumber(total.cacheLeitura)} lidos do cache`} />
