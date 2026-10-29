@@ -1,4 +1,4 @@
-import { Check, Copy, KeyRound } from 'lucide-react'
+import { Check, ChevronDown, Copy, KeyRound } from 'lucide-react'
 import { useState } from 'react'
 import { API_URL } from '../../config/env'
 import { useAsync } from '../../hooks/useAsync'
@@ -167,7 +167,7 @@ function ConectarNoClaudeAi() {
           <code>{URL_MCP}</code>
           <Copiar texto={URL_MCP} rotulo="Copiar endereço" />
         </div>
-        <p className="cop-sutil">A conexão aparece na lista abaixo como &quot;Claude (login)&quot; e se revoga por aqui, como um token.</p>
+        <p className="cop-sutil">A conexão aparece como &quot;Claude (login)&quot; em <strong>Tokens e conexões</strong>, logo abaixo, e se revoga por lá.</p>
       </div>
     </div>
   )
@@ -180,6 +180,8 @@ export function ConectarClaude() {
   const [revogando, setRevogando] = useState(false)
   const [erro, setErro] = useState(null)
   const [criado, setCriado] = useState(null)
+  // O token (Claude Code, Claude Desktop, n8n) fica recolhido: o caminho principal é o login no claude.ai
+  const [mostrarToken, setMostrarToken] = useState(false)
 
   const criar = async (e) => {
     e.preventDefault()
@@ -212,76 +214,94 @@ export function ConectarClaude() {
 
   return (
     <div className="cop-uso">
-      <div className="card">
-        <div className="card__header">
-          <h2 className="card__title">A cúpula de informação no seu Claude</h2>
-        </div>
-        <div className="card__body stack-sm">
-          <p>
-            Para toda a equipe, cada um com as permissões do próprio perfil e da sua marca. Pergunte sobre vendas, estoque, transferências e Lupe+ no Claude Code, no Claude Desktop ou
-            num agente do n8n, junto com o resto do seu trabalho. O servidor usa as mesmas consultas do copiloto: só leitura e nenhum dado de cliente
-            (pedidos, pontos ou devoluções).
-          </p>
-          <p className="cop-sutil">
-            Endereço do servidor MCP: <code>{URL_MCP}</code>. Fora do painel, quem escreve a resposta é o Claude do app: os valores vêm prontos
-            das consultas, mas confira os números importantes aqui no copiloto.
-          </p>
-          <form className="cop-mcp__form" onSubmit={criar}>
-            <input
-              className="input"
-              value={nome}
-              onChange={(e) => setNome(e.target.value.slice(0, 60))}
-              placeholder="Onde vai usar? Ex.: Claude Code do notebook"
-              aria-label="Nome do token"
-            />
-            <button type="submit" className="btn btn-primary" disabled={!nome.trim() || criando}>
-              <KeyRound size={15} aria-hidden="true" /> {criando ? 'Criando…' : 'Criar token'}
-            </button>
-          </form>
-          <FormError error={erro} />
-        </div>
-      </div>
-
-      {criado && <TokenCriado criado={criado} onFechar={() => setCriado(null)} />}
-
       <ConectarNoClaudeAi />
 
-      <div className="card">
-        <div className="card__header">
-          <h2 className="card__title">Seus tokens</h2>
-        </div>
-        <AsyncContent
-          state={tokens}
-          empty={
-            <div className="card__body">
-              <EmptyState title="Nenhum token ainda" description="Crie um token para conectar o Claude ou o n8n ao copiloto." />
-            </div>
-          }
+      <div>
+        <button
+          type="button"
+          className={`cop-mcp__mais${mostrarToken ? ' is-aberto' : ''}`}
+          onClick={() => setMostrarToken((v) => !v)}
+          aria-expanded={mostrarToken}
+          aria-controls="cop-mcp-token"
         >
-          {(lista) => (
-            <div className="table-wrap">
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Situação</th>
-                    <th>Criado</th>
-                    <th>Último uso</th>
-                    <th>Consultas</th>
-                    <th>Vale até</th>
-                    <th aria-label="Ações" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {lista.map((token) => (
-                    <LinhaToken key={token.id} token={token} onRevogar={revogar} revogando={revogando} />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </AsyncContent>
+          <KeyRound size={15} aria-hidden="true" />
+          Tokens e conexões (Claude Code, Claude Desktop, n8n)
+          <ChevronDown size={16} aria-hidden="true" className="cop-mcp__mais-seta" />
+        </button>
       </div>
+
+      {mostrarToken && (
+        <div className="stack" id="cop-mcp-token">
+          <div className="card">
+            <div className="card__header">
+              <h2 className="card__title">A cúpula de informação no seu Claude</h2>
+            </div>
+            <div className="card__body stack-sm">
+              <p>
+                Para toda a equipe, cada um com as permissões do próprio perfil e da sua marca. Pergunte sobre vendas, estoque, transferências e Lupe+ no Claude Code, no Claude Desktop ou
+                num agente do n8n, junto com o resto do seu trabalho. O servidor usa as mesmas consultas do copiloto: só leitura e nenhum dado de cliente
+                (pedidos, pontos ou devoluções).
+              </p>
+              <p className="cop-sutil">
+                Endereço do servidor MCP: <code>{URL_MCP}</code>. Fora do painel, quem escreve a resposta é o Claude do app: os valores vêm prontos
+                das consultas, mas confira os números importantes aqui no copiloto.
+              </p>
+              <form className="cop-mcp__form" onSubmit={criar}>
+                <input
+                  className="input"
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value.slice(0, 60))}
+                  placeholder="Onde vai usar? Ex.: Claude Code do notebook"
+                  aria-label="Nome do token"
+                />
+                <button type="submit" className="btn btn-primary" disabled={!nome.trim() || criando}>
+                  <KeyRound size={15} aria-hidden="true" /> {criando ? 'Criando…' : 'Criar token'}
+                </button>
+              </form>
+              <FormError error={erro} />
+            </div>
+          </div>
+
+          {criado && <TokenCriado criado={criado} onFechar={() => setCriado(null)} />}
+
+          <div className="card">
+            <div className="card__header">
+              <h2 className="card__title">Seus tokens e conexões</h2>
+            </div>
+            <AsyncContent
+              state={tokens}
+              empty={
+                <div className="card__body">
+                  <EmptyState title="Nenhum token ainda" description="Crie um token para conectar o Claude ou o n8n ao copiloto." />
+                </div>
+              }
+            >
+              {(lista) => (
+                <div className="table-wrap">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Nome</th>
+                        <th>Situação</th>
+                        <th>Criado</th>
+                        <th>Último uso</th>
+                        <th>Consultas</th>
+                        <th>Vale até</th>
+                        <th aria-label="Ações" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {lista.map((token) => (
+                        <LinhaToken key={token.id} token={token} onRevogar={revogar} revogando={revogando} />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </AsyncContent>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
