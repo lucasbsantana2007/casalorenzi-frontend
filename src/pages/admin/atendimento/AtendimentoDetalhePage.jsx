@@ -11,6 +11,7 @@ import { PageHeader } from '../../../components/ui/PageHeader'
 import { Select } from '../../../components/ui/Select'
 import { StatusBadge } from '../../../components/ui/StatusBadge'
 import { useAsync } from '../../../hooks/useAsync'
+import { useAtualizacaoAutomatica } from '../../../hooks/useAtualizacaoAutomatica'
 import { useEquipe } from '../../../hooks/useCadastros'
 import { useSession } from '../../../hooks/useSession'
 import { atendimentoService } from '../../../services/atendimentoService'
@@ -23,6 +24,8 @@ import { clienteService } from '../../../services/clienteService'
 export function AtendimentoDetalhePage() {
   const { id } = useParams()
   const state = useAsync(() => atendimentoService.obter(id), [id])
+  // Mensagens novas do cliente (site ou WhatsApp) aparecem sozinhas, sem recarregar a página
+  useAtualizacaoAutomatica(() => atendimentoService.obter(id), state.setData, { ativo: Boolean(state.data) })
 
   return (
     <>
