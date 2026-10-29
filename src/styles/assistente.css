@@ -1299,11 +1299,6 @@
   border-top: 0;
 }
 
-.cop-uso__tabelas {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 16px;
-}
 
 /* Conectar ao Claude (servidor MCP, decisão 106) */
 
