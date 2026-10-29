@@ -70,6 +70,8 @@ function Detalhe({ atendimento, onUpdate }) {
         actions={
           <>
             <StatusBadge type="atendimentoPainel" value={atendimento.status} />
+            {/* Cliente esperando a equipe há mais de 30 min num chamado da Lúcia (decisão 122) */}
+            {atendimento.atrasado && <StatusBadge tone="danger" label="Atrasado" />}
             {atendimento.responsavelId !== usuario.id && (
               <button type="button" className="btn btn-secondary" disabled={saving} onClick={() => atualizar({ responsavelId: usuario.id, status: atendimento.status === 'ABERTO' ? 'EM_ANDAMENTO' : undefined })}>
                 <UserCheck size={16} /> Assumir atendimento

@@ -57,7 +57,21 @@ const columns = [
       </>
     ),
   },
-  { key: 'status', header: 'Status', render: (a) => <StatusBadge type="atendimentoPainel" value={a.status} /> },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (a) => (
+      <>
+        <StatusBadge type="atendimentoPainel" value={a.status} />
+        {/* Chamado da Lúcia com o cliente esperando a equipe há mais de 30 min (decisão 122) */}
+        {a.atrasado && (
+          <span className="cell-sub nowrap">
+            <StatusBadge tone="danger" label="Atrasado" /> esperando {formatRelative(a.aguardandoEquipeDesde).replace('há ', '')}
+          </span>
+        )}
+      </>
+    ),
+  },
   {
     key: 'responsavel',
     header: 'Responsável',
@@ -91,8 +105,8 @@ export function AtendimentosPage() {
   )
 
   const todos = state.data ?? []
-  const pertence = (a, aba) => aba === 'TODOS' || etapaDoAtendimento(a.status) === aba
-  const tabs = [{ value: 'TODOS', label: 'Todos' }, ...ETAPAS_ATENDIMENTO].map(({ value, label }) => ({
+  const pertence = (a, aba) => aba === 'TODOS' || (aba === 'ATRASADOS' ? a.atrasado : etapaDoAtendimento(a.status) === aba)
+  const tabs = [{ value: 'TODOS', label: 'Todos' }, { value: 'ATRASADOS', label: 'Atrasados' }, ...ETAPAS_ATENDIMENTO].map(({ value, label }) => ({
     value,
     label,
     count: todos.filter((a) => pertence(a, value)).length,
