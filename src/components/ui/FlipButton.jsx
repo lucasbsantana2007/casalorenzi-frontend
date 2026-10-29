@@ -68,7 +68,8 @@ export function FlipButton({
     >
       <motion.span className="flip-button__conteudo" animate={{ rotateX: virado ? 180 : 0 }} transition={transicao}>
         {Icone && <Icone size={18} strokeWidth={1.6} aria-hidden="true" />}
-        <span>{virado ? textoDepois : textoAntes}</span>
+        {/* Sem texto, o botão fica só com o ícone (o nome vai no aria-label de quem usa) */}
+        {(virado ? textoDepois : textoAntes) && <span>{virado ? textoDepois : textoAntes}</span>}
       </motion.span>
     </motion.button>
   )
