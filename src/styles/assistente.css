@@ -1089,55 +1089,77 @@
   font-size: 11px;
 }
 
-/* Alertas */
-.cop-alertas {
+/* Automações: e-mails automáticos aos clientes (decisão 127) */
+.cop-auto {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.cop-alertas__resumo {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-  gap: 12px;
-}
-
-.cop-alerta-tipo {
+.cop-auto__topo {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 14px 16px;
-  text-align: left;
-  cursor: pointer;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px 24px;
 }
 
-.cop-alerta-tipo.is-active {
-  border-color: var(--navy-700);
-  box-shadow: var(--focus);
+.cop-auto__titulo {
+  margin: 0 0 4px;
+  font-size: 18px;
 }
 
-.cop-alerta-tipo span {
-  color: var(--text-muted);
-  font-size: 12px;
+.cop-auto__topo p {
+  margin: 0;
+  font-size: 13px;
 }
 
-.cop-alerta-tipo strong {
-  font-size: 24px;
-}
-
-.cop-alerta-tipo small {
-  color: var(--text-subtle);
-}
-
-.cop-alertas__barra {
+.cop-auto__confirmar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+}
+
+.cop-auto__confirmar span {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cop-auto__modo {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.cop-auto__modo svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.cop-auto__modo--teste {
+  border-color: transparent;
+  background: var(--info-bg);
+  color: var(--info);
+}
+
+.cop-auto__modo--real {
+  border-color: transparent;
+  background: var(--warning-bg);
+  color: var(--warning);
 }
 
 .cop-aviso {
+  margin: 0;
   padding: 8px 12px;
   border-radius: var(--radius);
   background: var(--info-bg);
@@ -1145,43 +1167,103 @@
   font-size: 13px;
 }
 
-.cop-alertas__lista {
+.cop-aviso--sucesso {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.cop-aviso--erro {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.cop-auto__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.cop-auto__email {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 16px;
+}
+
+.cop-auto__email p {
   margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-.cop-alerta {
+.cop-auto__email-topo {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-}
-
-.cop-alerta__topo {
-  display: flex;
-  flex-wrap: wrap;
   align-items: center;
+  gap: 10px;
+}
+
+.cop-auto__email-topo h3 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+}
+
+.cop-auto__icone {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--navy-50);
+  color: var(--navy-950);
+}
+
+.cop-auto__email.is-desligado .cop-auto__icone {
+  background: var(--surface-muted);
+  color: var(--text-subtle);
+}
+
+.cop-auto__numeros {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 8px;
+  margin: 0;
 }
 
-.cop-alerta__titulo {
-  font-size: 14px;
+.cop-auto__numeros div {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
 }
 
-.cop-alerta__itens {
-  margin: 6px 0 0;
-  padding-left: 18px;
+.cop-auto__numeros dt {
+  color: var(--text-muted);
   font-size: 12px;
 }
 
-.cop-alerta__acoes {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
+.cop-auto__numeros dd {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.cop-auto__numeros small {
+  color: var(--text-subtle);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+/* O texto ocupa a sobra: os números e o rodapé ficam alinhados entre os cartões */
+.cop-auto__texto {
+  flex: 1;
+}
+
+.cop-auto__quando {
+  white-space: nowrap;
+}
+
+.cop-auto__novo td {
+  background: var(--success-bg);
 }
 
 /* Uso da IA */
@@ -1225,8 +1307,9 @@
 
 /* Conectar ao Claude (servidor MCP, decisão 106) */
 
-/* Botão que abre e fecha o bloco do token, no estilo de um filtro */
-.cop-mcp__mais {
+/* Botão que abre e fecha um bloco, no estilo de um filtro: o do token e o das rotinas internas (Automações) */
+.cop-mcp__mais,
+.cop-mais {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1241,16 +1324,20 @@
 }
 
 .cop-mcp__mais:hover,
-.cop-mcp__mais.is-aberto {
+.cop-mcp__mais.is-aberto,
+.cop-mais:hover,
+.cop-mais.is-aberto {
   border-style: solid;
   color: var(--navy-950);
 }
 
-.cop-mcp__mais-seta {
+.cop-mcp__mais-seta,
+.cop-mais__seta {
   transition: transform 0.2s ease;
 }
 
-.cop-mcp__mais.is-aberto .cop-mcp__mais-seta {
+.cop-mcp__mais.is-aberto .cop-mcp__mais-seta,
+.cop-mais.is-aberto .cop-mais__seta {
   transform: rotate(180deg);
 }
 
