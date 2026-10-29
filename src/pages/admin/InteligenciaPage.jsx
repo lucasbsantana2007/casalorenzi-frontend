@@ -1,7 +1,7 @@
 import { CircleAlert, MessageSquarePlus, Send } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { AlertasPainel } from '../../components/copiloto/AlertasPainel'
+import { AutomacoesEmails } from '../../components/copiloto/AutomacoesEmails'
 import { BlocosCopiloto, TextoResposta } from '../../components/copiloto/BlocosCopiloto'
 import { ConectarClaude } from '../../components/copiloto/ConectarClaude'
 import { UsoIA } from '../../components/copiloto/UsoIA'
@@ -19,13 +19,17 @@ const novoId = () => (globalThis.crypto?.randomUUID ? crypto.randomUUID() : `${D
 export function InteligenciaPage() {
   const { pode } = useSession()
   const [searchParams, setSearchParams] = useSearchParams()
-  const aba = searchParams.get('aba') ?? 'assistente'
+  const admin = pode('administracao')
+  // A antiga aba Alertas virou Automações (decisão 127); links antigos (?aba=alertas) caem nela
+  const pedida = searchParams.get('aba') ?? 'assistente'
+  const aba = pedida === 'alertas' ? 'automacoes' : pedida
   const abas = [
     { value: 'assistente', label: 'Assistente' },
-    { value: 'alertas', label: 'Alertas' },
+    // E-mails automáticos aos clientes: só o Administrador
+    ...(admin ? [{ value: 'automacoes', label: 'Automações' }] : []),
     // O MCP é de toda a equipe, cada um com as próprias permissões (decisão 115)
     { value: 'conectar', label: 'Conectar ao Claude' },
-    ...(pode('administracao') ? [{ value: 'uso', label: 'Uso e custo da IA' }] : []),
+    ...(admin ? [{ value: 'uso', label: 'Uso e custo da IA' }] : []),
   ]
   return (
     <>
@@ -36,11 +40,11 @@ export function InteligenciaPage() {
       />
       <Tabs items={abas} value={aba} onChange={(valor) => setSearchParams(valor === 'assistente' ? {} : { aba: valor }, { replace: true })} label="Seções" />
       <div className="cop-conteudo">
-        {aba === 'alertas' ? (
-          <AlertasPainel />
+        {aba === 'automacoes' && admin ? (
+          <AutomacoesEmails />
         ) : aba === 'conectar' ? (
           <ConectarClaude />
-        ) : aba === 'uso' && pode('administracao') ? (
+        ) : aba === 'uso' && admin ? (
           <UsoIA />
         ) : (
           <Copiloto />
