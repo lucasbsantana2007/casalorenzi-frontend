@@ -1224,6 +1224,36 @@
 }
 
 /* Conectar ao Claude (servidor MCP, decisão 106) */
+
+/* Botão que abre e fecha o bloco do token, no estilo de um filtro */
+.cop-mcp__mais {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cop-mcp__mais:hover,
+.cop-mcp__mais.is-aberto {
+  border-style: solid;
+  color: var(--navy-950);
+}
+
+.cop-mcp__mais-seta {
+  transition: transform 0.2s ease;
+}
+
+.cop-mcp__mais.is-aberto .cop-mcp__mais-seta {
+  transform: rotate(180deg);
+}
+
 .cop-mcp__form {
   display: flex;
   gap: 8px;
