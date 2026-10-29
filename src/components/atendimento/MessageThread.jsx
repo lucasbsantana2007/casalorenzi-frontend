@@ -1,11 +1,20 @@
+import { useEffect, useRef } from 'react'
 import { formatDateTime } from '../../utils/format'
 import { Avatar } from '../ui/Avatar'
 import { AnexoImagem } from './AnexoImagem'
 
 // Histórico de mensagens. `perspectiva` define qual lado é "nosso" (alinhado à direita).
 export function MessageThread({ mensagens, perspectiva = 'ATENDENTE', nomeCliente }) {
+  // Chegou mensagem nova (atualização automática ou resposta enviada): mostra a última, sem pular ao abrir a tela
+  const lista = useRef(null)
+  const total = useRef(mensagens.length)
+  useEffect(() => {
+    if (mensagens.length > total.current) lista.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    total.current = mensagens.length
+  }, [mensagens.length])
+
   return (
-    <ol className="thread">
+    <ol className="thread" ref={lista}>
       {mensagens.map((m) => {
         if (m.autorTipo === 'SISTEMA') {
           return (

@@ -6,6 +6,7 @@ import { ReplyBox } from '../../components/atendimento/ReplyBox'
 import { AsyncContent } from '../../components/ui/AsyncContent'
 import { StatusBadge } from '../../components/ui/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { useAtualizacaoAutomatica } from '../../hooks/useAtualizacaoAutomatica'
 import { useSession } from '../../hooks/useSession'
 import { clienteService, responderSolicitacao } from '../../services/clienteService'
 import { formatDateTime } from '../../utils/format'
@@ -15,6 +16,8 @@ export function SolicitacaoDetalhePage() {
   const location = useLocation()
   const { clienteId } = useSession()
   const state = useAsync(() => clienteService.obterSolicitacao(clienteId, id), [clienteId, id])
+  // A resposta da equipe aparece sozinha, sem recarregar a página
+  useAtualizacaoAutomatica(() => clienteService.obterSolicitacao(clienteId, id), state.setData, { ativo: Boolean(state.data) })
 
   return (
     <>
