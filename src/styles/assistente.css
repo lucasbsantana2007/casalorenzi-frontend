@@ -10,14 +10,17 @@
   display: flex;
 }
 
+/* Só o ícone, num círculo */
 .chat-fab__botao {
-  padding: 13px 22px;
-  font-family: var(--store-font, var(--font-display));
-  font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  width: 48px;
+  height: 48px;
+  padding: 0;
   box-shadow: 0 12px 28px -12px rgba(12, 22, 40, 0.55);
+}
+
+.chat-fab__botao svg {
+  width: 21px;
+  height: 21px;
 }
 
 /* Moldura: posição e sombra. A sombra é um drop-shadow para seguir a forma recortada durante a abertura. */
@@ -724,7 +727,8 @@
   }
 
   .chat-fab__botao {
-    padding: 12px 16px;
+    width: 46px;
+    height: 46px;
   }
 
   /* Tela cheia que segue a área visível acima do teclado (variáveis definidas no ChatWidget) */
