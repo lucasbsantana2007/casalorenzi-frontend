@@ -117,6 +117,17 @@
   cursor: not-allowed;
 }
 
+/* Falar com a Lúcia no WhatsApp (decisão 127): ícone com rótulo, para não parecer só mais um botão */
+.chat__whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: auto;
+  padding: 0 10px;
+  font-size: 12px;
+  text-decoration: none;
+}
+
 .chat__mensagens {
   display: flex;
   flex: 1;

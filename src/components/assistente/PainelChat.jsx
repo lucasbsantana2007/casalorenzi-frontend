@@ -1,4 +1,4 @@
-import { ChevronDown, CircleAlert, RotateCcw, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react'
+import { ChevronDown, CircleAlert, MessageCircle, RotateCcw, Send, ThumbsDown, ThumbsUp, X } from 'lucide-react'
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { BlocosChat } from './BlocosChat'
 
@@ -116,6 +116,7 @@ export function PainelChat({ assistente, onFechar }) {
     encaminhar,
     entrar,
     logado,
+    whatsappLucia,
   } = assistente
   const [texto, setTexto] = useState('')
   const campoRef = useRef(null)
@@ -213,6 +214,18 @@ export function PainelChat({ assistente, onFechar }) {
           <p className="chat__subtitulo">Casa Lorenzi · Vulto</p>
         </div>
         <div className="chat__acoes">
+          {whatsappLucia && (
+            <a
+              className="chat__icone chat__whatsapp"
+              href={whatsappLucia}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Falar com a Lúcia no WhatsApp"
+              aria-label="Falar com a Lúcia no WhatsApp (abre em outra aba)"
+            >
+              <MessageCircle size={15} strokeWidth={1.6} aria-hidden="true" /> WhatsApp
+            </a>
+          )}
           <button type="button" className="chat__icone" onClick={novaConversa} title="Nova conversa" aria-label="Começar uma nova conversa" disabled={enviando}>
             <RotateCcw size={16} strokeWidth={1.6} />
           </button>

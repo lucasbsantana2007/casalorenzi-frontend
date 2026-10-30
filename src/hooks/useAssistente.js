@@ -45,6 +45,8 @@ export function useAssistente(marca) {
   const sacola = useSacola()
   const dono = isCliente ? usuario.id : null
   const [conversa, setConversa] = useState(null)
+  // Link para falar com a Lúcia no WhatsApp, sem protocolo (decisão 127); null sem o número configurado
+  const [whatsappLucia, setWhatsappLucia] = useState(null)
   const [mensagens, setMensagens] = useState([])
   const [status, setStatus] = useState('ociosa') // ociosa | carregando | pronta | erro
   const [enviando, setEnviando] = useState(false)
@@ -59,6 +61,7 @@ export function useAssistente(marca) {
     gravar(registro)
     setConversa(registro)
     setMensagens(nova.mensagens)
+    setWhatsappLucia(nova.whatsappLucia ?? null)
     return registro
   }, [marca, dono])
 
@@ -75,6 +78,7 @@ export function useAssistente(marca) {
             gravar(registro)
             setConversa(registro)
             setMensagens(dados.mensagens)
+            setWhatsappLucia(dados.whatsappLucia ?? null)
             setStatus('pronta')
             return
           }
@@ -273,5 +277,6 @@ export function useAssistente(marca) {
     encaminhar,
     entrar,
     logado: isCliente,
+    whatsappLucia,
   }
 }
