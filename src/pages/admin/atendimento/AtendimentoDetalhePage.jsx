@@ -25,7 +25,10 @@ export function AtendimentoDetalhePage() {
   const { id } = useParams()
   const state = useAsync(() => atendimentoService.obter(id), [id])
   // Mensagens novas do cliente (site ou WhatsApp) aparecem sozinhas, sem recarregar a página
-  useAtualizacaoAutomatica(() => atendimentoService.obter(id), state.setData, { ativo: Boolean(state.data) })
+  const aplicarAgora = useAtualizacaoAutomatica(() => atendimentoService.obter(id), state.setData, {
+    ativo: Boolean(state.data),
+    chave: id,
+  })
 
   return (
     <>
@@ -33,7 +36,7 @@ export function AtendimentoDetalhePage() {
         <ArrowLeft size={14} /> Atendimentos
       </Link>
       <AsyncContent state={state} isEmpty={() => false}>
-        {(atendimento) => <Detalhe atendimento={atendimento} onUpdate={state.setData} />}
+        {(atendimento) => <Detalhe atendimento={atendimento} onUpdate={aplicarAgora} />}
       </AsyncContent>
     </>
   )

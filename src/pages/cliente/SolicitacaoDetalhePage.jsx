@@ -17,7 +17,10 @@ export function SolicitacaoDetalhePage() {
   const { clienteId } = useSession()
   const state = useAsync(() => clienteService.obterSolicitacao(clienteId, id), [clienteId, id])
   // A resposta da equipe aparece sozinha, sem recarregar a página
-  useAtualizacaoAutomatica(() => clienteService.obterSolicitacao(clienteId, id), state.setData, { ativo: Boolean(state.data) })
+  const aplicarAgora = useAtualizacaoAutomatica(() => clienteService.obterSolicitacao(clienteId, id), state.setData, {
+    ativo: Boolean(state.data),
+    chave: `${clienteId}/${id}`,
+  })
 
   return (
     <>
@@ -52,7 +55,7 @@ export function SolicitacaoDetalhePage() {
                   ) : (
                     <ReplyBox
                       placeholder="Escreva uma mensagem para a equipe…"
-                      onSend={async (texto) => state.setData(await responderSolicitacao(s.id, clienteId, texto))}
+                      onSend={async (texto) => aplicarAgora(await responderSolicitacao(s.id, clienteId, texto))}
                     />
                   )}
                 </div>
