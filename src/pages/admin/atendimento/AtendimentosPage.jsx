@@ -108,7 +108,7 @@ export function AtendimentosPage() {
   useAtualizacaoAutomatica(
     () => atendimentoService.listar({ busca: buscaDebounced, tipoSolicitacaoId: tipoId, responsavelId }),
     state.setData,
-    { intervaloMs: 15000, ativo: Boolean(state.data) },
+    { intervaloMs: 15000, ativo: Boolean(state.data), chave: `${buscaDebounced}|${tipoId}|${responsavelId}` },
   )
 
   const todos = state.data ?? []
